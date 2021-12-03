@@ -1,0 +1,21 @@
+{
+  "name": "calculadora",
+  "version": "2021.12.2",
+  "description": "Compilador de una calculadora",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "tsc -w",
+    "prepare": "jison ./src/jison/grammar.jison -o ./src/jison/grammar.js && cp ./src/jison/grammar.js ./dist/jison/grammar.js",
+    "build": "browserify dist/scripts/app.js --standalone load > bundle.js"
+  },
+  "keywords": [
+    "compilador",
+    "jison",
+    "calculadora"
+  ],
+  "author": "Marco Chávez",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.11.11"
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="styles/style.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Nunito+Sans:wght@400;600;700&family=Rubik:wght@700&display=swap"
+			rel="stylesheet"
+		/>
+		<title>Calculadora</title>
+	</head>
+	<body>
+		<nav class="container__menu">
+			<ul class="menu">
+				<li class="item">
+					<a id="analize" class="link">Analizar</a>
+				</li>
+				<li class="item">
+					<a id="compile" class="link">Compilar</a>
+				</li>
+				<li class="item">
+					<a id="reports" class="link">Reportes</a>
+				</li>
+				<li class="item">
+					<a id="trees" class="link">Árboles</a>
+				</li>
+				<li class="item">
+					<a class="link">Item 5</a>
+				</li>
+			</ul>
+		</nav>
+		<div class="container">
+			<div class="item">
+				<h2 class="title">Código fuente</h2>
+				<textarea name="my_source" id="my_source"></textarea>
+			</div>
+			<div class="item">
+				<h2 class="title">Codigo destino</h2>
+				<textarea
+					name="my_result"
+					id="my_result"
+					cols="30"
+					rows="10"
+					readonly
+				></textarea>
+			</div>
+			<div class="item">
+				<h2 class="title">Consola</h2>
+				<textarea
+					name="my_console"
+					id="my_console"
+					cols="30"
+					rows="10"
+					readonly
+				></textarea>
+			</div>
+		</div>
+		<script src="bundle.js"></script>
+	</body>
+</html>
