@@ -9,35 +9,41 @@
 
 %%
 
-"("                 return '(';
-")"                 return ')';
-"["                 return '[';
-"]"                 return ']';
+/* COMENTARIOS */
+[/][*][^]*[*][/]    // COMENTARIO SIMPLE
+[/][/].*            // COMENTARIO MULTIPLE
 
-"+"                 return '+';
-"-"                 return '-';
-"*"                 return '*';
-"/"                 return '/';
-"^"                 return '^';
-"%"                 return '%';
+"("                     return '(';
+")"                     return ')';
+"["                     return '[';
+"]"                     return ']';
+
+"+"                     return '+';
+"-"                     return '-';
+"*"                     return '*';
+"/"                     return '/';
+"^"                     return '^';
+"%"                     return '%';
+
+["].*["]                {
+                            yytext = yytext.substr(1, yyleng - 2)
+                            return 'CADENA'
+                        }
+[0-9]+([.][0-9]+)?\b    return 'DECIMAL';
+[0-9]+\b                return 'ENTERO';
+([a-zA-Z])[a-zA-Z0-9_]* return 'IDENTIFICADOR';
 
 /* ESPACIOS EN BLANCO */
-[ \r\t]+            {}
-\n                  {}
-
-[0-9]+("."[0-9]+)?\b    return 'DECIMAL';
-[0-9]+\b                return 'ENTERO';
-
-<<EOF>>                 return 'EOF';
+[\t\n\r]+           // TABS, RETORNO Y SALTOS
+\s+                 // Espacios en blanco
 
 .                       { setConsole(`Error léxico (${yytext}), en la línea ${yylloc.first_line} y columna ${yylloc.first_column}\n`) }
+
+<<EOF>>                 return 'EOF';
 
 /lex
 
 %{
-    // const setConsole = (str) => {
-    //     document.querySelector('#my_console').value += str;
-    // };
 %}
 
 /* ASOCIACIÓN Y PRECEDENCIA */

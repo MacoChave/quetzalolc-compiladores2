@@ -63,6 +63,7 @@
 		'source result'
 		'console console';
 	grid-gap: 30px;
+	margin: 2em;
 	margin-top: 4em;
 }
 
