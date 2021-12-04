@@ -80,7 +80,7 @@ e
         { $$ = $1 / $3; }
 	| e '^' e
         { $$ = Math.pow($1, $3); }
-	| PARIZQ e PARDER
+	| '(' e ')'
         { $$ = $2; }
 	| '-' e %prec UMENOS
         { $$ = $2 *- 1; }

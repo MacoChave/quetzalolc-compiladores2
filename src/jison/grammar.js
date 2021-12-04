@@ -75,8 +75,8 @@ var grammar = (function(){
 var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,4],$V1=[1,3],$V2=[1,5],$V3=[1,6],$V4=[1,8],$V5=[1,9],$V6=[1,10],$V7=[1,11],$V8=[1,12],$V9=[5,6,7,8,9,10,12],$Va=[5,6,7,12],$Vb=[5,6,7,8,9,12];
 var parser = {trace: function trace () { },
 yy: {},
-symbols_: {"error":2,"expressions":3,"e":4,"EOF":5,"+":6,"-":7,"*":8,"/":9,"^":10,"PARIZQ":11,"PARDER":12,"ENTERO":13,"DECIMAL":14,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",6:"+",7:"-",8:"*",9:"/",10:"^",11:"PARIZQ",12:"PARDER",13:"ENTERO",14:"DECIMAL"},
+symbols_: {"error":2,"expressions":3,"e":4,"EOF":5,"+":6,"-":7,"*":8,"/":9,"^":10,"(":11,")":12,"ENTERO":13,"DECIMAL":14,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",6:"+",7:"-",8:"*",9:"/",10:"^",11:"(",12:")",13:"ENTERO",14:"DECIMAL"},
 productions_: [0,[3,2],[4,3],[4,3],[4,3],[4,3],[4,3],[4,3],[4,2],[4,1],[4,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
@@ -596,9 +596,9 @@ case 0:// COMENTARIO SIMPLE
 break;
 case 1:// COMENTARIO MULTIPLE
 break;
-case 2:return '(';
+case 2:return 11;
 break;
-case 3:return ')';
+case 3:return 12;
 break;
 case 4:return '[';
 break;
