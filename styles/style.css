@@ -1,5 +1,6 @@
 :root {
 	--primary: #448aff;
+	--primary-400: #69a1ff;
 	--accent: #4caf50;
 	--neutro-dark: #000000;
 	--neutro-light: #ffffff;
@@ -27,16 +28,33 @@
 	justify-content: center;
 }
 
-.item {
+[class$='__item'] {
+	line-height: 3;
 	list-style: none;
-	margin: 1em 1em;
 }
 
-.link {
+[class$='__link'] {
 	color: var(--neutro-light);
 	cursor: pointer;
 	display: block;
+	padding: 0 1em;
 	text-decoration: none;
+}
+
+[class$='__link']:hover {
+	background: var(--primary-400);
+}
+
+.submenu {
+	background: var(--primary);
+	display: block;
+	width: fit-content;
+	position: absolute;
+	width: fit-content;
+}
+
+.submenu--hide {
+	display: none;
 }
 
 .container {
@@ -52,6 +70,14 @@
 	grid-area: source;
 }
 
+.item:nth-child(2) {
+	grid-area: result;
+}
+
+.item:nth-child(3) {
+	grid-area: console;
+}
+
 .item textarea {
 	color: var(--neutro-dark);
 	background: var(--input-background);
@@ -63,14 +89,6 @@
 
 .item:nth-child(3) textarea {
 	height: 20vh;
-}
-
-.item:nth-child(2) {
-	grid-area: result;
-}
-
-.item:nth-child(3) {
-	grid-area: console;
 }
 
 .title {

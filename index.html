@@ -16,20 +16,34 @@
 	<body>
 		<nav class="container__menu">
 			<ul class="menu">
-				<li class="item">
-					<a id="analize" class="link">Analizar</a>
+				<li class="menu__item">
+					<a id="analize" class="menu__link">Interpretar</a>
 				</li>
-				<li class="item">
-					<a id="compile" class="link">Compilar</a>
+				<li class="menu__item">
+					<a id="compile" class="menu__link">Traducir</a>
 				</li>
-				<li class="item">
-					<a id="reports" class="link">Reportes</a>
-				</li>
-				<li class="item">
-					<a id="trees" class="link">Árboles</a>
-				</li>
-				<li class="item">
-					<a class="link">Item 5</a>
+				<li class="menu__item">
+					<a id="reports" class="menu__link">Reportes</a>
+					<ul class="submenu submenu--hide" id="submenu">
+						<li class="submenu__item">
+							<a id="symbols_table" class="submenu__link"
+								>Tabla de simbolos</a
+							>
+						</li>
+						<li class="submenu__item">
+							<a id="errors_table" class="submenu__link"
+								>Tabla de errores</a
+							>
+						</li>
+						<li class="submenu__item">
+							<a id="grammar_table" class="submenu__link"
+								>Tabla gramatical</a
+							>
+						</li>
+						<li class="submenu__item">
+							<a id="show_ast" class="submenu__link">AST</a>
+						</li>
+					</ul>
 				</li>
 			</ul>
 		</nav>
@@ -40,23 +54,11 @@
 			</div>
 			<div class="item">
 				<h2 class="title">Codigo destino</h2>
-				<textarea
-					name="my_result"
-					id="my_result"
-					cols="30"
-					rows="10"
-					readonly
-				></textarea>
+				<textarea name="my_result" id="my_result" readonly></textarea>
 			</div>
 			<div class="item">
 				<h2 class="title">Consola</h2>
-				<textarea
-					name="my_console"
-					id="my_console"
-					cols="30"
-					rows="10"
-					readonly
-				></textarea>
+				<textarea name="my_console" id="my_console" readonly></textarea>
 			</div>
 		</div>
 		<script src="bundle.js"></script>

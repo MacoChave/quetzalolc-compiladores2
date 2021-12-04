@@ -30,14 +30,14 @@
 
 <<EOF>>                 return 'EOF';
 
-.                       { setConsole(`Error léxico (${yytext}), en la línea ${yylloc.first_line} y columna ${yylloc.first_column}`) }
+.                       { setConsole(`Error léxico (${yytext}), en la línea ${yylloc.first_line} y columna ${yylloc.first_column}\n`) }
 
 /lex
 
 %{
-    const setConsole = (str) => {
-        document.querySelector('#my_console').value += str;
-    };
+    // const setConsole = (str) => {
+    //     document.querySelector('#my_console').value += str;
+    // };
 %}
 
 /* ASOCIACIÓN Y PRECEDENCIA */
