@@ -29,7 +29,11 @@
                             yytext = yytext.substr(1, yyleng - 2)
                             return 'CADENA'
                         }
-[0-9]+([.][0-9]+)?\b    return 'DECIMAL';
+['](.|\\(w|d|s|b|t|n|r))['] {
+                            yytext = yytext.substr(1, yyleng - 2)
+                            return 'CHAR'
+                        }
+[0-9]+([.][0-9]+)\b     return 'DECIMAL';
 [0-9]+\b                return 'ENTERO';
 ([a-zA-Z])[a-zA-Z0-9_]* return 'IDENTIFICADOR';
 

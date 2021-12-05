@@ -1,0 +1,12 @@
+export enum Type {
+	STRING,
+	CHAR,
+	INT,
+	DOUBLE,
+	BOOL,
+	VOID,
+	STRUCT,
+	NULL,
+	ATTRIBUTO,
+	ARRAY,
+}
