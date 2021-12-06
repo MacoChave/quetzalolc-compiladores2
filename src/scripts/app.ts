@@ -1,3 +1,7 @@
+import { AST } from './ast/ast';
+import { Scope } from './ast/scope';
+import { Instruction } from './interfaces/instruction';
+
 const grammar = require('../jison/grammar');
 
 const analize = document.querySelector('#analize');
@@ -10,23 +14,27 @@ const show_ast = document.querySelector('#show_ast');
 
 const my_source = <HTMLInputElement>document.querySelector('#my_source');
 
-const setResult = (res: string) => {
-	(<HTMLInputElement>(
-		document.querySelector('#my_result')
-	)).value += `${res}\n`;
-};
+// const setResult = (res: string) => {
+// 	(<HTMLInputElement>(
+// 		document.querySelector('#my_result')
+// 	)).value += `${res}\n`;
+// };
 
-const setConsole = (res: string) => {
-	(<HTMLInputElement>(
-		document.querySelector('#my_console')
-	)).value += `${res}\n`;
-};
+// const setConsole = (res: string) => {
+// 	(<HTMLInputElement>(
+// 		document.querySelector('#my_console')
+// 	)).value += `${res}\n`;
+// };
 
 analize?.addEventListener('click', () => {
-	console.info('Get source text...');
 	let source = my_source.value;
-	console.info({ source: source });
-	analize_source(source);
+	const result = analize_source(source);
+	console.log(result);
+	const globalScope: Scope = new Scope(null);
+	const ast: AST = new AST(result);
+	result.forEach((res: Instruction) => {
+		res.exec(globalScope, ast);
+	});
 });
 
 compile?.addEventListener('click', () => {});
@@ -43,8 +51,7 @@ grammar_table?.addEventListener('click', () => {});
 
 show_ast?.addEventListener('click', () => {});
 
-const analize_source = (source: string): void => {
+const analize_source = (source: string): Instruction[] => {
 	console.log('ANALIZANDO...');
-	const result = grammar.parse(source);
-	setConsole(result);
+	return grammar.parse(source);
 };

@@ -13,29 +13,50 @@
 [/][*][^]*[*][/]    // COMENTARIO SIMPLE
 [/][/].*            // COMENTARIO MULTIPLE
 
+'print'                 return 'print';
+'println'               return 'println';
+'null'                  return 'null';
+'true'                  return 'true';
+'false'                 return 'false';
+
 "("                     return '(';
 ")"                     return ')';
 "["                     return '[';
 "]"                     return ']';
 
+"."                     return '.';
+
 "+"                     return '+';
 "-"                     return '-';
 "*"                     return '*';
 "/"                     return '/';
-"^"                     return '^';
 "%"                     return '%';
 
-["].*["]                {
+"=="                    return '==';
+"!="                    return '!=';
+">"                     return '>';
+">="                    return '>=';
+">"                     return '<';
+">="                    return '<=';
+
+"&&"                    return '&&';
+"||"                    return '||';
+"!"                     return '!';
+
+"&"                     return '&';
+"^"                     return '^';
+
+["][^"]*["]             {
                             yytext = yytext.substr(1, yyleng - 2)
-                            return 'CADENA'
+                            return 'cadena'
                         }
 ['](.|\\(w|d|s|b|t|n|r))['] {
                             yytext = yytext.substr(1, yyleng - 2)
-                            return 'CHAR'
+                            return 'caracter'
                         }
-[0-9]+([.][0-9]+)\b     return 'DECIMAL';
-[0-9]+\b                return 'ENTERO';
-([a-zA-Z])[a-zA-Z0-9_]* return 'IDENTIFICADOR';
+[0-9]+([.][0-9]+)\b     return 'decimal';
+[0-9]+\b                return 'entero';
+([a-zA-Z])[a-zA-Z0-9_]* return 'identificador';
 
 /* ESPACIOS EN BLANCO */
 [\t\n\r]+           // TABS, RETORNO Y SALTOS
@@ -48,48 +69,131 @@
 /lex
 
 %{
+    const { Attribute } = require('../scripts/expressions/attribute')
+    const { Objeto } = require('../scripts/expressions/object')
+    const { Operacion, Operador } = require('../scripts/expressions/operation')
+    const { Primitive } = require('../scripts/expressions/primitive')
+    const { Print, Println } = require('../scripts/instructions/print')
 %}
 
 /* ASOCIACIÓN Y PRECEDENCIA */
 
+%left '||'
+%left '&&'
+%left '!'
+%left '==' '!=' '<' '<=' '>' '>='
+%left '&'
 %left '+' '-'
 %left '*' '/'
 %left '^'
-%left '!'
 %left '%'
 %left UMENOS
 
-%start expressions
+%start START
 
 %%
 
 /* DEFINICIÓN DE GRAMÁTICA */
 
-expressions
-	: e EOF
+START
+	: INSTRUCCIONES EOF
         {
             $$ = $1;
             return $$
         }
-;
+    ;
 
-e
-	: e '+' e
-        { $$ = $1 + $3; }
-	| e '-' e
-        { $$ = $1 - $3; }
-	| e '*' e
-        { $$ = $1 * $3; }
-	| e '/' e
-        { $$ = $1 / $3; }
-	| e '^' e
-        { $$ = Math.pow($1, $3); }
-	| '(' e ')'
-        { $$ = $2; }
-	| '-' e %prec UMENOS
-        { $$ = $2 *- 1; }
-	| ENTERO
-        { $$ = Number($1); }
-	| DECIMAL
-        { $$ = Number($1); }
-;
+INSTRUCCIONES
+    : INSTRUCCIONES INSTRUCCION
+        { 
+            $1.push($2)
+            $$ = $1
+        }
+    | INSTRUCCION
+        { $$ = [$1] }
+    ;
+
+INSTRUCCION
+    : PRINT
+        { $$ = $1 }
+    ;
+
+PRINT
+    : print '(' EXPR ')'
+        { $$ = new Print($3, @1.first_line, @1.first_column) }
+    | println '(' EXPR ')'
+        { $$ = new Println($3, @1.first_line, @1.first_column) }
+    ;
+
+EXPR
+    : PRIMITIVA
+        { $$ = $1 }
+    | OP_LOGICA
+        { $$ = $1 }
+    | OP_RELACIONAL
+        { $$ = $1 }
+    | OP_ARITMETICA
+        { $$ = $1 }
+    ;
+
+OP_LOGICA
+    : EXPR '&&' EXPR
+        { $$ = new Operacion($1, $3, Operador.AND, @1.first_line, @1.first_column) }
+    | EXPR '||' EXPR
+        { $$ = new Operacion($1, $3, Operador.OR, @1.first_line, @1.first_column) }
+	| '!' EXPR
+        { $$ = new Operacion($2, $2, Operador.NOT, @1.first_line, @1.first_column) }
+    ;
+
+OP_RELACIONAL
+    : EXPR '!=' EXPR
+        { $$ = new Operacion($1, $3, Operador.DIFERENTE, @1.first_line, @1.first_column) }
+    | EXPR '==' EXPR
+        { $$ = new Operacion($1, $3, Operador.IGUAL, @1.first_line, @1.first_column) }
+    | EXPR '<' EXPR
+        { $$ = new Operacion($1, $3, Operador.MENOR, @1.first_line, @1.first_column) }
+    | EXPR '<=' EXPR
+        { $$ = new Operacion($1, $3, Operador.MENOR_IGUAL, @1.first_line, @1.first_column) }
+    | EXPR '>' EXPR
+        { $$ = new Operacion($1, $3, Operador.MAYOR, @1.first_line, @1.first_column) }
+    | EXPR '>=' EXPR
+        { $$ = new Operacion($1, $3, Operador.MAYOR_IGUAL, @1.first_line, @1.first_column) }
+    ;
+
+OP_ARITMETICA
+	: EXPR '+' EXPR
+        { $$ = new Operacion($1, $3, Operador.SUMA, @1.first_line, @1.first_column) }
+	| EXPR '-' EXPR
+        { $$ = new Operacion($1, $3, Operador.RESTA, @1.first_line, @1.first_column) }
+	| EXPR '*' EXPR
+        { $$ = new Operacion($1, $3, Operador.MULTIPLICACION, @1.first_line, @1.first_column) }
+	| EXPR '/' EXPR
+        { $$ = new Operacion($1, $3, Operador.DIVISION, @1.first_line, @1.first_column) }
+	| EXPR '^' EXPR
+        { $$ = new Operacion($1, $3, Operador.REPETIR, @1.first_line, @1.first_column) }
+	| EXPR '&' EXPR
+        { $$ = new Operacion($1, $3, Operador.CONCAT, @1.first_line, @1.first_column) }
+	| EXPR '%' EXPR
+        { $$ = new Operacion($1, $3, Operador.MODULO, @1.first_line, @1.first_column) }
+	| '(' EXPR ')'
+        { $$ = $2 }
+    | '-' EXPR %prec UMENOS
+        { $$ = new Operacion($2, $2, Operador.NEGATIVO, @1.first_line, @1.first_column) }
+    ;
+
+PRIMITIVA
+	: entero
+        { $$ = new Primitive(Number($1), @1.first_column, @1.first_column) }
+	| decimal
+        { $$ = new Primitive(Number($1), @1.first_column, @1.first_column) }
+	| cadena
+        { $$ = new Primitive($1, @1.first_column, @1.first_column) }
+	| caracter
+        { $$ = new Primitive($1, @1.first_column, @1.first_column) }
+	| true
+        { $$ = new Primitive(true, @1.first_column, @1.first_column) }
+	| false
+        { $$ = new Primitive(false, @1.first_column, @1.first_column) }
+	| null
+        { $$ = new Primitive(null, @1.first_column, @1.first_column) }
+    ;

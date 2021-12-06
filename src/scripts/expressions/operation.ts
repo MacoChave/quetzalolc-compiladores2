@@ -2,6 +2,7 @@ import { AST } from '../ast/ast';
 import { Scope } from '../ast/scope';
 import { Type } from '../ast/type';
 import { Expression } from '../interfaces/expresion';
+import { setConsole } from '../shared';
 
 export enum Operador {
 	SUMA,
@@ -9,16 +10,18 @@ export enum Operador {
 	MULTIPLICACION,
 	DIVISION,
 	MODULO,
-	MENOS_UNARIO,
-	MAYOR_QUE,
-	MENOR_QUE,
-	IGAL_IGUAL,
-	DIFERENTE_QUE,
+	NEGATIVO,
+	REPETIR,
+	CONCAT,
+	MAYOR,
+	MENOR,
+	MAYOR_IGUAL,
+	MENOR_IGUAL,
+	IGUAL,
+	DIFERENTE,
 	OR,
 	AND,
 	NOT,
-	MAYOR_IGUAL_QUE,
-	MENOR_IGUAL_QUE,
 	DESCONOCIDO,
 }
 
@@ -30,17 +33,17 @@ export class Operacion implements Expression {
 	operador: Operador;
 
 	constructor(
-		line: number,
-		column: number,
 		op_izq: Expression,
 		op_der: Expression,
-		operador: Operador
+		operador: Operador,
+		line: number,
+		column: number
 	) {
-		this.line = line;
-		this.column = column;
 		this.op_izq = op_izq;
 		this.op_der = op_der;
 		this.operador = operador;
+		this.line = line;
+		this.column = column;
 	}
 
 	getType(scope: Scope, tree: AST): Type {
@@ -57,11 +60,11 @@ export class Operacion implements Expression {
 
 	getValue(scope: Scope, tree: AST) {
 		if (
-			this.operador !== Operador.MENOS_UNARIO &&
+			this.operador !== Operador.NEGATIVO &&
 			this.operador !== Operador.NOT
 		) {
 			let op1 = this.op_izq.getValue(scope, tree);
-			let op2 = this.op_izq.getValue(scope, tree);
+			let op2 = this.op_der.getValue(scope, tree);
 
 			if (this.operador === Operador.SUMA) {
 				if (typeof op1 === 'number' && typeof op2 === 'number')
@@ -71,8 +74,8 @@ export class Operacion implements Expression {
 					if (op2 === null) op2 = 'null';
 					return op1.toString() + op2.toString();
 				} else {
-					console.error(
-						`Error semántico ${op1} y ${op2} tiene un formato no permitido`
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
 					);
 					return null;
 				}
@@ -80,8 +83,8 @@ export class Operacion implements Expression {
 				if (typeof op1 === 'number' && typeof op2 === 'number')
 					return op1 - op2;
 				else {
-					console.error(
-						`Error semántico: ${op1} y ${op2} tiene tipo de dato no permitido`
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
 					);
 					return null;
 				}
@@ -89,53 +92,68 @@ export class Operacion implements Expression {
 				if (typeof op1 === 'number' && typeof op2 === 'number')
 					return op1 * op2;
 				else {
-					console.error(
-						`Error semántico: ${op1} y ${op2} tiene tipo no permitido`
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
 					);
 					return null;
 				}
 			} else if (this.operador === Operador.DIVISION) {
 				if (typeof op1 === 'number' && typeof op2 === 'number') {
 					if (op2 === 0) {
-						console.error(`Error semántico: ${op2} no debe ser 0`);
+						setConsole(
+							`Error semántico (${this.line},${this.column}): ${op1} no es divisible entre 0`
+						);
 						return null;
 					}
 					return op1 / op2;
 				} else {
-					console.error(
-						`Error semántico: ${op1} y ${op2} tiene tipo de dato no permitido`
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
 					);
 					return null;
 				}
 			} else if (this.operador === Operador.MODULO) {
 				if (typeof op1 === 'number' && typeof op2 === 'number') {
 					if (op2 === 0) {
-						console.error(`Error semántico: ${op2} no debe ser 0`);
+						setConsole(
+							`Error semántico (${this.line},${this.column}): ${op1} no es divisible entre 0`
+						);
 						return null;
 					}
 					return op1 % op2;
 				} else {
-					console.error(
-						`Error semántico: ${op1} y ${op2} tiene tipo no permitido`
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
 					);
 					return null;
 				}
+			} else if (this.operador === Operador.REPETIR) {
+				if (typeof op1 === 'string' && typeof op2 === 'number') {
+					return op1.repeat(op2);
+				} else {
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba (string, int)`
+					);
+					return null;
+				}
+			} else if (this.operador === Operador.CONCAT) {
+				return `${op1}${op2}`;
 			}
 		} else {
 			let op1 = this.op_izq.getValue(scope, tree);
-			if (this.operador == Operador.MENOS_UNARIO) {
+			if (this.operador == Operador.NEGATIVO) {
 				if (typeof (op1 === 'number')) return op1 * -1;
 				else {
-					console.error(
-						`Error semántico, ${op1} no es tipo numerico`
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba que ${op1} sea tipo int o double`
 					);
 					return null;
 				}
 			} else if (this.operador == Operador.NOT) {
 				if (typeof (op1 === 'boolean')) return op1 * -1;
 				else {
-					console.error(
-						`Error semántico, ${op1} no es tipo numerico`
+					setConsole(
+						`Error semántico (${this.line},${this.column}): Se esperaba que ${op1} sea tipo boolean`
 					);
 					return null;
 				}
