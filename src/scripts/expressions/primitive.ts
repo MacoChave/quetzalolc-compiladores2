@@ -7,14 +7,17 @@ export class Primitive implements Expression {
 	line: number;
 	column: number;
 	value: any;
+	type: Type;
 
-	constructor(value: any, line: number, column: number) {
+	constructor(value: any, type: Type, line: number, column: number) {
 		this.line = line;
+		this.type = type;
 		this.column = column;
 		this.value = value;
 	}
 
 	getType(scope: Scope, tree: AST): Type {
+		// TODO: Return this.type & match to Operation class
 		const value = this.getValue(scope, tree);
 		if (typeof value === 'boolean') return Type.BOOL;
 		else if (typeof value === 'string') return Type.STRING;

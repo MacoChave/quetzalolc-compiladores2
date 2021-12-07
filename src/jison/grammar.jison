@@ -32,12 +32,12 @@
 "/"                     return '/';
 "%"                     return '%';
 
-"=="                    return '==';
-"!="                    return '!=';
-">"                     return '>';
 ">="                    return '>=';
-">"                     return '<';
-">="                    return '<=';
+"<="                    return '<=';
+">"                     return '>';
+"<"                     return '<';
+"!="                    return '!=';
+"=="                    return '==';
 
 "&&"                    return '&&';
 "||"                    return '||';
@@ -74,6 +74,8 @@
     const { Operacion, Operador } = require('../scripts/expressions/operation')
     const { Primitive } = require('../scripts/expressions/primitive')
     const { Print, Println } = require('../scripts/instructions/print')
+    const { Type } = require('../scripts/ast/type')
+    const { setConsole } = require('../scripts/shared')
 %}
 
 /* ASOCIACIÓN Y PRECEDENCIA */
@@ -183,17 +185,17 @@ OP_ARITMETICA
 
 PRIMITIVA
 	: entero
-        { $$ = new Primitive(Number($1), @1.first_column, @1.first_column) }
+        { $$ = new Primitive(Number($1), Type.INT, @1.first_column, @1.first_column) }
 	| decimal
-        { $$ = new Primitive(Number($1), @1.first_column, @1.first_column) }
+        { $$ = new Primitive(Number($1), Type.DOUBLE, @1.first_column, @1.first_column) }
 	| cadena
-        { $$ = new Primitive($1, @1.first_column, @1.first_column) }
+        { $$ = new Primitive($1, Type.STRING, @1.first_column, @1.first_column) }
 	| caracter
-        { $$ = new Primitive($1, @1.first_column, @1.first_column) }
+        { $$ = new Primitive($1, Type.CHAR, @1.first_column, @1.first_column) }
 	| true
-        { $$ = new Primitive(true, @1.first_column, @1.first_column) }
+        { $$ = new Primitive(true, Type.BOOLEAN, @1.first_column, @1.first_column) }
 	| false
-        { $$ = new Primitive(false, @1.first_column, @1.first_column) }
+        { $$ = new Primitive(false, Type.BOOLEAN, @1.first_column, @1.first_column) }
 	| null
-        { $$ = new Primitive(null, @1.first_column, @1.first_column) }
+        { $$ = new Primitive(null, Type.NULL, @1.first_column, @1.first_column) }
     ;

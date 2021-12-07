@@ -66,16 +66,15 @@ export class Operacion implements Expression {
 			let op1 = this.op_izq.getValue(scope, tree);
 			let op2 = this.op_der.getValue(scope, tree);
 
+			/* ********** ********** **********
+			 * ARITMETICAS
+			 ********** ********** ********** */
 			if (this.operador === Operador.SUMA) {
 				if (typeof op1 === 'number' && typeof op2 === 'number')
 					return op1 + op2;
-				else if (op1 === 'string' || op2 === 'string') {
-					if (op1 === null) op1 = 'null';
-					if (op2 === null) op2 = 'null';
-					return op1.toString() + op2.toString();
-				} else {
+				else {
 					setConsole(
-						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
+						`Error semántico (${this.line},${this.column}): Se esperaba sumar int o double`
 					);
 					return null;
 				}
@@ -84,7 +83,7 @@ export class Operacion implements Expression {
 					return op1 - op2;
 				else {
 					setConsole(
-						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
+						`Error semántico (${this.line},${this.column}): Se esperaba restar int o double`
 					);
 					return null;
 				}
@@ -93,7 +92,7 @@ export class Operacion implements Expression {
 					return op1 * op2;
 				else {
 					setConsole(
-						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
+						`Error semántico (${this.line},${this.column}): Se esperaba multiplicar int o double`
 					);
 					return null;
 				}
@@ -108,7 +107,7 @@ export class Operacion implements Expression {
 					return op1 / op2;
 				} else {
 					setConsole(
-						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
+						`Error semántico (${this.line},${this.column}): Se esperaba dividir int o double`
 					);
 					return null;
 				}
@@ -123,7 +122,7 @@ export class Operacion implements Expression {
 					return op1 % op2;
 				} else {
 					setConsole(
-						`Error semántico (${this.line},${this.column}): Se esperaba un int o double`
+						`Error semántico (${this.line},${this.column}): Se esperaba dividir int o double`
 					);
 					return null;
 				}
@@ -132,14 +131,60 @@ export class Operacion implements Expression {
 					return op1.repeat(op2);
 				} else {
 					setConsole(
-						`Error semántico (${this.line},${this.column}): Se esperaba (string, int)`
+						`Error semántico (${this.line},${this.column}): Se esperaba operar (string, int)`
 					);
 					return null;
 				}
 			} else if (this.operador === Operador.CONCAT) {
-				return `${op1}${op2}`;
+				if (typeof op1 === 'string' && typeof op2 === 'string')
+					return `${op1}${op2}`;
+				else {
+					setConsole(
+						`Error semántico (): Se esperaba concatenar string`
+					);
+					return null;
+				}
+			} else if (this.operador === Operador.AND) {
+				/* ********** ********** **********
+				 * LÓGICAS
+				 ********** ********** ********** */
+				if (typeof op1 === 'boolean' && typeof op2 === 'boolean')
+					return op1 && op2;
+				else {
+					setConsole(
+						`Error semántico (): Se esperaba operar boolean`
+					);
+					return null;
+				}
+			} else if (this.operador === Operador.OR) {
+				if (typeof op1 === 'boolean' && typeof op2 === 'boolean')
+					return op1 || op2;
+				else {
+					setConsole(
+						`Error semántico (): Se esperaba operar boolean`
+					);
+					return null;
+				}
+			} else if (this.operador === Operador.IGUAL) {
+				/* ********** ********** **********
+				 * RELACIONALES
+				 ********** ********** ********** */
+				return op1 == op2;
+			} else if (this.operador === Operador.DIFERENTE) {
+				return op1 != op2;
+			} else if (this.operador === Operador.MENOR) {
+				return op1 < op2;
+			} else if (this.operador === Operador.MENOR_IGUAL) {
+				return op1 <= op2;
+			} else if (this.operador === Operador.MAYOR) {
+				return op1 > op2;
+			} else if (this.operador === Operador.MAYOR_IGUAL) {
+				return op1 >= op2;
 			}
 		} else {
+			/* ********** ********** **********
+			 * UNARIOS
+			 ********** ********** ********** */
 			let op1 = this.op_izq.getValue(scope, tree);
 			if (this.operador == Operador.NEGATIVO) {
 				if (typeof (op1 === 'number')) return op1 * -1;
@@ -150,7 +195,7 @@ export class Operacion implements Expression {
 					return null;
 				}
 			} else if (this.operador == Operador.NOT) {
-				if (typeof (op1 === 'boolean')) return op1 * -1;
+				if (typeof (op1 === 'boolean')) return !Boolean(op1);
 				else {
 					setConsole(
 						`Error semántico (${this.line},${this.column}): Se esperaba que ${op1} sea tipo boolean`
