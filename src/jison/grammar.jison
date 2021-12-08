@@ -7,6 +7,16 @@
 
 %options case-insensitive
 
+escapeChar              [\'\"\\bfnrtv]
+escape                  \\{escapeChar}
+acceptedCharDouble      [^\"\\]+
+stringDouble            {escape}|{acceptedCharDouble}
+stringLiteral           \"{stringDouble}\"
+
+acceptedCharSingle      [^\'\\]
+stringSingle            {escape}|{acceptedCharDouble}
+charLiteral             \'{stringDouble}\'
+
 %%
 
 /* COMENTARIOS */
@@ -24,6 +34,7 @@
 "["                     return '[';
 "]"                     return ']';
 
+","                     return ',';
 "."                     return '.';
 
 "+"                     return '+';
@@ -46,17 +57,26 @@
 "&"                     return '&';
 "^"                     return '^';
 
-["][^"]*["]             {
-                            yytext = yytext.substr(1, yyleng - 2)
-                            return 'cadena'
-                        }
-['](.|\\(w|d|s|b|t|n|r))['] {
-                            yytext = yytext.substr(1, yyleng - 2)
-                            return 'caracter'
-                        }
+// ["][^"]*["]             {
+//                             yytext = yytext.substr(1, yyleng - 2)
+//                             return 'cadena'
+//                         }
+// ['](.|\\(w|d|s|b|t|n|r))['] {
+//                             yytext = yytext.substr(1, yyleng - 2)
+//                             return 'caracter'
+//                         }
 [0-9]+([.][0-9]+)\b     return 'decimal';
 [0-9]+\b                return 'entero';
 ([a-zA-Z])[a-zA-Z0-9_]* return 'identificador';
+
+{stringLiteral}         {
+                            yytext = yytext.substr(1, yyleng - 2)
+                            return 'cadena'
+                        }
+{charLiteral}           {
+                            yytext = yytext.substr(1, yyleng - 2)
+                            return 'caracter'
+                        }
 
 /* ESPACIOS EN BLANCO */
 [\t\n\r]+           // TABS, RETORNO Y SALTOS
@@ -73,7 +93,7 @@
     const { Objeto } = require('../scripts/expressions/object')
     const { Operacion, Operador } = require('../scripts/expressions/operation')
     const { Primitive } = require('../scripts/expressions/primitive')
-    const { Print, Println } = require('../scripts/instructions/print')
+    const { Print } = require('../scripts/instructions/print')
     const { Type } = require('../scripts/ast/type')
     const { setConsole } = require('../scripts/shared')
 %}
@@ -89,6 +109,7 @@
 %left '*' '/'
 %left '^'
 %left '%'
+%left '?' ':'
 %left UMENOS
 
 %start START
@@ -121,10 +142,20 @@ INSTRUCCION
     ;
 
 PRINT
-    : print '(' EXPR ')'
+    : print '(' PRINT_ARGS ')'
         { $$ = new Print($3, @1.first_line, @1.first_column) }
-    | println '(' EXPR ')'
-        { $$ = new Println($3, @1.first_line, @1.first_column) }
+    | println '(' PRINT_ARGS ')'
+        { $$ = new Print($3, @1.first_line, @1.first_column, true) }
+    ;
+
+PRINT_ARGS
+    : PRINT_ARGS ',' EXPR
+        {
+            $1.push($3)
+            $$ = $1
+        }
+    | EXPR
+        { $$ = [$1] }
     ;
 
 EXPR

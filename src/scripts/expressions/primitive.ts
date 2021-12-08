@@ -32,6 +32,10 @@ export class Primitive implements Expression {
 		return this.value;
 	}
 
+	translate(scope: Scope, tree: AST) {
+		throw new Error('Method not implemented.');
+	}
+
 	isInt(n: number): boolean {
 		return Number(n) === n && n % 1 === 0;
 	}

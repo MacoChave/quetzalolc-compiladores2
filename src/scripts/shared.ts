@@ -1,11 +1,13 @@
 export const setResult = (res: string) => {
-	(<HTMLInputElement>(
-		document.querySelector('#my_result')
-	)).value += `${res}\n`;
+	let textarea = <HTMLInputElement>document.querySelector('#my_result');
+	let value = textarea.value;
+	value += res;
+	textarea.value = value;
 };
 
 export const setConsole = (res: string) => {
-	(<HTMLInputElement>(
-		document.querySelector('#my_console')
-	)).value += `${res}\n`;
+	let textarea = <HTMLInputElement>document.querySelector('#my_console');
+	let value = textarea.value;
+	value += res;
+	textarea.value = value;
 };

@@ -7,4 +7,5 @@ export interface Expression {
 	column: number;
 	getType(scope: Scope, tree: AST): Type;
 	getValue(scope: Scope, tree: AST): any;
+	translate(scope: Scope, tree: AST): any;
 }

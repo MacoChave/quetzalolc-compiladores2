@@ -1,4 +1,6 @@
 import { Expression } from '../interfaces/expresion';
+import { AST } from './ast';
+import { Scope } from './scope';
 import { Type } from './type';
 
 export class Symbol implements Expression {
@@ -27,5 +29,9 @@ export class Symbol implements Expression {
 	}
 	getValue(scope: any, tree: any) {
 		return this.value;
+	}
+
+	translate(scope: Scope, tree: AST) {
+		throw new Error('Method not implemented.');
 	}
 }

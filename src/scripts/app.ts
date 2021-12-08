@@ -1,6 +1,7 @@
 import { AST } from './ast/ast';
 import { Scope } from './ast/scope';
 import { Instruction } from './interfaces/instruction';
+import { setConsole } from './shared';
 
 const grammar = require('../jison/grammar');
 
@@ -14,19 +15,8 @@ const show_ast = document.querySelector('#show_ast');
 
 const my_source = <HTMLInputElement>document.querySelector('#my_source');
 
-// const setResult = (res: string) => {
-// 	(<HTMLInputElement>(
-// 		document.querySelector('#my_result')
-// 	)).value += `${res}\n`;
-// };
-
-// const setConsole = (res: string) => {
-// 	(<HTMLInputElement>(
-// 		document.querySelector('#my_console')
-// 	)).value += `${res}\n`;
-// };
-
 analize?.addEventListener('click', () => {
+	setConsole('Interpretando la entrada...\n\n');
 	let source = my_source.value;
 	const result = analize_source(source);
 	console.log(result);
@@ -37,7 +27,17 @@ analize?.addEventListener('click', () => {
 	});
 });
 
-compile?.addEventListener('click', () => {});
+compile?.addEventListener('click', () => {
+	setConsole('Compilando la entrada...\n\n');
+	let source = my_source.value;
+	const result = analize_source(source);
+	console.log(result);
+	const globalScope: Scope = new Scope(null);
+	const ast: AST = new AST(result);
+	result.forEach((res: Instruction) => {
+		res.translate(globalScope, ast);
+	});
+});
 
 reports?.addEventListener('click', () => {
 	document.querySelector('#submenu')?.classList.toggle('submenu--hide');
