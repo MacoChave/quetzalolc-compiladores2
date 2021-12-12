@@ -1,0 +1,77 @@
+import obtenerValor from '../../Reportes/cambiarTipo';
+import { Instruccion } from '../Abastracto/Instruccion';
+import nodoAST from '../Abastracto/nodoAST';
+import Errores from '../Excepciones/Errores';
+import Arbol from '../Simbolos/Arbol';
+import tablaSimbolos from '../Simbolos/tablaSimbolos';
+import Tipo from '../Simbolos/Tipo';
+import Return from './Return';
+
+export default class Metodos extends Instruccion {
+  public identificador: String;
+  public parametros: any;
+  private instrucciones: Instruccion[];
+  constructor(
+    tipo: Tipo,
+    fila: number,
+    columna: number,
+    identificador: String,
+    parametros: any,
+    instrucciones: Instruccion[]
+  ) {
+    super(tipo, fila, columna);
+    this.identificador = identificador.toLowerCase();
+    this.parametros = parametros;
+    this.instrucciones = instrucciones;
+  }
+  public getNodo(): nodoAST {
+    let nodo = new nodoAST('METODO');
+    nodo.agregarHijo('void');
+    nodo.agregarHijo(this.identificador + '');
+    nodo.agregarHijo('(');
+    let nuevo = null;
+    if (this.parametros.length > 0) {
+      nuevo = new nodoAST('PARAMETROS');
+    }
+    for (let param = 0; param < this.parametros.length; param++) {
+      if (nuevo == null) break;
+      let vari = obtenerValor(this.parametros[param].tipato.getTipo());
+      let ide = this.parametros[param].identificador;
+      if (vari != null) nuevo.agregarHijo(vari);
+      if (ide != null) nuevo.agregarHijo(ide);
+      if (param != this.parametros.length - 1) nuevo.agregarHijo(',');
+    }
+    if (nuevo != null) nodo.agregarHijoAST(nuevo);
+    nodo.agregarHijo(')');
+    nodo.agregarHijo('{');
+    this.instrucciones.forEach((element) => {
+      nodo.agregarHijoAST(element.getNodo());
+    });
+    nodo.agregarHijo('}');
+    return nodo;
+  }
+  public interpretar(arbol: Arbol, tabla: tablaSimbolos) {
+    for (let i = 0; i < this.instrucciones.length; i++) {
+      let val = this.instrucciones[i].interpretar(arbol, tabla);
+      if (val instanceof Errores) return val;
+      if (this.instrucciones[i] instanceof Return) {
+        if (val instanceof Return) {
+          if (val.valor != null) {
+            return new Errores(
+              'SEMANTICO',
+              'NO PUEDE DEVOLVER UN VALOR EN UN METODO',
+              this.fila,
+              this.columna
+            );
+          } else break;
+        } else
+          return new Errores(
+            'SEMANTICO',
+            'NO PUEDE DEVOLVER UN VALOR EN UN METODO',
+            this.fila,
+            this.columna
+          );
+      }
+    }
+  }
+}

@@ -16,6 +16,6 @@
   "author": "Marco Chávez",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^16.11.11"
+    "@types/node": "^16.11.12"
   }
 }
