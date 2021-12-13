@@ -1,10 +1,10 @@
-import { Instruccion } from '../Abastracto/Instruccion';
-import nodoAST from '../Abastracto/nodoAST';
+import { Instruccion } from '../Abstracto/Instruccion';
+import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
 import Identificador from '../Expresiones/Identificador';
-import Arbol from '../Simbolos/Arbol';
-import tablaSimbolos from '../Simbolos/tablaSimbolos';
-import Tipo, { tipoDato } from '../Simbolos/Tipo';
+import Arbol from '../TS/Arbol';
+import tablaSimbolos from '../TS/tablaSimbolos';
+import Tipo, { tipoDato } from '../TS/Tipo';
 
 export default class Decremento extends Instruccion {
   private identificador: Identificador | Instruccion;

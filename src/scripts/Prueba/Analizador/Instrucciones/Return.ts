@@ -1,8 +1,8 @@
-import { Instruccion } from '../Abastracto/Instruccion';
-import nodoAST from '../Abastracto/nodoAST';
-import Arbol from '../Simbolos/Arbol';
-import tablaSimbolos from '../Simbolos/tablaSimbolos';
-import Tipo, { tipoDato } from '../Simbolos/Tipo';
+import { Instruccion } from '../Abstracto/Instruccion';
+import nodoAST from '../Abstracto/nodoAST';
+import Arbol from '../TS/Arbol';
+import tablaSimbolos from '../TS/tablaSimbolos';
+import Tipo, { tipoDato } from '../TS/Tipo';
 
 export default class Return extends Instruccion {
   private expresionReturn?: Instruccion;

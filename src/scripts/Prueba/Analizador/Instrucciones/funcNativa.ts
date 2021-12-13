@@ -1,11 +1,11 @@
 import obtenerValor from '../../Reportes/cambiarTipo';
-import { Instruccion } from '../Abastracto/Instruccion';
-import nodoAST from '../Abastracto/nodoAST';
+import { Instruccion } from '../Abstracto/Instruccion';
+import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
 import Identificador from '../Expresiones/Identificador';
-import Arbol from '../Simbolos/Arbol';
-import tablaSimbolos from '../Simbolos/tablaSimbolos';
-import Tipo, { tipoDato } from '../Simbolos/Tipo';
+import Arbol from '../TS/Arbol';
+import tablaSimbolos from '../TS/tablaSimbolos';
+import Tipo, { tipoDato } from '../TS/Tipo';
 
 export default class funcNativa extends Instruccion {
   private identificador: string;
@@ -36,7 +36,7 @@ export default class funcNativa extends Instruccion {
     let exp = this.expresion.interpretar(arbol, tabla);
     if (exp instanceof Errores) return exp;
     switch (this.identificador) {
-      case 'tolower':
+      case 'tolowercase':
         if (this.expresion.tipoDato.getTipo() != tipoDato.CADENA)
           return new Errores(
             'SEMANTICO',
@@ -46,7 +46,7 @@ export default class funcNativa extends Instruccion {
           );
         this.tipoDato = new Tipo(tipoDato.CADENA);
         return exp.toString().toLowerCase();
-      case 'toupper':
+      case 'touppercase':
         if (this.expresion.tipoDato.getTipo() != tipoDato.CADENA)
           return new Errores(
             'SEMANTICO',
@@ -69,7 +69,7 @@ export default class funcNativa extends Instruccion {
             this.fila,
             this.columna
           );
-      case 'truncate':
+      case 'toint':
         this.tipoDato = new Tipo(tipoDato.ENTERO);
         if (
           this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
@@ -83,27 +83,12 @@ export default class funcNativa extends Instruccion {
             this.fila,
             this.columna
           );
-
-      case 'round':
-        this.tipoDato = new Tipo(tipoDato.ENTERO);
-        if (
-          this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
-          this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
-        )
-          return Math.round(parseFloat(exp));
-        else
-          return new Errores(
-            'SEMANTICO',
-            'TIPO DE DATO INCOMPATIBLE CON FUNCION ROUND',
-            this.fila,
-            this.columna
-          );
       case 'typeof':
         this.tipoDato = new Tipo(tipoDato.CADENA);
         let tipo = arbol.BuscarTipo(this.ide);
         if (tipo == 'lista' || tipo == 'vector') return tipo.toString();
         else return obtenerValor(this.expresion.tipoDato.getTipo());
-      case 'tostring':
+      /*case 'tostring':
         this.tipoDato = new Tipo(tipoDato.CADENA);
         if (
           this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
@@ -118,23 +103,7 @@ export default class funcNativa extends Instruccion {
             'TIPO DE DATO INCOMPATIBLE CON FUNCION TOSTRING',
             this.fila,
             this.columna
-          );
-      case 'tochararray':
-        this.tipoDato = new Tipo(tipoDato.CARACTER);
-        if (this.expresion.tipoDato.getTipo() == tipoDato.CADENA) {
-          let arreglo = [];
-          let cadena = exp.toString();
-          for (let i = 0; i < cadena.length; i++) {
-            arreglo.push(cadena[i]);
-          }
-          return arreglo;
-        } else
-          return new Errores(
-            'SEMANTICO',
-            'TIPO DE DATO INCOMPATIBLE CON FUNCION TOCHARARRAY',
-            this.fila,
-            this.columna
-          );
+          );*/
       default:
         return new Errores(
           'SEMANTICO',

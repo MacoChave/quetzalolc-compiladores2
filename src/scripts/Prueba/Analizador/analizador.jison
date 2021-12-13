@@ -75,18 +75,18 @@ const casteo= require('./Instrucciones/casteo');
 "default"       return 'RESDEFAULT';
 "for"           return 'RESFOR';
 "void"          return 'RESVOID';
-"exec"          return 'RESEXEC';
 "new"           return 'RESNUEVO';
 "list"          return 'RESLIST';
 "add"           return 'RESADD';
-"tolower"       return 'RESLOW';
-"toupper"       return 'RESUP';
-"length"        return 'RESLENG';
-"truncate"      return 'RESTRUN';
-"round"         return 'RESROUND';
-"typeof"        return 'RESTYPE';
-"tostring"      return 'RESTOSTR';
-"tochararray"   return 'RESTOCHRARR';
+"tolowercase"   return 'RESLOW'; //listo
+"touppercase"   return 'RESUP'; //listo
+"length"        return 'RESLENG'; //listo
+"caracterOfPosition" return 'RESCAROFPOS';
+"substring"     return 'RESSUBSTRING';
+"parse"         return 'RESPARSE';
+"toint"         return 'RESTOINT'; //listo
+"todouble"      return 'RESTODOU';
+"typeof"        return 'RESTYPE'; //listo
 //simbolos
 "{"             return 'LLAVEABRE';
 ","             return 'COMA';

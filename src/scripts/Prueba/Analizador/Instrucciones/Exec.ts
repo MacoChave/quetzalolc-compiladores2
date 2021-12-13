@@ -1,9 +1,9 @@
-import { Instruccion } from '../Abastracto/Instruccion';
-import nodoAST from '../Abastracto/nodoAST';
+import { Instruccion } from '../Abstracto/Instruccion';
+import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
-import Arbol from '../Simbolos/Arbol';
-import tablaSimbolos from '../Simbolos/tablaSimbolos';
-import Tipo, { tipoDato } from '../Simbolos/Tipo';
+import Arbol from '../TS/Arbol';
+import tablaSimbolos from '../TS/tablaSimbolos';
+import Tipo, { tipoDato } from '../TS/Tipo';
 import Declaracion from './Declaracion';
 import Metodos from './Metodos';
 
