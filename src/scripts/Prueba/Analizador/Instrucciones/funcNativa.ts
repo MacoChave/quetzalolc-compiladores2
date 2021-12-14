@@ -88,7 +88,7 @@ export default class funcNativa extends Instruccion {
         let tipo = arbol.BuscarTipo(this.ide);
         if (tipo == 'lista' || tipo == 'vector') return tipo.toString();
         else return obtenerValor(this.expresion.tipoDato.getTipo());
-      /*case 'tostring':
+      case 'string':
         this.tipoDato = new Tipo(tipoDato.CADENA);
         if (
           this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
@@ -98,12 +98,86 @@ export default class funcNativa extends Instruccion {
         )
           return exp.toString();
         else
+          try {
+            return exp.toString();
+          } catch (error) {
+            return new Errores(
+              'SEMANTICO',
+              'TIPO DE DATO INCOMPATIBLE CON FUNCION TOSTRING',
+              this.fila,
+              this.columna
+            );
+          }
+      case 'int':
+        if (this.expresion.tipoDato.getTipo() != tipoDato.CADENA)
           return new Errores(
             'SEMANTICO',
-            'TIPO DE DATO INCOMPATIBLE CON FUNCION TOSTRING',
+            'TIPO DE DATO INCOMPATIBLE CON FUNCION INT',
             this.fila,
             this.columna
-          );*/
+          );
+        this.tipoDato = new Tipo(tipoDato.CADENA);
+        try {
+          return parseInt(exp.toString());
+        } catch (error) {
+          return new Errores(
+            'SEMANTICO',
+            'NO SE PUEDE CONVERTIR CADENAS DE CARACTERES A INT',
+            this.fila,
+            this.columna
+          );
+        }
+      case 'double':
+        if (this.expresion.tipoDato.getTipo() != tipoDato.CADENA)
+          return new Errores(
+            'SEMANTICO',
+            'TIPO DE DATO INCOMPATIBLE CON FUNCION DOUBLE',
+            this.fila,
+            this.columna
+          );
+        this.tipoDato = new Tipo(tipoDato.CADENA);
+        try {
+          return parseFloat(exp.toString());
+        } catch (error) {
+          return new Errores(
+            'SEMANTICO',
+            'NO SE PUEDE CONVERTIR CADENAS DE CARACTERES A DOUBLE',
+            this.fila,
+            this.columna
+          );
+        }
+      case 'boolean':
+        if (this.expresion.tipoDato.getTipo() != tipoDato.CADENA)
+          return new Errores(
+            'SEMANTICO',
+            'TIPO DE DATO INCOMPATIBLE CON FUNCION BOOLEAN',
+            this.fila,
+            this.columna
+          );
+        this.tipoDato = new Tipo(tipoDato.CADENA);
+        try {
+          let valor = exp.toString();
+          if(valor == '1' || valor.toLowerCase() == 'true'){
+            return true;
+          }else if(valor == '0' || valor.toLowerCase() == 'false'){
+            return false;
+          }else{
+            return new Errores(
+              'SEMANTICO',
+              'NO SE PUEDE CONVERTIR ESTA CADENA A BOOLEAN',
+              this.fila,
+              this.columna
+            );
+          }
+          
+        } catch (error) {
+          return new Errores(
+            'SEMANTICO',
+            'NO SE PUEDE CONVERTIR ESTA CADENA A BOOLEAN',
+            this.fila,
+            this.columna
+          );
+        }
       default:
         return new Errores(
           'SEMANTICO',

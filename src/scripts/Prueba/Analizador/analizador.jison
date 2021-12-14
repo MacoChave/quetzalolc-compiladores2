@@ -308,12 +308,14 @@ EXPRESION:
     |RESNULO                    {$$= new primitivo.default(new Tipo.default(Tipo.tipoDato.NULO),$1,@1.first_line,@1.first_column);}
     
     //VARIABLES, FUNCIONES Y VECTORES
+    |CORCHABRE LISTAVALORES CORCHCIERRA {$$=$2;}
     |IDENTIFICADOR              {$$=new identificador.default($1,@1.first_line,@1.first_column);}         
     |CONDINCREMENTO             {$$=$1;}
     |CONDECREMENTO              {$$=$1;}
     |LLAMADA                    {$$=$1;}
     |ACCESOVECTOR               {$$=$1;}
     |FUNCNATIVA PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$3,@1.first_line,@1.first_column); }
+    |FUNCNATIVA PUNTO RESPARSE PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$5,@1.first_line,@1.first_column); }
     |PARABRE TIPODATO PARCIERRA EXPRESION {$$=new casteo.default($2,$4,@1.first_line,@1.first_column);}
  
     ;
@@ -404,7 +406,7 @@ FUNCIONES:
     ;
 VECTORES:
     TIPODATO CORCHABRE CORCHCIERRA IDENTIFICADOR IGUAL RESNUEVO TIPODATO CORCHABRE EXPRESION CORCHCIERRA {$$=new vectores.default($1,$4,true,@1.first_line,@1.first_column,$9,$7);}
-    |TIPODATO CORCHABRE CORCHCIERRA IDENTIFICADOR IGUAL LLAVEABRE LISTAVALORES LLAVECIERRA  {$$=new vectores.default($1,$4,false,@1.first_line,@1.first_column,undefined,undefined,$7);}
+    |TIPODATO CORCHABRE CORCHCIERRA IDENTIFICADOR IGUAL CORCHABRE LISTAVALORES CORCHCIERRA  {$$=new vectores.default($1,$4,false,@1.first_line,@1.first_column,undefined,undefined,$7);}
     ;
 LISTAVALORES:
     LISTAVALORES COMA EXPRESION         {$1.push($3);$$=$1;} 
@@ -423,8 +425,10 @@ FUNCNATIVA:
     |RESTRUN        {$$=$1;}
     |RESROUND       {$$=$1;}
     |RESTYPE        {$$=$1;}
-    |RESTOSTR       {$$=$1;}
-    |RESTOCHRARR    {$$=$1;}
+    |RESSTRING      {$$=$1;}
+    |RESINT         {$$=$1;}
+    |RESDOUBLE      {$$=$1;}
+    |RESBOOL        {$$=$1;}
     ;
 BLOQUEINSTRUCCION:
     LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=$2;}
