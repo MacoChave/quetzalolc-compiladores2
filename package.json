@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "tsc -w",
-    "prepare": "jison ./src/jison/grammar.jison -o ./src/jison/grammar.js && cp ./src/jison/grammar.js ./dist/jison/grammar.js",
+    "prepare": "jison ./src/scripts/Analizador/analizador.jison -o ./src/scripts/Analizador/analizador.js && cp ./src/scripts/Analizador/analizador.js ./dist/scripts/Analizador/analizador.js",
     "build": "browserify dist/scripts/app.js --standalone load > bundle.js"
   },
   "keywords": [

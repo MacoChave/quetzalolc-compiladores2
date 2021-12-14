@@ -720,6 +720,4414 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Instruccion = void 0;
+var Instruccion = /** @class */ (function () {
+    function Instruccion(tipo, fila, columna) {
+        this.tipoDato = tipo;
+        this.fila = fila;
+        this.columna = columna;
+    }
+    return Instruccion;
+}());
+exports.Instruccion = Instruccion;
+
+},{}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var nodoAST = /** @class */ (function () {
+    function nodoAST(valor) {
+        this.listaNodos = new Array();
+        this.valor = valor;
+    }
+    nodoAST.prototype.agregarHijo = function (val, ambito, operador) {
+        if (ambito != undefined) {
+            switch (ambito) {
+                case 'ar':
+                    switch (operador) {
+                        case 0:
+                            val = '+';
+                            break;
+                        case 1:
+                            val = '-';
+                            break;
+                        case 2:
+                            val = '*';
+                            break;
+                        case 3:
+                            val = '/';
+                            break;
+                        case 4:
+                            val = '^';
+                            break;
+                        case 5:
+                            val = '%';
+                            break;
+                    }
+                    break;
+                case 'log':
+                    switch (operador) {
+                        case 0:
+                            val = '||';
+                            break;
+                        case 1:
+                            val = '&&';
+                            break;
+                        case 2:
+                            val = '!';
+                            break;
+                    }
+                    break;
+                case 'rel':
+                    switch (operador) {
+                        case 0:
+                            val = '==';
+                            break;
+                        case 1:
+                            val = '!=';
+                            break;
+                        case 2:
+                            val = '>';
+                            break;
+                        case 3:
+                            val = '<';
+                            break;
+                        case 4:
+                            val = '>=';
+                            break;
+                        case 5:
+                            val = '<=';
+                            break;
+                    }
+                    break;
+            }
+            this.listaNodos.push(new nodoAST(val));
+        }
+        else
+            this.listaNodos.push(new nodoAST(val));
+    };
+    nodoAST.prototype.agregarHijoAST = function (hijo) {
+        if (hijo != undefined)
+            this.listaNodos.push(hijo);
+    };
+    nodoAST.prototype.getValor = function () {
+        return this.valor;
+    };
+    nodoAST.prototype.getHijos = function () {
+        return this.listaNodos;
+    };
+    return nodoAST;
+}());
+exports.default = nodoAST;
+
+},{}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Errores = /** @class */ (function () {
+    function Errores(tipo, desc, fila, columna) {
+        this.tipoError = tipo;
+        this.desc = desc;
+        this.fila = fila;
+        this.columna = columna;
+    }
+    Errores.prototype.getDesc = function () {
+        return this.desc;
+    };
+    Errores.prototype.getTipoError = function () {
+        return this.tipoError;
+    };
+    Errores.prototype.getcolumna = function () {
+        return this.columna;
+    };
+    Errores.prototype.getFila = function () {
+        return this.fila;
+    };
+    Errores.prototype.returnError = function () {
+        return ('Se obtuvo: ' + this.tipoError + ' desc:{' + this.desc + '} en la fila: ' + this.fila + ' en la columna: ' + this.columna +
+            '\n');
+    };
+    return Errores;
+}());
+exports.default = Errores;
+
+},{}],7:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.listaErrores = void 0;
+var arbolNuevo;
+var contador;
+var cuerpo;
+//tablas arboles y excepcciones
+// class Listado_Errores {
+// 	public interpretar(entrada: string) {
+// 		listaErrores = new Array<Errores>();
+// 		let parser = require('../analizador');
+// 		try {
+// 			let ast = new Arbol(parser.parse(entrada));
+// 			var tabla = new tablaSimbolos();
+// 			ast.settablaGlobal(tabla);
+// 			for (let i of ast.getinstrucciones()) {
+// 				if (i instanceof Metodos || i instanceof Funciones) {
+// 					ast.getfunciones().push(i);
+// 				}
+// 			}
+// 			for (let i of ast.getinstrucciones()) {
+// 				if (i instanceof Errores) {
+// 					listaErrores.push(i);
+// 					ast.actualizaConsola((<Errores>i).returnError());
+// 				}
+// 				if (
+// 					i instanceof Metodos ||
+// 					i instanceof Funciones ||
+// 					i instanceof Exec
+// 				)
+// 					continue;
+// 				if (
+// 					i instanceof Declaracion ||
+// 					i instanceof Asignacion ||
+// 					i instanceof declaracionVectores ||
+// 					i instanceof declaracionListas ||
+// 					i instanceof asignacionVector ||
+// 					i instanceof asignacionLista ||
+// 					i instanceof agregarLista
+// 				) {
+// 					var resultador = i.interpretar(ast, tabla);
+// 					if (resultador instanceof Errores) {
+// 						listaErrores.push(resultador);
+// 						ast.actualizaConsola(
+// 							(<Errores>resultador).returnError()
+// 						);
+// 					}
+// 				} else {
+// 					let error = new Errores(
+// 						'SEMANTICO',
+// 						'SENTENCIA FUERA DE METODO',
+// 						i.fila,
+// 						i.columna
+// 					);
+// 					listaErrores.push(error);
+// 					ast.actualizaConsola((<Errores>error).returnError());
+// 				}
+// 			}
+// 			for (let i of ast.getinstrucciones()) {
+// 				if (i instanceof Exec) {
+// 					var resultador = i.interpretar(ast, tabla);
+// 					if (resultador instanceof Errores) {
+// 						listaErrores.push(resultador);
+// 						ast.actualizaConsola(
+// 							(<Errores>resultador).returnError()
+// 						);
+// 					}
+// 				}
+// 			}
+// 			arbolNuevo = ast;
+// 			/*res.send({
+//           resultado: ast.getconsola(),
+//           errores: listaErrores,
+//           tabla: ast.getSimbolos(),
+//         });*/
+// 		} catch (err) {
+// 			/*res.json({ error: err, errores: listaErrores });*/
+// 		}
+// 	}
+// 	public graficar() {
+// 		let otro = arbolNuevo;
+// 		if (otro == null) return /*res.json({ msg: false })*/;
+// 		let arbolAst = new nodoAST('RAIZ');
+// 		let nodoINS = new nodoAST('INSTRUCCIONES');
+// 		otro.getinstrucciones().forEach((element) => {
+// 			nodoINS.agregarHijoAST(element.getNodo());
+// 		});
+// 		arbolAst.agregarHijoAST(nodoINS);
+// 		graficarArbol(<nodoAST>arbolAst);
+// 		return /*res.json({ msg: true })*/;
+// 	}
+// }
+// export const listado_Errores = new Listado_Errores();
+
+},{}],8:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Operadores = void 0;
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Aritmetica = /** @class */ (function (_super) {
+    __extends(Aritmetica, _super);
+    function Aritmetica(operador, fila, columna, op1, op2) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.operacion = operador;
+        if (!op2)
+            _this.valorUnario = op1;
+        else {
+            _this.valor1 = op1;
+            _this.valor2 = op2;
+        }
+        return _this;
+    }
+    Aritmetica.prototype.getNodo = function () {
+        var _a, _b;
+        var nodo = new nodoAST_1.default('ARITMETICA');
+        if (this.valorUnario != null) {
+            nodo.agregarHijo(this.operacion + '');
+            nodo.agregarHijoAST(this.valorUnario.getNodo());
+        }
+        else {
+            nodo.agregarHijoAST((_a = this.valor1) === null || _a === void 0 ? void 0 : _a.getNodo());
+            nodo.agregarHijo(this.operacion + '', 'ar', this.operacion);
+            nodo.agregarHijoAST((_b = this.valor2) === null || _b === void 0 ? void 0 : _b.getNodo());
+        }
+        return nodo;
+    };
+    Aritmetica.prototype.interpretar = function (arbol, tabla) {
+        var _a, _b;
+        var izq, der, uno;
+        izq = der = uno = null;
+        if (this.valorUnario != null) {
+            uno = this.valorUnario.interpretar(arbol, tabla);
+            if (uno instanceof Errores_1.default)
+                return uno;
+        }
+        else {
+            izq = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.interpretar(arbol, tabla);
+            if (izq instanceof Errores_1.default)
+                return izq;
+            der = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.interpretar(arbol, tabla);
+            if (der instanceof Errores_1.default)
+                return der;
+        }
+        switch (this.operacion) {
+            case Operadores.SUMA:
+                return this.operador1Suma(izq, der);
+            case Operadores.RESTA:
+                return this.operador1Resta(izq, der);
+            case Operadores.MULTIPLICACION:
+                return this.operador1Multi(izq, der);
+            case Operadores.DIVISION:
+                return this.operador1Division(izq, der);
+            case Operadores.MODULADOR:
+                return this.operador1Mod(izq, der);
+            case Operadores.MENOSNUM:
+                return this.opMenosUnario(uno);
+            default:
+                return new Errores_1.default('ERROR SEMANTICO', 'OPERADOR INVALIDO', this.fila, this.columna);
+        }
+    };
+    /*----------------------------------------------------------MENOSUNARIO------------------------------------------------- */
+    Aritmetica.prototype.opMenosUnario = function (izq) {
+        var _a;
+        var opUn = (_a = this.valorUnario) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        switch (opUn) {
+            case Tipo_1.tipoDato.ENTERO:
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                return parseInt(izq) * -1;
+            case Tipo_1.tipoDato.DECIMAL:
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                return parseFloat(izq) * -1.0;
+        }
+    };
+    /*----------------------------------------------------------SUMA------------------------------------------------- */
+    Aritmetica.prototype.operador1Suma = function (izq, der) {
+        var _a, _b;
+        var op1 = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        var op2 = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo();
+        switch (op1 //operador 1
+        ) {
+            case Tipo_1.tipoDato.ENTERO:
+                return this.op2Suma(1, op2, izq, der);
+            case Tipo_1.tipoDato.DECIMAL:
+                return this.op2Suma(2, op2, izq, der);
+            case Tipo_1.tipoDato.CARACTER:
+                return this.op2Suma(3, op2, izq, der);
+        }
+    };
+    Aritmetica.prototype.op2Suma = function (numero, op2, izq, der) {
+        if (numero == 1) {
+            //entero
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(Entero + Entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    return parseInt(izq) + parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(Entero + Double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) + parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(entero + caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseInt(izq) + res;
+                default: //OPERACION ENTRE BOOLEANOS O STRING
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
+            }
+        }
+        else if (numero == 2) {
+            //decimal
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(double + entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) + parseFloat(der);
+                case Tipo_1.tipoDato.DECIMAL: //(double + double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) + parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(double + caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseInt(izq) + res;
+                default: //OPERACION ENTRE BOOLEANOS O STRING
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
+            }
+        }
+        else if (numero == 3) {
+            //caracter
+            switch (op2) { //2DO OPERADOR
+                case Tipo_1.tipoDato.ENTERO: //(caracter + entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = izq + '';
+                    var res = da.charCodeAt(0);
+                    return res + parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(caracter + double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da = izq + '';
+                    var res = da.charCodeAt(0);
+                    return res + parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: // (caracter + caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 + res;
+                default: //OPERACION ENTRE BOOLEANOS O STRING
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
+            }
+        }
+    };
+    /*----------------------------------------------------------RESTA------------------------------------------------- */
+    Aritmetica.prototype.operador1Resta = function (izq, der) {
+        var _a, _b;
+        var op1 = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        var op2 = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo();
+        switch (op1 //operador 1
+        ) {
+            case Tipo_1.tipoDato.ENTERO:
+                return this.op2Resta(1, op2, izq, der);
+            case Tipo_1.tipoDato.DECIMAL:
+                return this.op2Resta(2, op2, izq, der);
+            case Tipo_1.tipoDato.CARACTER:
+                return this.op2Resta(3, op2, izq, der);
+        }
+    };
+    Aritmetica.prototype.op2Resta = function (numero, op2, izq, der) {
+        if (numero == 1) {
+            //entero
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(Entero - Entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    return parseInt(izq) - parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(Entero - Double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) - parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(entero - caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseInt(izq) - res;
+                default: //OPERACION ENTRE BOOLEANOS O STRING
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA RESTA', this.fila, this.columna);
+            }
+        }
+        else if (numero == 2) {
+            //decimal
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(double - entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) - parseFloat(der);
+                case Tipo_1.tipoDato.DECIMAL: //(double - double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) - parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(double - caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseInt(izq) - res;
+                default: //OPERACION ENTRE BOOLEANOS O STRING
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
+            }
+        }
+        else if (numero == 3) {
+            //caracter
+            switch (op2) { //2DO OPERADOR
+                case Tipo_1.tipoDato.ENTERO: //(caracter - entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = izq + '';
+                    var res = da.charCodeAt(0);
+                    return res - parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(caracter - double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da = izq + '';
+                    var res = da.charCodeAt(0);
+                    return res - parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: // (caracter - caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 - res;
+                default: //OPERACION ENTRE BOOLEANOS O STRING
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
+            }
+        }
+    };
+    /*----------------------------------------------------------MULTIPLICACION------------------------------------------------- */
+    Aritmetica.prototype.operador1Multi = function (izq, der) {
+        var _a, _b;
+        var op1 = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        var op2 = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo();
+        switch (op1 //operador 1
+        ) {
+            case Tipo_1.tipoDato.ENTERO:
+                return this.op2Multi(1, op2, izq, der);
+            case Tipo_1.tipoDato.DECIMAL:
+                return this.op2Multi(2, op2, izq, der);
+            case Tipo_1.tipoDato.CARACTER:
+                return this.op2Multi(3, op2, izq, der);
+        }
+    };
+    Aritmetica.prototype.op2Multi = function (numero, op2, izq, der) {
+        if (numero == 1) {
+            //entero
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(entero * entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    return parseInt(izq) * parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(entero * double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) * parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(entero * caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseInt(izq) * res;
+                default:
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA MULTIPLICACION', this.fila, this.columna);
+            }
+        }
+        else if (numero == 2) {
+            //decimal
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(double * entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) * parseFloat(der);
+                case Tipo_1.tipoDato.DECIMAL: //(double * double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) * parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(double * caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseFloat(izq) * res;
+                default:
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA MULTIPLICACION', this.fila, this.columna);
+            }
+        }
+        else if (numero == 3) {
+            //caracter
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(caracter * entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 * parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(caracter * double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 * parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: // (caracter * caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 * res;
+                default:
+                    //error semantico
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA MULTIPLICACION', this.fila, this.columna);
+            }
+        }
+    };
+    /*----------------------------------------------------------DIVISION------------------------------------------------- */
+    Aritmetica.prototype.operador1Division = function (izq, der) {
+        var _a, _b;
+        var op1 = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        var op2 = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo();
+        switch (op1 //operador 1
+        ) {
+            case Tipo_1.tipoDato.ENTERO:
+                return this.op2Division(1, op2, izq, der);
+            case Tipo_1.tipoDato.DECIMAL:
+                return this.op2Division(2, op2, izq, der);
+            case Tipo_1.tipoDato.CARACTER:
+                return this.op2Division(3, op2, izq, der);
+        }
+    };
+    Aritmetica.prototype.op2Division = function (numero, op2, izq, der) {
+        if (numero == 1) {
+            //entero
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(entero / entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return der != 0
+                        ? parseInt(izq) / parseInt(der)
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                case Tipo_1.tipoDato.DECIMAL: //(entero / double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return der != 0
+                        ? parseFloat(izq) / parseFloat(der)
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                case Tipo_1.tipoDato.CARACTER: //(entero / caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return res != 0
+                        ? parseInt(izq) / res
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                default:
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA DIVISION', this.fila, this.columna);
+            }
+        }
+        else if (numero == 2) {
+            //decimal
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(double / entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return der != 0
+                        ? parseFloat(izq) / parseFloat(der)
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                case Tipo_1.tipoDato.DECIMAL: //(double / double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return der != 0
+                        ? parseFloat(izq) / parseFloat(der)
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                case Tipo_1.tipoDato.CARACTER: // (double / caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return der != 0
+                        ? parseFloat(izq) / res
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                default:
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO PERMITIDO', this.fila, this.columna);
+            }
+        }
+        else if (numero == 3) {
+            //caracter
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(caracter / entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return der != 0
+                        ? res1 / parseInt(der)
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                case Tipo_1.tipoDato.DECIMAL: //(caracter / double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return der != 0
+                        ? res1 / parseFloat(der)
+                        : 'NO SE PUEDE DIVIDIR SOBRE CERO';
+                case Tipo_1.tipoDato.CARACTER: // (caracter / caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res != 0
+                        ? res1 / res
+                        : "NO SE PUEDE DIVIDIR SOBRE 0";
+                default:
+                    //error semantico
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA MULTIPLICACION', this.fila, this.columna);
+            }
+        }
+    };
+    /*----------------------------------------------------------MODULACION------------------------------------------------- */
+    Aritmetica.prototype.operador1Mod = function (izq, der) {
+        var _a, _b;
+        var op1 = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        var op2 = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo();
+        switch (op1 //operador 1
+        ) {
+            case Tipo_1.tipoDato.ENTERO:
+                return this.op2Mod(1, op2, izq, der);
+            case Tipo_1.tipoDato.DECIMAL:
+                return this.op2Mod(2, op2, izq, der);
+            case Tipo_1.tipoDato.CARACTER:
+                return this.op2Mod(3, op2, izq, der);
+        }
+    };
+    Aritmetica.prototype.op2Mod = function (numero, op2, izq, der) {
+        if (numero == 1) {
+            //entero
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(entero % entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    return parseInt(izq) % parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(entero % double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) % parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(entero % caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseInt(izq) * res;
+                default:
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OBTENER EL MODULO', this.fila, this.columna);
+            }
+        }
+        else if (numero == 2) {
+            //decimal
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //retorna decimal
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) % parseFloat(der);
+                case Tipo_1.tipoDato.DECIMAL: //retorna decimal
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    return parseFloat(izq) % parseFloat(der);
+                case Tipo_1.tipoDato.CARACTER: //(entero % caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    return parseInt(izq) * res;
+                default:
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OBTENER EL MODULO', this.fila, this.columna);
+            }
+        }
+        else if (numero == 3) {
+            //caracter
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(caracter / entero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 % parseInt(der);
+                case Tipo_1.tipoDato.DECIMAL: //(caracter / double)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 % parseInt(der);
+                case Tipo_1.tipoDato.CARACTER: // (caracter / caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                    var da = der + '';
+                    var res = da.charCodeAt(0);
+                    var da1 = izq + '';
+                    var res1 = da1.charCodeAt(0);
+                    return res1 % res;
+                default:
+                    //error semantico
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OBTENER EL MODULO', this.fila, this.columna);
+            }
+        }
+    };
+    return Aritmetica;
+}(Instruccion_1.Instruccion));
+exports.default = Aritmetica;
+var Operadores;
+(function (Operadores) {
+    Operadores[Operadores["SUMA"] = 0] = "SUMA";
+    Operadores[Operadores["RESTA"] = 1] = "RESTA";
+    Operadores[Operadores["MULTIPLICACION"] = 2] = "MULTIPLICACION";
+    Operadores[Operadores["DIVISION"] = 3] = "DIVISION";
+    Operadores[Operadores["MODULADOR"] = 4] = "MODULADOR";
+    Operadores[Operadores["MENOSNUM"] = 5] = "MENOSNUM";
+})(Operadores = exports.Operadores || (exports.Operadores = {}));
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],9:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Operadores = void 0;
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Cadena = /** @class */ (function (_super) {
+    __extends(Cadena, _super);
+    function Cadena(operador, fila, columna, op1, op2) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.operacion = operador;
+        if (!op2)
+            _this.valorUnario = op1;
+        else {
+            _this.valor1 = op1;
+            _this.valor2 = op2;
+        }
+        return _this;
+    }
+    Cadena.prototype.getNodo = function () {
+        var _a, _b;
+        var nodo = new nodoAST_1.default('ARITMETICA');
+        if (this.valorUnario != null) {
+            nodo.agregarHijo(this.operacion + '');
+            nodo.agregarHijoAST(this.valorUnario.getNodo());
+        }
+        else {
+            nodo.agregarHijoAST((_a = this.valor1) === null || _a === void 0 ? void 0 : _a.getNodo());
+            nodo.agregarHijo(this.operacion + '', 'ar', this.operacion);
+            nodo.agregarHijoAST((_b = this.valor2) === null || _b === void 0 ? void 0 : _b.getNodo());
+        }
+        return nodo;
+    };
+    Cadena.prototype.interpretar = function (arbol, tabla) {
+        var _a, _b;
+        var izq, der, uno;
+        izq = der = uno = null;
+        izq = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.interpretar(arbol, tabla);
+        if (izq instanceof Errores_1.default)
+            return izq;
+        der = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.interpretar(arbol, tabla);
+        if (der instanceof Errores_1.default)
+            return der;
+        switch (this.operacion) {
+            case Operadores.CONCATENACION:
+                return this.concatenacionCadenas(izq, der);
+            case Operadores.DUPLICIDAD:
+                return this.duplicarCadenas(izq, der);
+            default:
+                return new Errores_1.default('ERROR SEMANTICO', 'OPERADOR INVALIDO', this.fila, this.columna);
+        }
+    };
+    /*----------------------------------------------------------CONCATENACION------------------------------------------------- */
+    Cadena.prototype.concatenacionCadenas = function (izq, der) {
+        var _a, _b;
+        var op1 = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        var op2 = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo();
+        switch (op1 //operador 1
+        ) {
+            case Tipo_1.tipoDato.CADENA:
+                return this.op2Concatenacion(1, op2, izq, der);
+            case Tipo_1.tipoDato.CARACTER:
+                return this.op2Concatenacion(2, op2, izq, der);
+        }
+    };
+    Cadena.prototype.op2Concatenacion = function (numero, op2, izq, der) {
+        if (numero == 1) {
+            //cadena
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.CADENA: //(Cadena & Cadena)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                    return izq + '' + der;
+                case Tipo_1.tipoDato.CARACTER: //(Cadena & caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                    return izq + '' + der;
+                default: //OTROS TIPOS DE DATOS
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'ESTA OPERACION NO PUEDE EJECUTARSE CON OTRO TIPO DE DATO QUE NO SEA CADENA', this.fila, this.columna);
+            }
+        }
+        else if (numero == 2) {
+            //caracter
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.CADENA: //(Caracter & Cadena)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                    return izq + '' + der;
+                case Tipo_1.tipoDato.CARACTER: //(Caracter & caracter)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                    return izq + '' + der;
+                default: //OTROS TIPOS DE DATOS
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'ESTA OPERACION NO PUEDE EJECUTARSE CON OTRO TIPO DE DATO QUE NO SEA CADENA', this.fila, this.columna);
+            }
+        }
+    };
+    /*----------------------------------------------------------DUPLICIDAD------------------------------------------------- */
+    Cadena.prototype.duplicarCadenas = function (izq, der) {
+        var _a, _b;
+        var op1 = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.tipoDato.getTipo();
+        var op2 = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo();
+        switch (op1 //operador 1
+        ) {
+            case Tipo_1.tipoDato.CADENA:
+                return this.op2Duplicar(1, op2, izq, der);
+            case Tipo_1.tipoDato.CARACTER:
+                return this.op2Duplicar(2, op2, izq, der);
+        }
+    };
+    Cadena.prototype.op2Duplicar = function (numero, op2, izq, der) {
+        if (numero == 1) {
+            //cadena
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(Cadena^Numero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                    var palabra = izq + '';
+                    return palabra.repeat(parseInt(der));
+                default: //OTROS TIPOS DE DATOS
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'NO SE PUEDE UTILIZAR OTRO TIPO DE DATO DIFERENTE A ENTERO', this.fila, this.columna);
+            }
+        }
+        else if (numero == 2) {
+            //caracter
+            switch (op2 //OPERADOR 2
+            ) {
+                case Tipo_1.tipoDato.ENTERO: //(Caracter^Numero)
+                    this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                    var palabra = izq + '';
+                    return palabra.repeat(parseInt(der));
+                default: //OTROS TIPOS DE DATOS
+                    //error
+                    return new Errores_1.default('SEMANTICO', 'NO SE PUEDE UTILIZAR OTRO TIPO DE DATO DIFERENTE A ENTERO', this.fila, this.columna);
+            }
+        }
+    };
+    return Cadena;
+}(Instruccion_1.Instruccion));
+exports.default = Cadena;
+var Operadores;
+(function (Operadores) {
+    Operadores[Operadores["CONCATENACION"] = 0] = "CONCATENACION";
+    Operadores[Operadores["DUPLICIDAD"] = 1] = "DUPLICIDAD";
+})(Operadores = exports.Operadores || (exports.Operadores = {}));
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],10:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Identificador = /** @class */ (function (_super) {
+    __extends(Identificador, _super);
+    function Identificador(identificador, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        return _this;
+    }
+    Identificador.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('IDENTIFICADOR');
+        nodo.agregarHijo(this.identificador + '');
+        return nodo;
+    };
+    Identificador.prototype.interpretar = function (arbol, tabla) {
+        var variable = tabla.getVariable(this.identificador);
+        if (variable != null) {
+            this.tipoDato = variable.gettipo();
+            return variable.getvalor();
+        }
+        else {
+            return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' NO EXISTE', this.fila, this.columna);
+        }
+    };
+    return Identificador;
+}(Instruccion_1.Instruccion));
+exports.default = Identificador;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],11:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Logicas = void 0;
+//relacionales
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Logica = /** @class */ (function (_super) {
+    __extends(Logica, _super);
+    function Logica(relacion, fila, columna, cond1, cond2) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.loogica = relacion;
+        if (!cond2)
+            _this.condExcep = cond1;
+        else {
+            _this.cond1 = cond1;
+            _this.cond2 = cond2;
+        }
+        return _this;
+    }
+    Logica.prototype.getNodo = function () {
+        var _a, _b;
+        var nodo = new nodoAST_1.default('LOGICO');
+        if (this.condExcep != null) {
+            nodo.agregarHijo(this.loogica + '', 'log', this.loogica);
+            nodo.agregarHijoAST(this.condExcep.getNodo());
+        }
+        else {
+            nodo.agregarHijoAST((_a = this.cond1) === null || _a === void 0 ? void 0 : _a.getNodo());
+            nodo.agregarHijo(this.loogica + '', 'log', this.loogica);
+            nodo.agregarHijoAST((_b = this.cond2) === null || _b === void 0 ? void 0 : _b.getNodo());
+        }
+        return nodo;
+    };
+    Logica.prototype.interpretar = function (arbol, tabla) {
+        var _a, _b;
+        var izq, der, unico;
+        izq = der = unico = null;
+        if (this.condExcep != null) {
+            unico = this.condExcep.interpretar(arbol, tabla);
+            if (unico instanceof Errores_1.default)
+                return unico;
+        }
+        else {
+            izq = (_a = this.cond1) === null || _a === void 0 ? void 0 : _a.interpretar(arbol, tabla);
+            if (izq instanceof Errores_1.default)
+                return izq;
+            der = (_b = this.cond2) === null || _b === void 0 ? void 0 : _b.interpretar(arbol, tabla);
+            if (der instanceof Errores_1.default)
+                return der;
+        }
+        //inicio comparacion
+        switch (this.loogica) {
+            case Logicas.AND:
+                this.tipoDato.setTipo(Tipo_1.tipoDato.BOOLEANO);
+                return izq && der ? true : false;
+            case Logicas.OR:
+                this.tipoDato.setTipo(Tipo_1.tipoDato.BOOLEANO);
+                return izq || der ? true : false;
+            case Logicas.NOT:
+                this.tipoDato.setTipo(Tipo_1.tipoDato.BOOLEANO);
+                return !unico;
+        }
+    };
+    return Logica;
+}(Instruccion_1.Instruccion));
+exports.default = Logica;
+var Logicas;
+(function (Logicas) {
+    Logicas[Logicas["OR"] = 0] = "OR";
+    Logicas[Logicas["AND"] = 1] = "AND";
+    Logicas[Logicas["NOT"] = 2] = "NOT";
+})(Logicas = exports.Logicas || (exports.Logicas = {}));
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],12:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Tipo_1 = require("../TS/Tipo");
+var Primitivo = /** @class */ (function (_super) {
+    __extends(Primitivo, _super);
+    function Primitivo(tipo, valor, fila, columna) {
+        var _this = _super.call(this, tipo, fila, columna) || this;
+        _this.valor = valor;
+        if (tipo.getTipo() == Tipo_1.tipoDato.CADENA) {
+            var val = _this.valor.toString();
+            _this.valor = val
+                .replace('\\n', '\n')
+                .replace('\\t', '\t')
+                .replace('\\r', '\r')
+                .replace('\\\\', '\\')
+                .replace("\\'", "'")
+                .replace('\\"', '"');
+        }
+        return _this;
+    }
+    Primitivo.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('PRIMITIVO');
+        nodo.agregarHijo(this.valor + '');
+        return nodo;
+    };
+    Primitivo.prototype.interpretar = function (arbol, tabla) {
+        if (this.tipoDato.getTipo() == Tipo_1.tipoDato.BOOLEANO) {
+            return this.valor == 'true' ? true : false;
+        }
+        if (this.tipoDato.getTipo() == Tipo_1.tipoDato.NULO) {
+            return null;
+        }
+        return this.valor;
+    };
+    return Primitivo;
+}(Instruccion_1.Instruccion));
+exports.default = Primitivo;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],13:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Relacionales = void 0;
+//aritmeticas
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Relacional = /** @class */ (function (_super) {
+    __extends(Relacional, _super);
+    function Relacional(relacion, fila, columna, cond1, cond2) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.relacion = relacion;
+        _this.cond1 = cond1;
+        _this.cond2 = cond2;
+        return _this;
+    }
+    Relacional.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('RELACIONAL');
+        nodo.agregarHijoAST(this.cond1.getNodo());
+        nodo.agregarHijo(this.relacion + '', 'rel', this.relacion);
+        nodo.agregarHijoAST(this.cond2.getNodo());
+        return nodo;
+    };
+    Relacional.prototype.interpretar = function (arbol, tabla) {
+        var izq, der;
+        izq = this.obtieneValor(this.cond1, arbol, tabla);
+        if (izq instanceof Errores_1.default)
+            return izq;
+        der = this.obtieneValor(this.cond2, arbol, tabla);
+        if (der instanceof Errores_1.default)
+            return der;
+        if ((this.cond1.tipoDato.getTipo() == Tipo_1.tipoDato.CADENA &&
+            this.cond2.tipoDato.getTipo() != Tipo_1.tipoDato.CADENA) ||
+            (this.cond2.tipoDato.getTipo() == Tipo_1.tipoDato.CADENA &&
+                this.cond1.tipoDato.getTipo() != Tipo_1.tipoDato.CADENA)) {
+            return new Errores_1.default('ERROR SEMANTICO', 'SOLO PUEDE COMPARAR CADENAS CON OTRO TIPO DE DATO', this.fila, this.columna);
+        }
+        else {
+            this.tipoDato.setTipo(Tipo_1.tipoDato.BOOLEANO);
+            switch (this.relacion) {
+                case Relacionales.IGUAL:
+                    return izq == der;
+                case Relacionales.DIFERENTE:
+                    return izq != der;
+                case Relacionales.MENOR:
+                    return izq < der;
+                case Relacionales.MENORIGUAL:
+                    return izq <= der;
+                case Relacionales.MAYOR:
+                    return izq > der;
+                case Relacionales.MAYORIGUAL:
+                    return izq >= der;
+                default:
+                    return 'TIPO DE COMPARACION RELACIONAL INCORRECTO';
+            }
+        }
+    };
+    Relacional.prototype.obtieneValor = function (operando, arbol, tabla) {
+        var valor = operando.interpretar(arbol, tabla);
+        switch (operando.tipoDato.getTipo()) {
+            case Tipo_1.tipoDato.ENTERO:
+                return parseInt(valor);
+            case Tipo_1.tipoDato.DECIMAL:
+                return parseFloat(valor);
+            case Tipo_1.tipoDato.CARACTER:
+                var da = valor + '';
+                var res = da.charCodeAt(0);
+                return res;
+            case Tipo_1.tipoDato.BOOLEANO:
+                var dats = valor + '';
+                var otr = dats.toLowerCase();
+                return parseInt(otr);
+            case Tipo_1.tipoDato.CADENA:
+                return '' + valor;
+        }
+    };
+    return Relacional;
+}(Instruccion_1.Instruccion));
+exports.default = Relacional;
+var Relacionales;
+(function (Relacionales) {
+    Relacionales[Relacionales["IGUAL"] = 0] = "IGUAL";
+    Relacionales[Relacionales["DIFERENTE"] = 1] = "DIFERENTE";
+    Relacionales[Relacionales["MAYOR"] = 2] = "MAYOR";
+    Relacionales[Relacionales["MENOR"] = 3] = "MENOR";
+    Relacionales[Relacionales["MAYORIGUAL"] = 4] = "MAYORIGUAL";
+    Relacionales[Relacionales["MENORIGUAL"] = 5] = "MENORIGUAL";
+})(Relacionales = exports.Relacionales || (exports.Relacionales = {}));
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],14:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Asignacion = /** @class */ (function (_super) {
+    __extends(Asignacion, _super);
+    function Asignacion(identificador, valor, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.valor = valor;
+        return _this;
+    }
+    Asignacion.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('ASIGNACION');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('=');
+        nodo.agregarHijoAST(this.valor.getNodo());
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    Asignacion.prototype.interpretar = function (arbol, tabla) {
+        //tomar el tipoDato de la variable
+        var variable = tabla.getVariable(this.identificador);
+        if (variable != null) {
+            var val = this.valor.interpretar(arbol, tabla);
+            if (variable.gettipo().getTipo() != this.valor.tipoDato.getTipo()) {
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+            }
+            else {
+                variable.setvalor(val);
+                arbol.actualizarTabla(this.identificador, variable.getvalor(), this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
+                //identificadorm,
+                //actualizar valor de la tabla y no crear otra equis des
+            }
+        }
+        else {
+            console.log(this.identificador);
+            return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' NO EXISTE', this.fila, this.columna);
+        }
+    };
+    return Asignacion;
+}(Instruccion_1.Instruccion));
+exports.default = Asignacion;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],15:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Break = /** @class */ (function (_super) {
+    __extends(Break, _super);
+    function Break(fila, columna) {
+        return _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+    }
+    Break.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('BREAK');
+        nodo.agregarHijo('break');
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    Break.prototype.interpretar = function (arbol, tabla) {
+        return 'ByLy23';
+    };
+    return Break;
+}(Instruccion_1.Instruccion));
+exports.default = Break;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],16:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Listado_Errores_1 = require("../../Excepciones/Listado_Errores");
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var tablaSimbolos_1 = __importDefault(require("../../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var Return_1 = __importDefault(require("../Return"));
+var condWhile = /** @class */ (function (_super) {
+    __extends(condWhile, _super);
+    function condWhile(condicion, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.condicion = condicion;
+        _this.expresion = expresion;
+        return _this;
+    }
+    condWhile.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('DO_WHILE');
+        nodo.agregarHijo('do');
+        nodo.agregarHijo('{');
+        this.expresion.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.condicion.getNodo());
+        nodo.agregarHijo(')');
+        nodo.agregarHijo('}');
+        return nodo;
+    };
+    condWhile.prototype.interpretar = function (arbol, tabla) {
+        var val = this.condicion.interpretar(arbol, tabla);
+        if (val instanceof Errores_1.default)
+            return val;
+        if (this.condicion.tipoDato.getTipo() != Tipo_1.tipoDato.BOOLEANO) {
+            return new Errores_1.default('SEMANTICO', 'DATO DEBE SER BOOLEANO', this.fila, this.columna);
+        }
+        do {
+            var nuevaTabla = new tablaSimbolos_1.default(tabla);
+            nuevaTabla.setNombre('Do_While');
+            for (var i = 0; i < this.expresion.length; i++) {
+                var a = this.expresion[i].interpretar(arbol, nuevaTabla);
+                if (a instanceof Errores_1.default) {
+                    Listado_Errores_1.listaErrores.push(a);
+                    arbol.actualizaConsola(a.returnError());
+                }
+                if (a instanceof Return_1.default)
+                    return a;
+                if (a == 'ByLyContinue')
+                    break;
+                if (a == 'ByLy23')
+                    return;
+            }
+        } while (this.condicion.interpretar(arbol, tabla));
+    };
+    return condWhile;
+}(Instruccion_1.Instruccion));
+exports.default = condWhile;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],17:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var Listado_Errores_1 = require("../../Excepciones/Listado_Errores");
+var tablaSimbolos_1 = __importDefault(require("../../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var Return_1 = __importDefault(require("../Return"));
+var condFor = /** @class */ (function (_super) {
+    __extends(condFor, _super);
+    function condFor(declasignacion, condicion, actualizacion, instrucciones, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.declaracionAsignacion = declasignacion;
+        _this.actualizacion = actualizacion;
+        _this.condicion = condicion;
+        _this.instrucciones = instrucciones;
+        return _this;
+    }
+    condFor.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('FOR');
+        nodo.agregarHijo('for');
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.declaracionAsignacion.getNodo());
+        nodo.agregarHijo(';');
+        nodo.agregarHijoAST(this.condicion.getNodo());
+        nodo.agregarHijo(';');
+        nodo.agregarHijoAST(this.actualizacion.getNodo());
+        nodo.agregarHijo(')');
+        nodo.agregarHijo('{');
+        this.instrucciones.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo('}');
+        return nodo;
+    };
+    condFor.prototype.interpretar = function (arbol, tabla) {
+        var nuevaTabla = new tablaSimbolos_1.default(tabla);
+        nuevaTabla.setNombre('For');
+        var declaAsig = this.declaracionAsignacion.interpretar(arbol, nuevaTabla);
+        if (declaAsig instanceof Errores_1.default)
+            return declaAsig;
+        var val = this.condicion.interpretar(arbol, nuevaTabla);
+        if (val instanceof Errores_1.default)
+            return val;
+        if (this.condicion.tipoDato.getTipo() != Tipo_1.tipoDato.BOOLEANO) {
+            return new Errores_1.default('SEMANTICO', 'DATO DEBE SER BOOLEANO', this.fila, this.columna);
+        }
+        while (this.condicion.interpretar(arbol, nuevaTabla)) {
+            var otraTabla = new tablaSimbolos_1.default(nuevaTabla);
+            otraTabla.setNombre('ForDentro');
+            for (var i = 0; i < this.instrucciones.length; i++) {
+                var a = this.instrucciones[i].interpretar(arbol, otraTabla);
+                if (a instanceof Errores_1.default) {
+                    Listado_Errores_1.listaErrores.push(a);
+                    arbol.actualizaConsola(a.returnError());
+                }
+                if (a instanceof Return_1.default)
+                    return a;
+                if (a == 'ByLyContinue')
+                    break;
+                if (a == 'ByLy23')
+                    return;
+            }
+            var valActualizacion = this.actualizacion.interpretar(arbol, nuevaTabla);
+            if (valActualizacion instanceof Errores_1.default)
+                return valActualizacion;
+        }
+    };
+    return condFor;
+}(Instruccion_1.Instruccion));
+exports.default = condFor;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],18:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var Listado_Errores_1 = require("../../Excepciones/Listado_Errores");
+var tablaSimbolos_1 = __importDefault(require("../../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var Return_1 = __importDefault(require("../Return"));
+var condWhile = /** @class */ (function (_super) {
+    __extends(condWhile, _super);
+    function condWhile(condicion, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.condicion = condicion;
+        _this.expresion = expresion;
+        return _this;
+    }
+    condWhile.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('DO_WHILE');
+        nodo.agregarHijo('while');
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.condicion.getNodo());
+        nodo.agregarHijo(')');
+        nodo.agregarHijo('{');
+        this.expresion.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo('}');
+        return nodo;
+    };
+    condWhile.prototype.interpretar = function (arbol, tabla) {
+        var val = this.condicion.interpretar(arbol, tabla);
+        if (val instanceof Errores_1.default)
+            return val;
+        if (this.condicion.tipoDato.getTipo() != Tipo_1.tipoDato.BOOLEANO) {
+            return new Errores_1.default('SEMANTICO', 'DATO DEBE SER BOOLEANO', this.fila, this.columna);
+        }
+        while (this.condicion.interpretar(arbol, tabla)) {
+            var nuevaTabla = new tablaSimbolos_1.default(tabla);
+            nuevaTabla.setNombre('While');
+            for (var i = 0; i < this.expresion.length; i++) {
+                var a = this.expresion[i].interpretar(arbol, nuevaTabla);
+                if (a instanceof Errores_1.default) {
+                    Listado_Errores_1.listaErrores.push(a);
+                    arbol.actualizaConsola(a.returnError());
+                }
+                if (a instanceof Return_1.default)
+                    return a;
+                if (a == 'ByLyContinue')
+                    break;
+                if (a == 'ByLy23')
+                    return;
+            }
+        }
+    };
+    return condWhile;
+}(Instruccion_1.Instruccion));
+exports.default = condWhile;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],19:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var Listado_Errores_1 = require("../../Excepciones/Listado_Errores");
+var tablaSimbolos_1 = __importDefault(require("../../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var Return_1 = __importDefault(require("../Return"));
+var condIf = /** @class */ (function (_super) {
+    __extends(condIf, _super);
+    function condIf(fila, columna, cond1, condIf, condElse, condElseIf) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.cond1 = cond1;
+        _this.condIf = condIf;
+        _this.condElse = condElse;
+        _this.condElseIf = condElseIf;
+        return _this;
+    }
+    condIf.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('IF');
+        nodo.agregarHijo('if');
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.cond1.getNodo());
+        nodo.agregarHijo(')');
+        nodo.agregarHijo('{');
+        this.condIf.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo('}');
+        if (this.condElse != undefined) {
+            nodo.agregarHijo('else');
+            nodo.agregarHijo('{');
+            this.condElse.forEach(function (element) {
+                nodo.agregarHijoAST(element.getNodo());
+            });
+            nodo.agregarHijo('}');
+        }
+        if (this.condElseIf != undefined) {
+            nodo.agregarHijo('else');
+            nodo.agregarHijo('if');
+            nodo.agregarHijo('{');
+            nodo.agregarHijoAST(this.condElseIf.getNodo());
+            nodo.agregarHijo('}');
+        }
+        return nodo;
+    };
+    condIf.prototype.interpretar = function (arbol, tabla) {
+        var val = this.cond1.interpretar(arbol, tabla);
+        if (this.cond1.tipoDato.getTipo() != Tipo_1.tipoDato.BOOLEANO) {
+            return new Errores_1.default('SEMANTICO', 'DATO DEBE SER BOOLEANO', this.fila, this.columna);
+        }
+        if (val) {
+            var nuevaTabla = new tablaSimbolos_1.default(tabla);
+            nuevaTabla.setNombre('If');
+            for (var i = 0; i < this.condIf.length; i++) {
+                var a = this.condIf[i].interpretar(arbol, nuevaTabla);
+                if (a instanceof Errores_1.default) {
+                    Listado_Errores_1.listaErrores.push(a);
+                    arbol.actualizaConsola(a.returnError());
+                }
+                if (a instanceof Return_1.default)
+                    return a;
+                if (a == 'ByLyContinue')
+                    return a;
+                if (a == 'ByLy23')
+                    return a;
+            }
+        }
+        else {
+            if (this.condElse != undefined) {
+                var nuevaTabla = new tablaSimbolos_1.default(tabla);
+                nuevaTabla.setNombre('else');
+                for (var i = 0; i < this.condElse.length; i++) {
+                    var a = this.condElse[i].interpretar(arbol, nuevaTabla);
+                    if (a instanceof Errores_1.default) {
+                        Listado_Errores_1.listaErrores.push(a);
+                        arbol.actualizaConsola(a.returnError());
+                    }
+                    if (a instanceof Return_1.default)
+                        return a;
+                    if (a == 'ByLyContinue')
+                        return a;
+                    if (a == 'ByLy23')
+                        return a;
+                }
+            }
+            else if (this.condElseIf != undefined) {
+                var b = this.condElseIf.interpretar(arbol, tabla);
+                if (b instanceof Errores_1.default)
+                    return b;
+                if (b instanceof Return_1.default)
+                    return b;
+                if (b == 'ByLyContinue')
+                    return b;
+                if (b == 'ByLy23')
+                    return b;
+            }
+        }
+        /*if (!this.cond2) {
+      if (val == true) {
+        this.condIf.forEach((valor) => {
+          let a = valor.interpretar(arbol, tabla);
+          if (a instanceof Errores) return a;
+        });
+      }
+    } else {
+      if (val == true) {
+        this.condIf.forEach((valor) => {
+          let a = valor.interpretar(arbol, tabla);
+          if (a instanceof Errores) return a;
+        });
+      } else {
+        this.condElse?.forEach((valor) => {
+          let a = valor.interpretar(arbol, tabla);
+          if (a instanceof Errores) return a;
+        });
+      }
+    }*/
+    };
+    return condIf;
+}(Instruccion_1.Instruccion));
+exports.default = condIf;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],20:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var condIfTernario = /** @class */ (function (_super) {
+    __extends(condIfTernario, _super);
+    function condIfTernario(cond, conIf, conElse, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.condicion = cond;
+        _this.condIf = conIf;
+        _this.condElse = conElse;
+        return _this;
+    }
+    condIfTernario.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('TERNARIO');
+        nodo.agregarHijoAST(this.condicion.getNodo());
+        nodo.agregarHijo('?');
+        nodo.agregarHijoAST(this.condIf.getNodo());
+        nodo.agregarHijo(':');
+        nodo.agregarHijoAST(this.condElse.getNodo());
+        return nodo;
+    };
+    condIfTernario.prototype.interpretar = function (arbol, tabla) {
+        var val = this.condicion.interpretar(arbol, tabla);
+        if (val instanceof Errores_1.default)
+            return val;
+        if (this.condicion.tipoDato.getTipo() != Tipo_1.tipoDato.BOOLEANO) {
+            return new Errores_1.default('SEMANTICO', 'DATO DEBE SER BOOLEANO', this.fila, this.columna);
+        }
+        if (Boolean(val)) {
+            var ifc = this.condIf.interpretar(arbol, tabla);
+            if (ifc instanceof Errores_1.default)
+                return ifc;
+            this.tipoDato.setTipo(this.condIf.tipoDato.getTipo());
+            return ifc;
+        }
+        else {
+            var elsec = this.condElse.interpretar(arbol, tabla);
+            if (elsec instanceof Errores_1.default)
+                return elsec;
+            this.tipoDato.setTipo(this.condElse.tipoDato.getTipo());
+            return elsec;
+        }
+    };
+    return condIfTernario;
+}(Instruccion_1.Instruccion));
+exports.default = condIfTernario;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../TS/Tipo":44}],21:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var Listado_Errores_1 = require("../../Excepciones/Listado_Errores");
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var Return_1 = __importDefault(require("../Return"));
+var condSwitch = /** @class */ (function (_super) {
+    __extends(condSwitch, _super);
+    function condSwitch(fila, columna, expresion, listaCasos, defecto) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.expresion = expresion;
+        _this.listaCasos = listaCasos;
+        _this.defecto = defecto;
+        return _this;
+    }
+    condSwitch.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('SWITCH');
+        nodo.agregarHijo('switch');
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(')');
+        nodo.agregarHijo('{');
+        if (this.listaCasos != undefined) {
+            this.listaCasos.forEach(function (element) {
+                nodo.agregarHijoAST(element.getNodo());
+            });
+        }
+        if (this.defecto != undefined) {
+            nodo.agregarHijoAST(this.defecto.getNodo());
+        }
+        nodo.agregarHijo('}');
+        return nodo;
+    };
+    condSwitch.prototype.interpretar = function (arbol, tabla) {
+        if (this.listaCasos != undefined) {
+            for (var _i = 0, _a = this.listaCasos; _i < _a.length; _i++) {
+                var caso = _a[_i];
+                caso.expresionCase = this.expresion;
+                var a = caso.interpretar(arbol, tabla);
+                if (a instanceof Errores_1.default) {
+                    Listado_Errores_1.listaErrores.push(a);
+                    arbol.actualizaConsola(a.returnError());
+                }
+                if (a instanceof Return_1.default)
+                    return a;
+                if (a == 'ByLyContinue') {
+                    Listado_Errores_1.listaErrores.push(new Errores_1.default('SEMANTICO', 'CONTINUE FUERA DE CICLO', this.fila, this.columna));
+                    arbol.actualizaConsola(a.returnError());
+                }
+                if (a == 'ByLy23')
+                    return;
+            }
+            //caso solo casos
+        }
+        if (this.defecto != undefined) {
+            var a = this.defecto.interpretar(arbol, tabla);
+            if (a instanceof Errores_1.default) {
+                Listado_Errores_1.listaErrores.push(a);
+                arbol.actualizaConsola(a.returnError());
+            }
+            if (a instanceof Return_1.default)
+                return a;
+            if (a == 'ByLyContinue') {
+                Listado_Errores_1.listaErrores.push(new Errores_1.default('SEMANTICO', 'CONTINUE FUERA DE CICLO', this.fila, this.columna));
+                arbol.actualizaConsola(a.returnError());
+            }
+            if (a == 'ByLy23')
+                return;
+        }
+    };
+    return condSwitch;
+}(Instruccion_1.Instruccion));
+exports.default = condSwitch;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../Return":32}],22:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var Listado_Errores_1 = require("../../Excepciones/Listado_Errores");
+var tablaSimbolos_1 = __importDefault(require("../../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var Return_1 = __importDefault(require("../Return"));
+var condSwitchCase = /** @class */ (function (_super) {
+    __extends(condSwitchCase, _super);
+    function condSwitchCase(fila, columna, expresion, instrucciones) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.expresion = expresion;
+        _this.instrucciones = instrucciones;
+        return _this;
+    }
+    condSwitchCase.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('CASE');
+        nodo.agregarHijo('case');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(':');
+        this.instrucciones.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        return nodo;
+    };
+    condSwitchCase.prototype.interpretar = function (arbol, tabla) {
+        var _a, _b;
+        var val = this.expresion.interpretar(arbol, tabla);
+        var valExpresion = (_a = this.expresionCase) === null || _a === void 0 ? void 0 : _a.interpretar(arbol, tabla);
+        if (this.expresion.tipoDato.getTipo() ==
+            ((_b = this.expresionCase) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo())) {
+            if (val == valExpresion) {
+                var nuevaTabla = new tablaSimbolos_1.default(tabla);
+                nuevaTabla.setNombre('Case');
+                for (var i = 0; i < this.instrucciones.length; i++) {
+                    var a = this.instrucciones[i].interpretar(arbol, nuevaTabla);
+                    if (a instanceof Errores_1.default) {
+                        Listado_Errores_1.listaErrores.push(a);
+                        arbol.actualizaConsola(a.returnError());
+                    }
+                    if (a instanceof Return_1.default)
+                        return a;
+                    if (a == 'ByLyContinue')
+                        return a;
+                    if (a == 'ByLy23')
+                        return a;
+                }
+            }
+        }
+        else {
+            return new Errores_1.default('SEMANTICO', 'VARIABLE  TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+        }
+    };
+    return condSwitchCase;
+}(Instruccion_1.Instruccion));
+exports.default = condSwitchCase;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],23:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
+var Listado_Errores_1 = require("../../Excepciones/Listado_Errores");
+var tablaSimbolos_1 = __importDefault(require("../../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../../TS/Tipo"));
+var Return_1 = __importDefault(require("../Return"));
+var condSwitchCase = /** @class */ (function (_super) {
+    __extends(condSwitchCase, _super);
+    function condSwitchCase(fila, columna, instrucciones) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.instrucciones = instrucciones;
+        return _this;
+    }
+    condSwitchCase.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('DEFAULT');
+        nodo.agregarHijo('default');
+        nodo.agregarHijo(':');
+        this.instrucciones.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        return nodo;
+    };
+    condSwitchCase.prototype.interpretar = function (arbol, tabla) {
+        var nuevaTabla = new tablaSimbolos_1.default(tabla);
+        nuevaTabla.setNombre('default');
+        for (var i = 0; i < this.instrucciones.length; i++) {
+            var a = this.instrucciones[i].interpretar(arbol, nuevaTabla);
+            if (a instanceof Errores_1.default) {
+                Listado_Errores_1.listaErrores.push(a);
+                arbol.actualizaConsola(a.returnError());
+            }
+            if (a instanceof Return_1.default)
+                return a;
+            if (a == 'ByLyContinue')
+                return a;
+            if (a == 'ByLy23')
+                return a;
+        }
+    };
+    return condSwitchCase;
+}(Instruccion_1.Instruccion));
+exports.default = condSwitchCase;
+
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],24:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Continue = /** @class */ (function (_super) {
+    __extends(Continue, _super);
+    function Continue(fila, columna) {
+        return _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+    }
+    Continue.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('CONTINUE');
+        nodo.agregarHijo('continue');
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    Continue.prototype.interpretar = function (arbol, tabla) {
+        return 'ByLyContinue';
+    };
+    return Continue;
+}(Instruccion_1.Instruccion));
+exports.default = Continue;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],25:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var reporteTabla_1 = require("../../Reportes/reporteTabla");
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Simbolo_1 = __importDefault(require("../TS/Simbolo"));
+var Tipo_1 = require("../TS/Tipo");
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var Declaracion = /** @class */ (function (_super) {
+    __extends(Declaracion, _super);
+    function Declaracion(tipo, fila, columna, id, valor) {
+        var _this = _super.call(this, tipo, fila, columna) || this;
+        _this.tipo = tipo;
+        _this.identificador = id;
+        _this.valor = valor;
+        return _this;
+    }
+    Declaracion.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('DECLARACION');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
+        nodo.agregarHijo(this.identificador);
+        if (this.valor != undefined) {
+            nodo.agregarHijo('=');
+            nodo.agregarHijoAST(this.valor.getNodo());
+        }
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    Declaracion.prototype.interpretar = function (arbol, tabla) {
+        if (this.valor === undefined) {
+            switch (this.tipo.getTipo()) {
+                case Tipo_1.tipoDato.ENTERO:
+                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, 0)) ==
+                        'La variable existe actualmente') {
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    }
+                    else {
+                        if (!arbol.actualizarTabla(this.identificador, '0', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                            var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, '0', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                            arbol.listaSimbolos.push(nuevoSimbolo);
+                        }
+                    }
+                    break;
+                case Tipo_1.tipoDato.DECIMAL:
+                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, 0.0)) == 'La variable existe actualmente') {
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    }
+                    else {
+                        if (!arbol.actualizarTabla(this.identificador, '0.0', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                            var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, '0.0', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                            arbol.listaSimbolos.push(nuevoSimbolo);
+                        }
+                    }
+                    break;
+                case Tipo_1.tipoDato.CARACTER:
+                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, '\u0000')) == 'La variable existe actualmente') {
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    }
+                    else {
+                        if (!arbol.actualizarTabla(this.identificador, '\u0000', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                            var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, '\u0000', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                            arbol.listaSimbolos.push(nuevoSimbolo);
+                        }
+                    }
+                    break;
+                case Tipo_1.tipoDato.CADENA:
+                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, '')) ==
+                        'La variable existe actualmente') {
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    }
+                    else {
+                        if (!arbol.actualizarTabla(this.identificador, '', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                            var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, '', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                            arbol.listaSimbolos.push(nuevoSimbolo);
+                        }
+                    }
+                    break;
+                case Tipo_1.tipoDato.BOOLEANO:
+                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, true)) == 'La variable existe actualmente') {
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    }
+                    else {
+                        if (!arbol.actualizarTabla(this.identificador, 'true', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                            var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, 'true', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                            arbol.listaSimbolos.push(nuevoSimbolo);
+                        }
+                    }
+                    break;
+            }
+        }
+        else {
+            var val = this.valor.interpretar(arbol, tabla);
+            if (this.tipo.getTipo() != this.valor.tipoDato.getTipo()) {
+                return new Errores_1.default('SEMANTICO', 'TIPO DE VALOR DIFERENTE', this.fila, this.columna);
+            }
+            else {
+                if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, val)) ==
+                    'La variable existe actualmente') {
+                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                }
+                else {
+                    if (!arbol.actualizarTabla(this.identificador, val, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, val, 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                        arbol.listaSimbolos.push(nuevoSimbolo);
+                    }
+                }
+            }
+        }
+    };
+    return Declaracion;
+}(Instruccion_1.Instruccion));
+exports.default = Declaracion;
+
+},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":43,"../TS/Tipo":44}],26:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Identificador_1 = __importDefault(require("../Expresiones/Identificador"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Incremento = /** @class */ (function (_super) {
+    __extends(Incremento, _super);
+    function Incremento(identificador, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador;
+        return _this;
+    }
+    Incremento.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('DECREMENTO');
+        nodo.agregarHijoAST(this.identificador.getNodo());
+        nodo.agregarHijo('-');
+        nodo.agregarHijo('-');
+        return nodo;
+    };
+    Incremento.prototype.interpretar = function (arbol, tabla) {
+        //tomar el tipoDato de la variable
+        if (this.identificador instanceof Identificador_1.default) {
+            var variable = tabla.getVariable(this.identificador.identificador);
+            if (variable != null) {
+                if (variable.gettipo().getTipo() == Tipo_1.tipoDato.ENTERO ||
+                    variable.gettipo().getTipo() == Tipo_1.tipoDato.DECIMAL) {
+                    this.tipoDato.setTipo(variable.gettipo().getTipo());
+                    var uno = variable.getvalor();
+                    uno--;
+                    variable.setvalor(uno);
+                }
+                else {
+                    return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+                }
+            }
+            else {
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' NO EXISTE', this.fila, this.columna);
+            }
+        }
+        else {
+            var valE = this.identificador.interpretar(arbol, tabla);
+            if (valE instanceof Errores_1.default)
+                return valE;
+            if (this.identificador.tipoDato.getTipo() == Tipo_1.tipoDato.ENTERO) {
+                this.tipoDato.setTipo(Tipo_1.tipoDato.ENTERO);
+                var otro = parseInt(valE);
+                otro--;
+                return otro;
+            }
+            else if (this.identificador.tipoDato.getTipo() == Tipo_1.tipoDato.DECIMAL) {
+                this.tipoDato.setTipo(Tipo_1.tipoDato.DECIMAL);
+                var otro = parseFloat(valE);
+                otro--;
+                return otro;
+            }
+            else {
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+            }
+        }
+    };
+    return Incremento;
+}(Instruccion_1.Instruccion));
+exports.default = Incremento;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":44}],27:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var tablaSimbolos_1 = __importDefault(require("../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Declaracion_1 = __importDefault(require("./Declaracion"));
+var Metodos_1 = __importDefault(require("./Metodos"));
+var Exec = /** @class */ (function (_super) {
+    __extends(Exec, _super);
+    function Exec(identificador, parametros, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.parametros = parametros;
+        return _this;
+    }
+    Exec.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('EXEC');
+        nodo.agregarHijo('exec');
+        nodo.agregarHijo(this.identificador + '');
+        nodo.agregarHijo('(');
+        this.parametros.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo(')');
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    Exec.prototype.interpretar = function (arbol, tabla) {
+        var _a;
+        var funcion = arbol.getFuncion(this.identificador);
+        if (funcion == null)
+            return new Errores_1.default('SEMANTICO', 'NO SE ENCONTRO LA FUNCION', this.fila, this.columna);
+        if (funcion instanceof Metodos_1.default) {
+            var metodo = funcion;
+            if (metodo.parametros.length == ((_a = this.parametros) === null || _a === void 0 ? void 0 : _a.length)) {
+                var nuevaTabla = new tablaSimbolos_1.default(arbol.gettablaGlobal());
+                for (var param = 0; param < this.parametros.length; param++) {
+                    var newVal = this.parametros[param].interpretar(arbol, tabla);
+                    if (newVal instanceof Errores_1.default)
+                        return newVal;
+                    var dec = new Declaracion_1.default(metodo.parametros[param].tipato, metodo.fila, metodo.columna, metodo.parametros[param].identificador);
+                    var nuevaDec = dec.interpretar(arbol, nuevaTabla);
+                    if (nuevaDec instanceof Errores_1.default)
+                        return nuevaDec;
+                    var variable = nuevaTabla.getVariable(metodo.parametros[param].identificador);
+                    if (variable != null) {
+                        if (variable.gettipo().getTipo() !=
+                            this.parametros[param].tipoDato.getTipo()) {
+                            return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                                metodo.parametros[param].identificador +
+                                ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                        }
+                        else {
+                            variable.setvalor(newVal);
+                            nuevaTabla.setNombre(funcion.identificador);
+                        }
+                    }
+                    else {
+                        return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                            metodo.parametros[param].identificador +
+                            ' NO EXISTE', this.fila, this.columna);
+                    }
+                }
+                var nuevMet = metodo.interpretar(arbol, nuevaTabla);
+                if (nuevMet instanceof Errores_1.default)
+                    return nuevMet;
+            }
+            else {
+                return new Errores_1.default('SEMANTICO', 'PARAMETROS NO COINCIDENTES', this.fila, this.columna);
+            }
+        }
+    };
+    return Exec;
+}(Instruccion_1.Instruccion));
+exports.default = Exec;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44,"../TS/tablaSimbolos":45,"./Declaracion":25,"./Metodos":31}],28:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Return_1 = __importDefault(require("./Return"));
+var Funciones = /** @class */ (function (_super) {
+    __extends(Funciones, _super);
+    function Funciones(tipo, fila, columna, identificador, parametros, instrucciones) {
+        var _this = _super.call(this, tipo, fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.parametros = parametros;
+        _this.instrucciones = instrucciones;
+        return _this;
+    }
+    Funciones.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('FUNCION');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipoDato.getTipo()) + '');
+        nodo.agregarHijo(this.identificador + '');
+        nodo.agregarHijo('(');
+        var nuevo = null;
+        if (this.parametros.length > 0) {
+            nuevo = new nodoAST_1.default('PARAMETROS');
+        }
+        for (var param = 0; param < this.parametros.length; param++) {
+            if (nuevo == null)
+                break;
+            var vari = cambiarTipo_1.default(this.parametros[param].tipato.getTipo());
+            var ide = this.parametros[param].identificador;
+            if (vari != null)
+                nuevo.agregarHijo(vari);
+            if (ide != null)
+                nuevo.agregarHijo(ide);
+            if (param != this.parametros.length - 1)
+                nuevo.agregarHijo(',');
+        }
+        if (nuevo != null)
+            nodo.agregarHijoAST(nuevo);
+        nodo.agregarHijo(')');
+        nodo.agregarHijo('{');
+        this.instrucciones.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo('}');
+        return nodo;
+    };
+    Funciones.prototype.interpretar = function (arbol, tabla) {
+        for (var i = 0; i < this.instrucciones.length; i++) {
+            var val = this.instrucciones[i].interpretar(arbol, tabla);
+            if (val instanceof Errores_1.default)
+                return val;
+            if (val instanceof Return_1.default) {
+                if (val.valor != null) {
+                    if (this.tipoDato.getTipo() == val.tipoDato.getTipo())
+                        return val.valor;
+                    else
+                        return new Errores_1.default('SEMANTICO', 'TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                }
+                else {
+                    return new Errores_1.default('SEMANTICO', 'DEBE DEVOLVER UN VALOR EN LA FUNCION', this.fila, this.columna);
+                }
+            }
+        }
+    };
+    return Funciones;
+}(Instruccion_1.Instruccion));
+exports.default = Funciones;
+
+},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],29:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Identificador_1 = __importDefault(require("../Expresiones/Identificador"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Decremento = /** @class */ (function (_super) {
+    __extends(Decremento, _super);
+    function Decremento(identificador, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador;
+        return _this;
+    }
+    Decremento.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('INCREMENTO');
+        nodo.agregarHijoAST(this.identificador.getNodo());
+        nodo.agregarHijo('+');
+        nodo.agregarHijo('+');
+        return nodo;
+    };
+    Decremento.prototype.interpretar = function (arbol, tabla) {
+        //tomar el tipoDato de la variable
+        if (this.identificador instanceof Identificador_1.default) {
+            var variable = tabla.getVariable(this.identificador.identificador);
+            if (variable != null) {
+                if (variable.gettipo().getTipo() == Tipo_1.tipoDato.ENTERO ||
+                    variable.gettipo().getTipo() == Tipo_1.tipoDato.DECIMAL) {
+                    this.tipoDato.setTipo(variable.gettipo().getTipo());
+                    var uno = variable.getvalor();
+                    uno++;
+                    variable.setvalor(uno);
+                }
+                else {
+                    return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+                }
+            }
+            else {
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' NO EXISTE', this.fila, this.columna);
+            }
+        }
+        else {
+            var valE = this.identificador.interpretar(arbol, tabla);
+            if (valE instanceof Errores_1.default)
+                return valE;
+            if (this.identificador.tipoDato.getTipo() == Tipo_1.tipoDato.ENTERO) {
+                this.tipoDato.setTipo(Tipo_1.tipoDato.ENTERO);
+                var otro = parseInt(valE);
+                otro++;
+                return otro;
+            }
+            else if (this.identificador.tipoDato.getTipo() == Tipo_1.tipoDato.DECIMAL) {
+                this.tipoDato.setTipo(Tipo_1.tipoDato.DECIMAL);
+                var otro = parseFloat(valE);
+                otro++;
+                return otro;
+            }
+            else {
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+            }
+        }
+    };
+    return Decremento;
+}(Instruccion_1.Instruccion));
+exports.default = Decremento;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":44}],30:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var reporteTabla_1 = require("../../Reportes/reporteTabla");
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var tablaSimbolos_1 = __importDefault(require("../TS/tablaSimbolos"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Declaracion_1 = __importDefault(require("./Declaracion"));
+var declaracionListas_1 = __importDefault(require("./declaracionListas"));
+var declaracionVectores_1 = __importDefault(require("./declaracionVectores"));
+var Funciones_1 = __importDefault(require("./Funciones"));
+var Metodos_1 = __importDefault(require("./Metodos"));
+var LlamadaFuncMetd = /** @class */ (function (_super) {
+    __extends(LlamadaFuncMetd, _super);
+    function LlamadaFuncMetd(identificador, parametros, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.parametros = parametros;
+        return _this;
+    }
+    LlamadaFuncMetd.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('LLAMADA');
+        nodo.agregarHijo(this.identificador + '');
+        nodo.agregarHijo('(');
+        this.parametros.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo(')');
+        return nodo;
+    };
+    LlamadaFuncMetd.prototype.interpretar = function (arbol, tabla) {
+        var _a, _b;
+        var funcion = arbol.getFuncion(this.identificador);
+        if (funcion == null)
+            return new Errores_1.default('SEMANTICO', 'NO SE ENCONTRO LA FUNCION', this.fila, this.columna);
+        if (funcion instanceof Metodos_1.default) {
+            var metodo = funcion;
+            if (metodo.parametros.length == ((_a = this.parametros) === null || _a === void 0 ? void 0 : _a.length)) {
+                var nuevaTabla = new tablaSimbolos_1.default(arbol.gettablaGlobal());
+                for (var param = 0; param < this.parametros.length; param++) {
+                    var newVal = this.parametros[param].interpretar(arbol, tabla);
+                    if (newVal instanceof Errores_1.default)
+                        return newVal;
+                    var dec = void 0;
+                    if (metodo.parametros[param].arreglo) {
+                        dec = new declaracionVectores_1.default(metodo.parametros[param].tipato, metodo.parametros[param].identificador, false, metodo.fila, metodo.columna);
+                    }
+                    else if (metodo.parametros[param].lista) {
+                        dec = new declaracionListas_1.default(metodo.parametros[param].tipato, metodo.parametros[param].identificador, metodo.fila, metodo.columna, metodo.parametros[param].tipato, undefined);
+                    }
+                    else {
+                        dec = new Declaracion_1.default(metodo.parametros[param].tipato, metodo.fila, metodo.columna, metodo.parametros[param].identificador);
+                    }
+                    var nuevaDec = dec.interpretar(arbol, nuevaTabla);
+                    if (nuevaDec instanceof Errores_1.default)
+                        return nuevaDec;
+                    var variable = nuevaTabla.getVariable(metodo.parametros[param].identificador);
+                    if (variable != null) {
+                        if (variable.gettipo().getTipo() !=
+                            this.parametros[param].tipoDato.getTipo()) {
+                            return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                                metodo.parametros[param].identificador +
+                                ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                        }
+                        else {
+                            variable.setvalor(newVal);
+                            nuevaTabla.setNombre(metodo.identificador);
+                            if (!arbol.actualizarTabla(this.identificador.toString(), '', this.fila.toString(), nuevaTabla.getNombre().toString(), this.columna.toString())) {
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, '', 'Metodo', 'Void', nuevaTabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                arbol.listaSimbolos.push(nuevoSimbolo);
+                            }
+                        }
+                    }
+                    else {
+                        return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                            metodo.parametros[param].identificador +
+                            ' NO EXISTE', this.fila, this.columna);
+                    }
+                }
+                var nuevMet = metodo.interpretar(arbol, nuevaTabla);
+                if (nuevMet instanceof Errores_1.default)
+                    return nuevMet;
+            }
+            else {
+                return new Errores_1.default('SEMANTICO', 'PARAMETROS NO COINCIDENTES', this.fila, this.columna);
+            }
+        }
+        else if (funcion instanceof Funciones_1.default) {
+            var metodo = funcion;
+            if (metodo.parametros.length == ((_b = this.parametros) === null || _b === void 0 ? void 0 : _b.length)) {
+                var nuevaTabla = new tablaSimbolos_1.default(arbol.gettablaGlobal());
+                for (var param = 0; param < this.parametros.length; param++) {
+                    var newVal = this.parametros[param].interpretar(arbol, tabla);
+                    if (newVal instanceof Errores_1.default)
+                        return newVal;
+                    var dec = new Declaracion_1.default(metodo.parametros[param].tipato, metodo.fila, metodo.columna, metodo.parametros[param].identificador);
+                    var nuevaDec = dec.interpretar(arbol, nuevaTabla);
+                    if (nuevaDec instanceof Errores_1.default)
+                        return nuevaDec;
+                    var variable = nuevaTabla.getVariable(metodo.parametros[param].identificador);
+                    if (variable != null) {
+                        if (variable.gettipo().getTipo() !=
+                            this.parametros[param].tipoDato.getTipo()) {
+                            return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                                metodo.parametros[param].identificador +
+                                ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                        }
+                        else {
+                            variable.setvalor(newVal);
+                            nuevaTabla.setNombre(metodo.identificador);
+                            if (!arbol.actualizarTabla(metodo.identificador.toString(), newVal, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(metodo.identificador, newVal, 'Funcion', cambiarTipo_1.default(this.tipoDato.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                arbol.listaSimbolos.push(nuevoSimbolo);
+                            }
+                            //nueva variable
+                        }
+                    }
+                    else {
+                        return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                            metodo.parametros[param].identificador +
+                            ' NO EXISTE', this.fila, this.columna);
+                    }
+                }
+                var nuevMet = metodo.interpretar(arbol, nuevaTabla);
+                if (nuevMet instanceof Errores_1.default)
+                    return nuevMet;
+                this.tipoDato = metodo.tipoDato;
+                return nuevMet;
+            }
+            else {
+                return new Errores_1.default('SEMANTICO', 'PARAMETROS NO COINCIDENTES', this.fila, this.columna);
+            }
+        }
+    };
+    return LlamadaFuncMetd;
+}(Instruccion_1.Instruccion));
+exports.default = LlamadaFuncMetd;
+
+},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44,"../TS/tablaSimbolos":45,"./Declaracion":25,"./Funciones":28,"./Metodos":31,"./declaracionListas":39,"./declaracionVectores":40}],31:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Return_1 = __importDefault(require("./Return"));
+var Metodos = /** @class */ (function (_super) {
+    __extends(Metodos, _super);
+    function Metodos(tipo, fila, columna, identificador, parametros, instrucciones) {
+        var _this = _super.call(this, tipo, fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.parametros = parametros;
+        _this.instrucciones = instrucciones;
+        return _this;
+    }
+    Metodos.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('METODO');
+        nodo.agregarHijo('void');
+        nodo.agregarHijo(this.identificador + '');
+        nodo.agregarHijo('(');
+        var nuevo = null;
+        if (this.parametros.length > 0) {
+            nuevo = new nodoAST_1.default('PARAMETROS');
+        }
+        for (var param = 0; param < this.parametros.length; param++) {
+            if (nuevo == null)
+                break;
+            var vari = cambiarTipo_1.default(this.parametros[param].tipato.getTipo());
+            var ide = this.parametros[param].identificador;
+            if (vari != null)
+                nuevo.agregarHijo(vari);
+            if (ide != null)
+                nuevo.agregarHijo(ide);
+            if (param != this.parametros.length - 1)
+                nuevo.agregarHijo(',');
+        }
+        if (nuevo != null)
+            nodo.agregarHijoAST(nuevo);
+        nodo.agregarHijo(')');
+        nodo.agregarHijo('{');
+        this.instrucciones.forEach(function (element) {
+            nodo.agregarHijoAST(element.getNodo());
+        });
+        nodo.agregarHijo('}');
+        return nodo;
+    };
+    Metodos.prototype.interpretar = function (arbol, tabla) {
+        for (var i = 0; i < this.instrucciones.length; i++) {
+            var val = this.instrucciones[i].interpretar(arbol, tabla);
+            if (val instanceof Errores_1.default)
+                return val;
+            if (this.instrucciones[i] instanceof Return_1.default) {
+                if (val instanceof Return_1.default) {
+                    if (val.valor != null) {
+                        return new Errores_1.default('SEMANTICO', 'NO PUEDE DEVOLVER UN VALOR EN UN METODO', this.fila, this.columna);
+                    }
+                    else
+                        break;
+                }
+                else
+                    return new Errores_1.default('SEMANTICO', 'NO PUEDE DEVOLVER UN VALOR EN UN METODO', this.fila, this.columna);
+            }
+        }
+    };
+    return Metodos;
+}(Instruccion_1.Instruccion));
+exports.default = Metodos;
+
+},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],32:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Return = /** @class */ (function (_super) {
+    __extends(Return, _super);
+    function Return(fila, columna, expresion) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.valor = null;
+        _this.expresionReturn = expresion;
+        return _this;
+    }
+    Return.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('RETURN');
+        nodo.agregarHijo('return');
+        if (this.expresionReturn != undefined) {
+            nodo.agregarHijoAST(this.expresionReturn.getNodo());
+        }
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    Return.prototype.interpretar = function (arbol, tabla) {
+        var _a;
+        if (this.expresionReturn) {
+            this.valor = (_a = this.expresionReturn) === null || _a === void 0 ? void 0 : _a.interpretar(arbol, tabla);
+            this.tipoDato = this.expresionReturn.tipoDato;
+        }
+        return this;
+    };
+    return Return;
+}(Instruccion_1.Instruccion));
+exports.default = Return;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],33:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var accesoLista = /** @class */ (function (_super) {
+    __extends(accesoLista, _super);
+    function accesoLista(identificador, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.expresion = expresion;
+        return _this;
+    }
+    accesoLista.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('ACCESO-LISTA');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('[');
+        nodo.agregarHijo('[');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(']');
+        nodo.agregarHijo(']');
+        return nodo;
+    };
+    accesoLista.prototype.interpretar = function (arbol, tabla) {
+        var exp = this.expresion.interpretar(arbol, tabla);
+        if (exp instanceof Errores_1.default)
+            return exp;
+        if (this.expresion.tipoDato.getTipo() != Tipo_1.tipoDato.ENTERO)
+            return new Errores_1.default('SEMANTICO', 'TIPO DE DATO DIFERENTE', this.fila, this.columna);
+        var ide = tabla.getVariable(this.identificador);
+        if (ide != null) {
+            this.tipoDato = new Tipo_1.default(ide.gettipo().getTipo());
+            return ide.getvalor()[exp];
+        }
+        return null;
+    };
+    return accesoLista;
+}(Instruccion_1.Instruccion));
+exports.default = accesoLista;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],34:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var accesoVector = /** @class */ (function (_super) {
+    __extends(accesoVector, _super);
+    function accesoVector(identificador, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.expresion = expresion;
+        return _this;
+    }
+    accesoVector.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('ACCESO-VECTOR');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('[');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(']');
+        return nodo;
+    };
+    accesoVector.prototype.interpretar = function (arbol, tabla) {
+        var exp = this.expresion.interpretar(arbol, tabla);
+        if (exp instanceof Errores_1.default)
+            return exp;
+        if (this.expresion.tipoDato.getTipo() != Tipo_1.tipoDato.ENTERO)
+            return new Errores_1.default('SEMANTICO', 'TIPO DE DATO DIFERENTE', this.fila, this.columna);
+        var ide = tabla.getVariable(this.identificador);
+        if (ide != null) {
+            this.tipoDato = new Tipo_1.default(ide.gettipo().getTipo());
+            return ide.getvalor()[exp];
+        }
+        return null;
+    };
+    return accesoVector;
+}(Instruccion_1.Instruccion));
+exports.default = accesoVector;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],35:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var agregarLista = /** @class */ (function (_super) {
+    __extends(agregarLista, _super);
+    function agregarLista(identificador, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.expresion = expresion;
+        return _this;
+    }
+    agregarLista.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('ADD-LISTA');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('.');
+        nodo.agregarHijo('add');
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(')');
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    agregarLista.prototype.interpretar = function (arbol, tabla) {
+        var ide = tabla.getVariable(this.identificador);
+        if (ide != null) {
+            var arreglo = ide.getvalor();
+            var exp = this.expresion.interpretar(arbol, tabla);
+            if (exp instanceof Errores_1.default)
+                return exp;
+            if (ide.gettipo().getTipo() != this.expresion.tipoDato.getTipo())
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+            arreglo.push(exp);
+            ide.setvalor(arreglo);
+            arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
+        }
+        else
+            return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
+    };
+    return agregarLista;
+}(Instruccion_1.Instruccion));
+exports.default = agregarLista;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],36:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var asignacionLista = /** @class */ (function (_super) {
+    __extends(asignacionLista, _super);
+    function asignacionLista(identificador, posicion, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.posicion = posicion;
+        _this.expresion = expresion;
+        return _this;
+    }
+    asignacionLista.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('ASIGNACION-LISTA');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('[');
+        nodo.agregarHijo('[');
+        nodo.agregarHijoAST(this.posicion.getNodo());
+        nodo.agregarHijo(']');
+        nodo.agregarHijo(']');
+        nodo.agregarHijo('=');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    asignacionLista.prototype.interpretar = function (arbol, tabla) {
+        var ide = tabla.getVariable(this.identificador);
+        if (ide != null) {
+            var pos = this.posicion.interpretar(arbol, tabla);
+            if (pos instanceof Errores_1.default)
+                return pos;
+            if (this.posicion.tipoDato.getTipo() != Tipo_1.tipoDato.ENTERO)
+                return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO NUMERICO', this.fila, this.columna);
+            var arreglo = ide.getvalor();
+            if (pos > arreglo.length)
+                return new Errores_1.default('SEMANTICO', 'RANGO FUERA DE LOS LIMITES', this.fila, this.columna);
+            var exp = this.expresion.interpretar(arbol, tabla);
+            if (exp instanceof Errores_1.default)
+                return exp;
+            if (ide.gettipo().getTipo() != this.expresion.tipoDato.getTipo())
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+            arreglo[pos] = exp;
+            ide.setvalor(arreglo);
+            arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
+        }
+        else
+            return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
+    };
+    return asignacionLista;
+}(Instruccion_1.Instruccion));
+exports.default = asignacionLista;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],37:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var asignacionVector = /** @class */ (function (_super) {
+    __extends(asignacionVector, _super);
+    function asignacionVector(identificador, posicion, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.posicion = posicion;
+        _this.expresion = expresion;
+        return _this;
+    }
+    asignacionVector.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('ASIGNACION-VECTOR');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('[');
+        nodo.agregarHijoAST(this.posicion.getNodo());
+        nodo.agregarHijo(']');
+        nodo.agregarHijo('=');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    asignacionVector.prototype.interpretar = function (arbol, tabla) {
+        var ide = tabla.getVariable(this.identificador);
+        if (ide != null) {
+            var pos = this.posicion.interpretar(arbol, tabla);
+            if (pos instanceof Errores_1.default)
+                return pos;
+            if (this.posicion.tipoDato.getTipo() != Tipo_1.tipoDato.ENTERO)
+                return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO NUMERICO', this.fila, this.columna);
+            var arreglo = ide.getvalor();
+            if (pos > arreglo.length)
+                return new Errores_1.default('SEMANTICO', 'RANGO FUERA DE LOS LIMITES', this.fila, this.columna);
+            var exp = this.expresion.interpretar(arbol, tabla);
+            if (exp instanceof Errores_1.default)
+                return exp;
+            if (ide.gettipo().getTipo() != this.expresion.tipoDato.getTipo())
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+            arreglo[pos] = exp;
+            ide.setvalor(arreglo);
+            arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
+        }
+        else
+            return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
+    };
+    return asignacionVector;
+}(Instruccion_1.Instruccion));
+exports.default = asignacionVector;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],38:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var casteo = /** @class */ (function (_super) {
+    __extends(casteo, _super);
+    function casteo(tipo, expresion, fila, columna) {
+        var _this = _super.call(this, tipo, fila, columna) || this;
+        _this.tipo = tipo;
+        _this.expresion = expresion;
+        return _this;
+    }
+    casteo.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('CASTEO');
+        nodo.agregarHijo('(');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
+        nodo.agregarHijo(')');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        return nodo;
+    };
+    casteo.prototype.interpretar = function (arbol, tabla) {
+        var exp = this.expresion.interpretar(arbol, tabla);
+        if (exp instanceof Errores_1.default)
+            return exp;
+        if (this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.ENTERO) {
+            if (this.tipo.getTipo() == Tipo_1.tipoDato.DECIMAL) {
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                return parseFloat(exp);
+            }
+            else if (this.tipo.getTipo() == Tipo_1.tipoDato.CADENA) {
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                return exp.toString();
+            }
+            else if (this.tipo.getTipo() == Tipo_1.tipoDato.CARACTER) {
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CARACTER);
+                return String.fromCharCode(parseInt(exp));
+            }
+            else
+                return new Errores_1.default('SEMANTICO', 'NO ES POSIBLE EL CASTEO POR TIPO DE DATO', this.fila, this.columna);
+        }
+        else if (this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.DECIMAL) {
+            if (this.tipo.getTipo() == Tipo_1.tipoDato.ENTERO) {
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                return parseInt(exp);
+            }
+            else if (this.tipo.getTipo() == Tipo_1.tipoDato.CADENA) {
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                return exp.toString();
+            }
+            else
+                return new Errores_1.default('SEMANTICO', 'NO ES POSIBLE EL CASTEO POR TIPO DE DATO', this.fila, this.columna);
+        }
+        else if (this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.CARACTER) {
+            if (this.tipo.getTipo() == Tipo_1.tipoDato.ENTERO) {
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                var da = exp + '';
+                var res = da.charCodeAt(0);
+                return res;
+            }
+            else if (this.tipo.getTipo() == Tipo_1.tipoDato.DECIMAL) {
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.DECIMAL);
+                var da = exp + '';
+                var res = da.charCodeAt(0);
+                return res;
+            }
+            else
+                return new Errores_1.default('SEMANTICO', 'NO ES POSIBLE EL CASTEO POR TIPO DE DATO', this.fila, this.columna);
+        }
+        else
+            return new Errores_1.default('SEMANTICO', 'NO ES POSIBLE EL CASTEO POR TIPO DE DATO', this.fila, this.columna);
+    };
+    return casteo;
+}(Instruccion_1.Instruccion));
+exports.default = casteo;
+
+},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],39:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var reporteTabla_1 = require("../../Reportes/reporteTabla");
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Simbolo_1 = __importDefault(require("../TS/Simbolo"));
+var declaracionListas = /** @class */ (function (_super) {
+    __extends(declaracionListas, _super);
+    function declaracionListas(tipo, identificador, fila, columna, tipoVector, expresion) {
+        var _this = _super.call(this, tipo, fila, columna) || this;
+        _this.tipo = tipo;
+        _this.identificador = identificador.toLowerCase();
+        _this.tipoVector = tipoVector;
+        _this.expresion = expresion;
+        return _this;
+    }
+    declaracionListas.prototype.getNodo = function () {
+        var _a;
+        var nodo = new nodoAST_1.default('LISTAS');
+        nodo.agregarHijo('list');
+        nodo.agregarHijo('<');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
+        nodo.agregarHijo('>');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('=');
+        nodo.agregarHijo('new');
+        nodo.agregarHijo('list');
+        nodo.agregarHijo('<');
+        nodo.agregarHijo(cambiarTipo_1.default((_a = this.tipoVector) === null || _a === void 0 ? void 0 : _a.getTipo()) + '');
+        nodo.agregarHijo('>');
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    declaracionListas.prototype.interpretar = function (arbol, tabla) {
+        var _a, _b;
+        if (this.tipoVector != null) {
+            if (this.tipo.getTipo() != this.tipoVector.getTipo())
+                return new Errores_1.default('SEMANTICO', 'TIPOS DE DATOS DIFERENTES EN DECLARACION', this.fila, this.columna);
+            else {
+                var arreglo = new Array();
+                if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, arreglo)) == 'La variable existe actualmente')
+                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                else {
+                    if (!arbol.actualizarTabla(this.identificador, arreglo.toString(), this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo.toString(), 'lista', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                        arbol.listaSimbolos.push(nuevoSimbolo);
+                    }
+                }
+            }
+        }
+        else {
+            var exp = (_a = this.expresion) === null || _a === void 0 ? void 0 : _a.interpretar(arbol, tabla);
+            if (exp instanceof Errores_1.default)
+                return exp;
+            if (this.tipo.getTipo() != ((_b = this.expresion) === null || _b === void 0 ? void 0 : _b.tipoDato.getTipo()))
+                return new Errores_1.default('SEMANTICO', 'TIPOS DE DATOS DIFERENTES EN DECLARACION', this.fila, this.columna);
+            var arreglo = new Array();
+            for (var i = 0; i < exp.length; i++) {
+                arreglo.push(exp[i]);
+            }
+            if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, arreglo)) == 'La variable existe actualmente')
+                return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+            else {
+                if (!arbol.actualizarTabla(this.identificador, arreglo.toString(), this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                    var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo.toString(), 'lista', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                    arbol.listaSimbolos.push(nuevoSimbolo);
+                }
+            }
+        }
+    };
+    return declaracionListas;
+}(Instruccion_1.Instruccion));
+exports.default = declaracionListas;
+
+},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":43}],40:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var reporteTabla_1 = require("../../Reportes/reporteTabla");
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Simbolo_1 = __importDefault(require("../TS/Simbolo"));
+var Tipo_1 = require("../TS/Tipo");
+var declaracionVectores = /** @class */ (function (_super) {
+    __extends(declaracionVectores, _super);
+    function declaracionVectores(tipo, identificador, tipoDeclaracion, fila, columna, cantidad, tipoVector, listaValores) {
+        var _this = _super.call(this, tipo, fila, columna) || this;
+        _this.tipo = tipo;
+        _this.identificador = identificador;
+        _this.tipoDeclaracion = tipoDeclaracion;
+        _this.cantidad = cantidad;
+        _this.tipoVector = tipoVector;
+        _this.listaValores = listaValores;
+        return _this;
+    }
+    declaracionVectores.prototype.getNodo = function () {
+        var _a, _b;
+        var nodo = new nodoAST_1.default('VECTORES');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
+        nodo.agregarHijo('[');
+        nodo.agregarHijo(']');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('=');
+        if (this.tipoDeclaracion) {
+            nodo.agregarHijo('[');
+            nodo.agregarHijoAST((_a = this.cantidad) === null || _a === void 0 ? void 0 : _a.getNodo());
+            nodo.agregarHijo(']');
+        }
+        else {
+            nodo.agregarHijo('{');
+            (_b = this.listaValores) === null || _b === void 0 ? void 0 : _b.forEach(function (res) {
+                nodo.agregarHijoAST(res.getNodo());
+                nodo.agregarHijo(',');
+            });
+            nodo.agregarHijo('}');
+        }
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    declaracionVectores.prototype.interpretar = function (arbol, tabla) {
+        var _a, _b, _c;
+        if (this.tipoDeclaracion) {
+            if (this.tipoVector == null)
+                return new Errores_1.default('SINTACTICO', 'NO EXISTE TIPO DE DATO DE VECTOR', this.fila, this.columna);
+            if (this.tipo.getTipo() != ((_a = this.tipoVector) === null || _a === void 0 ? void 0 : _a.getTipo()))
+                return new Errores_1.default('SEMANTICO', 'TIPOS DE DATOS DIFERENTES EN DECLARACION', this.fila, this.columna);
+            else {
+                var numero = (_b = this.cantidad) === null || _b === void 0 ? void 0 : _b.interpretar(arbol, tabla);
+                if (numero instanceof Errores_1.default)
+                    return numero;
+                if (((_c = this.cantidad) === null || _c === void 0 ? void 0 : _c.tipoDato.getTipo()) != Tipo_1.tipoDato.ENTERO)
+                    return new Errores_1.default('SEMANTICO', 'VARIABLE NO ES TIPO ENTERO', this.fila, this.columna);
+                var num = parseInt(numero);
+                var arreglo = [];
+                for (var i = 0; i < num; i++) {
+                    arreglo[i] = [];
+                }
+                if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, arreglo)) == 'La variable existe actualmente')
+                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                else {
+                    if (!arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo, 'vector', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                        arbol.listaSimbolos.push(nuevoSimbolo);
+                    }
+                }
+            }
+        }
+        else {
+            var arreglo = [];
+            if (this.listaValores == null)
+                this.listaValores = [];
+            for (var i = 0; i < this.listaValores.length; i++) {
+                var valor = this.listaValores[i].interpretar(arbol, tabla);
+                if (valor instanceof Errores_1.default)
+                    return valor;
+                if (this.tipo.getTipo() != this.listaValores[i].tipoDato.getTipo())
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO DIFERENTE', this.fila, this.columna);
+                arreglo[i] = valor;
+            }
+            if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, arreglo)) == 'La variable existe actualmente')
+                return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+            else {
+                if (!arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
+                    var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo, 'vector', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                    arbol.listaSimbolos.push(nuevoSimbolo);
+                }
+            }
+            //declaracion tipo 2
+        }
+    };
+    return declaracionVectores;
+}(Instruccion_1.Instruccion));
+exports.default = declaracionVectores;
+
+},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":43,"../TS/Tipo":44}],41:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Identificador_1 = __importDefault(require("../Expresiones/Identificador"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var funcNativa = /** @class */ (function (_super) {
+    __extends(funcNativa, _super);
+    function funcNativa(identificador, expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.ENTERO), fila, columna) || this;
+        _this.identificador = identificador.toLowerCase();
+        _this.expresion = expresion;
+        if (expresion instanceof Identificador_1.default)
+            _this.ide = expresion.identificador.toString();
+        else
+            _this.ide = '';
+        return _this;
+    }
+    funcNativa.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('FUNCION-NATIVA');
+        nodo.agregarHijo(this.identificador);
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(')');
+        return nodo;
+    };
+    funcNativa.prototype.interpretar = function (arbol, tabla) {
+        var exp = this.expresion.interpretar(arbol, tabla);
+        if (exp instanceof Errores_1.default)
+            return exp;
+        switch (this.identificador) {
+            case 'tolowercase':
+                if (this.expresion.tipoDato.getTipo() != Tipo_1.tipoDato.CADENA)
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION TOLOWER', this.fila, this.columna);
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                return exp.toString().toLowerCase();
+            case 'touppercase':
+                if (this.expresion.tipoDato.getTipo() != Tipo_1.tipoDato.CADENA)
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION TOUPPER', this.fila, this.columna);
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                return exp.toString().toUpperCase();
+            case 'length':
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                var vec = arbol.BuscarTipo(this.ide);
+                if (vec == 'lista' || vec == 'vector')
+                    return exp.length;
+                else if (this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.CADENA)
+                    return exp.length;
+                else
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION LENGTH', this.fila, this.columna);
+            case 'toint':
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+                if (this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.DECIMAL ||
+                    this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.ENTERO)
+                    return Math.trunc(parseFloat(exp));
+                else
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION TRUNCATE', this.fila, this.columna);
+            case 'typeof':
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                var tipo = arbol.BuscarTipo(this.ide);
+                if (tipo == 'lista' || tipo == 'vector')
+                    return tipo.toString();
+                else
+                    return cambiarTipo_1.default(this.expresion.tipoDato.getTipo());
+            case 'string':
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                if (this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.DECIMAL ||
+                    this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.ENTERO ||
+                    this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.BOOLEANO ||
+                    this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.CARACTER)
+                    return exp.toString();
+                else
+                    try {
+                        return exp.toString();
+                    }
+                    catch (error) {
+                        return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION TOSTRING', this.fila, this.columna);
+                    }
+            case 'int':
+                if (this.expresion.tipoDato.getTipo() != Tipo_1.tipoDato.CADENA)
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION INT', this.fila, this.columna);
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                try {
+                    return parseInt(exp.toString());
+                }
+                catch (error) {
+                    return new Errores_1.default('SEMANTICO', 'NO SE PUEDE CONVERTIR CADENAS DE CARACTERES A INT', this.fila, this.columna);
+                }
+            case 'double':
+                if (this.expresion.tipoDato.getTipo() != Tipo_1.tipoDato.CADENA)
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION DOUBLE', this.fila, this.columna);
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                try {
+                    return parseFloat(exp.toString());
+                }
+                catch (error) {
+                    return new Errores_1.default('SEMANTICO', 'NO SE PUEDE CONVERTIR CADENAS DE CARACTERES A DOUBLE', this.fila, this.columna);
+                }
+            case 'boolean':
+                if (this.expresion.tipoDato.getTipo() != Tipo_1.tipoDato.CADENA)
+                    return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION BOOLEAN', this.fila, this.columna);
+                this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
+                try {
+                    var valor = exp.toString();
+                    if (valor == '1' || valor.toLowerCase() == 'true') {
+                        return true;
+                    }
+                    else if (valor == '0' || valor.toLowerCase() == 'false') {
+                        return false;
+                    }
+                    else {
+                        return new Errores_1.default('SEMANTICO', 'NO SE PUEDE CONVERTIR ESTA CADENA A BOOLEAN', this.fila, this.columna);
+                    }
+                }
+                catch (error) {
+                    return new Errores_1.default('SEMANTICO', 'NO SE PUEDE CONVERTIR ESTA CADENA A BOOLEAN', this.fila, this.columna);
+                }
+            default:
+                return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION NATIVA', this.fila, this.columna);
+        }
+    };
+    return funcNativa;
+}(Instruccion_1.Instruccion));
+exports.default = funcNativa;
+
+},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":44}],42:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Instruccion_1 = require("../Abstracto/Instruccion");
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Tipo_1 = __importStar(require("../TS/Tipo"));
+var Print = /** @class */ (function (_super) {
+    __extends(Print, _super);
+    function Print(expresion, fila, columna) {
+        var _this = _super.call(this, new Tipo_1.default(Tipo_1.tipoDato.CADENA), fila, columna) || this;
+        _this.expresion = expresion;
+        return _this;
+    }
+    Print.prototype.getNodo = function () {
+        var nodo = new nodoAST_1.default('IMPRESION');
+        nodo.agregarHijo('print');
+        nodo.agregarHijo('(');
+        nodo.agregarHijoAST(this.expresion.getNodo());
+        nodo.agregarHijo(')');
+        nodo.agregarHijo(';');
+        return nodo;
+    };
+    Print.prototype.interpretar = function (arbol, tabla) {
+        var valor = this.expresion.interpretar(arbol, tabla);
+        if (valor instanceof Errores_1.default)
+            return valor;
+        arbol.actualizaConsola(valor + '');
+    };
+    return Print;
+}(Instruccion_1.Instruccion));
+exports.default = Print;
+
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],43:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Simbolo = /** @class */ (function () {
+    function Simbolo(tipo, identificador, valor) {
+        this.tipo = tipo;
+        this.identificador = identificador.toLowerCase();
+        this.valor = valor;
+    }
+    //getters y setters
+    Simbolo.prototype.gettipo = function () {
+        return this.tipo;
+    };
+    Simbolo.prototype.settipo = function (value) {
+        this.tipo = value;
+    };
+    Simbolo.prototype.getidentificador = function () {
+        return this.identificador;
+    };
+    Simbolo.prototype.setidentificador = function (value) {
+        this.identificador = value;
+    };
+    Simbolo.prototype.getvalor = function () {
+        return this.valor;
+    };
+    Simbolo.prototype.setvalor = function (value) {
+        this.valor = value;
+    };
+    return Simbolo;
+}());
+exports.default = Simbolo;
+
+},{}],44:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.tipoDato = void 0;
+var Tipo = /** @class */ (function () {
+    function Tipo(tipos) {
+        this.tipos = tipos;
+    }
+    Tipo.prototype.getTipo = function () {
+        return this.tipos;
+    };
+    Tipo.prototype.setTipo = function (tipo) {
+        this.tipos = tipo;
+    };
+    Tipo.prototype.igual = function (compara) {
+        return (this.tipos = compara.tipos);
+    };
+    return Tipo;
+}());
+exports.default = Tipo;
+var tipoDato;
+(function (tipoDato) {
+    tipoDato[tipoDato["ENTERO"] = 0] = "ENTERO";
+    tipoDato[tipoDato["DECIMAL"] = 1] = "DECIMAL";
+    tipoDato[tipoDato["BOOLEANO"] = 2] = "BOOLEANO";
+    tipoDato[tipoDato["CARACTER"] = 3] = "CARACTER";
+    tipoDato[tipoDato["CADENA"] = 4] = "CADENA";
+    tipoDato[tipoDato["VOID"] = 5] = "VOID";
+    tipoDato[tipoDato["NULO"] = 6] = "NULO";
+})(tipoDato = exports.tipoDato || (exports.tipoDato = {}));
+
+},{}],45:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Tipo_1 = __importStar(require("./Tipo"));
+var tablaSimbolos = /** @class */ (function () {
+    function tablaSimbolos(anterior) {
+        this.tablaAnterior = anterior;
+        this.tablaActual = new Map();
+        this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
+        this.nombreDato = '';
+    }
+    tablaSimbolos.prototype.getAnterior = function () {
+        return this.tablaAnterior;
+    };
+    tablaSimbolos.prototype.setAnterior = function (anterior) {
+        this.tablaAnterior = anterior;
+    };
+    tablaSimbolos.prototype.getTabla = function () {
+        return this.tablaActual;
+    };
+    tablaSimbolos.prototype.setTabla = function (Tabla) {
+        this.tablaActual = Tabla;
+    };
+    tablaSimbolos.prototype.setVariable = function (simbolo) {
+        for (var e = this; e != null; e = e.getAnterior()) {
+            var encontrado = (e.getTabla().get(simbolo.getidentificador().toLowerCase()));
+            if (encontrado != null) {
+                return "La variable existe actualmente";
+            }
+            break;
+        }
+        this.tablaActual.set(simbolo.getidentificador().toLowerCase(), simbolo);
+        return "creada con exito";
+    };
+    tablaSimbolos.prototype.getVariable = function (id) {
+        for (var e = this; e != null; e = e.getAnterior()) {
+            var encontrado = e.getTabla().get(id.toLowerCase());
+            if (encontrado != null) {
+                return encontrado;
+            }
+        }
+        return null;
+    };
+    tablaSimbolos.prototype.getNombre = function () {
+        return this.nombreDato;
+    };
+    tablaSimbolos.prototype.setNombre = function (nombre) {
+        this.nombreDato = nombre;
+    };
+    return tablaSimbolos;
+}());
+exports.default = tablaSimbolos;
+
+},{"./Tipo":44}],46:[function(require,module,exports){
 (function (process){(function (){
 /* parser generated by jison 0.4.18 */
 /*
@@ -794,127 +5202,265 @@ process.umask = function() { return 0; };
     recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
   }
 */
-var grammar = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,5],$V1=[1,6],$V2=[5,8,12],$V3=[1,25],$V4=[1,24],$V5=[1,26],$V6=[1,17],$V7=[1,18],$V8=[1,19],$V9=[1,20],$Va=[1,21],$Vb=[1,22],$Vc=[1,23],$Vd=[1,29],$Ve=[11,13],$Vf=[1,30],$Vg=[1,31],$Vh=[1,32],$Vi=[1,33],$Vj=[1,34],$Vk=[1,35],$Vl=[1,36],$Vm=[1,37],$Vn=[1,38],$Vo=[1,39],$Vp=[1,40],$Vq=[1,41],$Vr=[1,42],$Vs=[1,43],$Vt=[1,44],$Vu=[11,13,19,20,22,23,24,25,26,27,28,29,30,31,32,33,34],$Vv=[11,13,19,20],$Vw=[11,13,19,20,22,23,24,25,26,27],$Vx=[11,13,19,20,22,23,24,25,26,27,28,29,33],$Vy=[11,13,19,20,22,23,24,25,26,27,28,29,30,31,33];
+var analizador = (function(){
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,23],$V1=[1,24],$V2=[1,44],$V3=[1,25],$V4=[1,27],$V5=[1,39],$V6=[1,40],$V7=[1,41],$V8=[1,42],$V9=[1,43],$Va=[1,45],$Vb=[1,46],$Vc=[1,48],$Vd=[1,49],$Ve=[1,50],$Vf=[1,51],$Vg=[1,52],$Vh=[1,53],$Vi=[1,54],$Vj=[1,28],$Vk=[1,29],$Vl=[1,30],$Vm=[1,31],$Vn=[1,32],$Vo=[1,33],$Vp=[1,34],$Vq=[1,36],$Vr=[1,37],$Vs=[1,38],$Vt=[1,57],$Vu=[1,58],$Vv=[1,59],$Vw=[1,60],$Vx=[1,61],$Vy=[1,62],$Vz=[2,5,27,28,31,33,35,36,37,38,39,41,53,57,58,59,60,61,62,63,70,73,74,77,78,79,80,84,86,87,90,93,98,100,101,102,103,104,105],$VA=[40,41,42,43,44,45,46,47,48,49,50,51,52,54,55,75,88,89],$VB=[2,61],$VC=[1,79],$VD=[2,60],$VE=[1,81],$VF=[1,80],$VG=[1,86],$VH=[1,90],$VI=[1,96],$VJ=[1,97],$VK=[1,98],$VL=[1,99],$VM=[1,100],$VN=[1,101],$VO=[1,102],$VP=[1,103],$VQ=[1,104],$VR=[1,105],$VS=[1,106],$VT=[1,107],$VU=[1,108],$VV=[1,109],$VW=[1,110],$VX=[1,111],$VY=[33,47,63,68],$VZ=[9,30,40,41,42,43,44,45,46,47,48,49,50,51,52,54,55,65,75,76,88,89,95],$V_=[2,26],$V$=[1,123],$V01=[1,137],$V11=[9,30],$V21=[9,30,51,52,65,75,76,88,89,95],$V31=[1,164],$V41=[65,95],$V51=[1,172],$V61=[1,176],$V71=[30,95],$V81=[2,5,27,28,31,33,35,36,37,38,39,41,53,57,58,59,60,61,62,63,70,72,73,74,77,78,79,80,84,86,87,90,93,98,100,101,102,103,104,105],$V91=[9,30,40,41,45,46,47,48,49,50,51,52,54,55,65,75,76,88,89,95],$Va1=[9,30,45,46,47,48,49,50,51,52,54,55,65,75,76,88,89,95],$Vb1=[1,196],$Vc1=[2,110],$Vd1=[1,230],$Ve1=[1,229],$Vf1=[84,86,87];
 var parser = {trace: function trace () { },
 yy: {},
-symbols_: {"error":2,"START":3,"INSTRUCCIONES":4,"EOF":5,"INSTRUCCION":6,"PRINT":7,"print":8,"(":9,"PRINT_ARGS":10,")":11,"println":12,",":13,"EXPR":14,"PRIMITIVA":15,"OP_LOGICA":16,"OP_RELACIONAL":17,"OP_ARITMETICA":18,"&&":19,"||":20,"!":21,"!=":22,"==":23,"<":24,"<=":25,">":26,">=":27,"+":28,"-":29,"*":30,"/":31,"^":32,"&":33,"%":34,"entero":35,"decimal":36,"cadena":37,"caracter":38,"true":39,"false":40,"null":41,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",8:"print",9:"(",11:")",12:"println",13:",",19:"&&",20:"||",21:"!",22:"!=",23:"==",24:"<",25:"<=",26:">",27:">=",28:"+",29:"-",30:"*",31:"/",32:"^",33:"&",34:"%",35:"entero",36:"decimal",37:"cadena",38:"caracter",39:"true",40:"false",41:"null"},
-productions_: [0,[3,2],[4,2],[4,1],[6,1],[7,4],[7,4],[10,3],[10,1],[14,1],[14,1],[14,1],[14,1],[16,3],[16,3],[16,2],[17,3],[17,3],[17,3],[17,3],[17,3],[17,3],[18,3],[18,3],[18,3],[18,3],[18,3],[18,3],[18,3],[18,3],[18,2],[15,1],[15,1],[15,1],[15,1],[15,1],[15,1],[15,1]],
+symbols_: {"error":2,"INI":3,"INSTRUCCIONES":4,"EOF":5,"INSTRUCCION":6,"IMPRIMIR":7,"DECLARACION":8,"PTCOMA":9,"ASIGNACION":10,"CONDICIONIF":11,"CONDICIONWHILE":12,"CONDICIONDOWHILE":13,"CONDBREAK":14,"CODCONTINUE":15,"CONDRETURN":16,"CONDSWITCH":17,"CONDINCREMENTO":18,"CONDECREMENTO":19,"CONDFOR":20,"METODOS":21,"LLAMADA":22,"EJECUTAR":23,"FUNCIONES":24,"VECTORES":25,"ASIGVECTORES":26,"RESPRINT":27,"PARABRE":28,"EXPRESION":29,"PARCIERRA":30,"RESPRINTLN":31,"TIPODATO":32,"IDENTIFICADOR":33,"IGUAL":34,"RESINT":35,"RESCHAR":36,"RESBOOL":37,"RESDOUBLE":38,"RESSTRING":39,"MAS":40,"MENOS":41,"POR":42,"DIVI":43,"MOD":44,"COMPARACION":45,"DIFERENTE":46,"MAYOR":47,"MENOR":48,"MAYORIGUAL":49,"MENORIGUAL":50,"AND":51,"OR":52,"NOT":53,"CONCAD":54,"DUPLI":55,"IFTERNARIO":56,"ENTERO":57,"DECIMAL":58,"CADENA":59,"BOOLEANO":60,"CARACTER":61,"RESNULO":62,"CORCHABRE":63,"LISTAVALORES":64,"CORCHCIERRA":65,"ACCESOVECTOR":66,"FUNCNATIVA":67,"PUNTO":68,"RESPARSE":69,"RESIF":70,"BLOQUEINSTRUCCION":71,"RESELSE":72,"RESWHILE":73,"RESDO":74,"INTERROGACION":75,"DOSPUNTOS":76,"RESBREAK":77,"RESCONTINUE":78,"RESRETURN":79,"RESSWITCH":80,"LLAVEABRE":81,"LISTACASOS":82,"DEFECTO":83,"LLAVECIERRA":84,"CASO":85,"RESCASE":86,"RESDEFAULT":87,"MASINC":88,"MENOSDES":89,"RESFOR":90,"DECLASIG":91,"ACTUALIZACION":92,"RESVOID":93,"PARAMETROS":94,"COMA":95,"RESLIST":96,"PARLLAMADA":97,"RESEXEC":98,"RESNUEVO":99,"RESLOW":100,"RESUP":101,"RESLENG":102,"RESTRUN":103,"RESROUND":104,"RESTYPE":105,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",9:"PTCOMA",27:"RESPRINT",28:"PARABRE",30:"PARCIERRA",31:"RESPRINTLN",33:"IDENTIFICADOR",34:"IGUAL",35:"RESINT",36:"RESCHAR",37:"RESBOOL",38:"RESDOUBLE",39:"RESSTRING",40:"MAS",41:"MENOS",42:"POR",43:"DIVI",44:"MOD",45:"COMPARACION",46:"DIFERENTE",47:"MAYOR",48:"MENOR",49:"MAYORIGUAL",50:"MENORIGUAL",51:"AND",52:"OR",53:"NOT",54:"CONCAD",55:"DUPLI",57:"ENTERO",58:"DECIMAL",59:"CADENA",60:"BOOLEANO",61:"CARACTER",62:"RESNULO",63:"CORCHABRE",65:"CORCHCIERRA",68:"PUNTO",69:"RESPARSE",70:"RESIF",72:"RESELSE",73:"RESWHILE",74:"RESDO",75:"INTERROGACION",76:"DOSPUNTOS",77:"RESBREAK",78:"RESCONTINUE",79:"RESRETURN",80:"RESSWITCH",81:"LLAVEABRE",84:"LLAVECIERRA",86:"RESCASE",87:"RESDEFAULT",88:"MASINC",89:"MENOSDES",90:"RESFOR",93:"RESVOID",95:"COMA",96:"RESLIST",98:"RESEXEC",99:"RESNUEVO",100:"RESLOW",101:"RESUP",102:"RESLENG",103:"RESTRUN",104:"RESROUND",105:"RESTYPE"},
+productions_: [0,[3,2],[4,2],[4,1],[6,1],[6,2],[6,2],[6,1],[6,1],[6,1],[6,1],[6,1],[6,2],[6,1],[6,2],[6,2],[6,1],[6,1],[6,2],[6,2],[6,1],[6,2],[6,2],[6,2],[7,5],[7,5],[8,2],[8,4],[32,1],[32,1],[32,1],[32,1],[32,1],[10,3],[29,3],[29,3],[29,3],[29,3],[29,3],[29,3],[29,2],[29,3],[29,3],[29,3],[29,3],[29,3],[29,3],[29,3],[29,3],[29,2],[29,3],[29,3],[29,1],[29,1],[29,1],[29,1],[29,1],[29,1],[29,1],[29,3],[29,1],[29,1],[29,1],[29,4],[29,6],[11,5],[11,7],[11,7],[12,5],[13,7],[56,5],[14,2],[15,2],[16,1],[16,2],[17,8],[17,7],[17,7],[82,2],[82,1],[85,4],[83,3],[18,2],[19,2],[20,9],[91,1],[91,1],[92,1],[92,1],[92,1],[21,6],[21,5],[94,4],[94,6],[94,7],[94,4],[94,5],[94,2],[22,4],[22,3],[97,3],[97,1],[23,5],[23,4],[24,6],[24,5],[25,10],[25,8],[64,3],[64,1],[66,4],[26,6],[67,1],[67,1],[67,1],[67,1],[67,1],[67,1],[71,3],[71,2]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
-
-            this.$ = $$[$0-1];
-            return this.$
-        
+return $$[$0-1];
 break;
-case 2:
- 
-            $$[$0-1].push($$[$0])
-            this.$ = $$[$0-1]
-        
+case 2: case 78:
+if($$[$0]!=false)$$[$0-1].push($$[$0]);this.$=$$[$0-1];
 break;
-case 3: case 8:
- this.$ = [$$[$0]] 
+case 3: case 79:
+this.$=($$[$0]!=false) ?[$$[$0]]:[];
 break;
-case 4: case 9: case 10: case 11: case 12:
- this.$ = $$[$0] 
+case 4: case 7: case 8: case 9: case 10: case 11: case 13: case 16: case 17: case 20: case 52: case 61: case 62: case 85: case 86: case 87: case 88: case 89: case 112: case 113: case 114: case 115: case 116: case 117:
+this.$=$$[$0];
 break;
-case 5:
- this.$ = new Print($$[$0-1], _$[$0-3].first_line, _$[$0-3].first_column) 
-break;
-case 6:
- this.$ = new Print($$[$0-1], _$[$0-3].first_line, _$[$0-3].first_column, true) 
-break;
-case 7:
-
-            $$[$0-2].push($$[$0])
-            this.$ = $$[$0-2]
-        
-break;
-case 13:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.AND, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 14:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.OR, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 15:
- this.$ = new Operacion($$[$0], $$[$0], Operador.NOT, _$[$0-1].first_line, _$[$0-1].first_column) 
-break;
-case 16:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.DIFERENTE, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 17:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.IGUAL, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 18:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.MENOR, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 19:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.MENOR_IGUAL, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 20:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.MAYOR, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 21:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.MAYOR_IGUAL, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 22:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.SUMA, _$[$0-2].first_line, _$[$0-2].first_column) 
+case 5: case 6: case 12: case 14: case 15: case 18: case 19: case 21: case 22: case 39: case 59: case 118:
+this.$=$$[$0-1];
 break;
 case 23:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.RESTA, _$[$0-2].first_line, _$[$0-2].first_column) 
+
+                                            inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",_$[$0-1].first_line,_$[$0-1].first_column));console.log("sinta ");
+                                            this.$=false;
+                                        
 break;
-case 24:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.MULTIPLICACION, _$[$0-2].first_line, _$[$0-2].first_column) 
-break;
-case 25:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.DIVISION, _$[$0-2].first_line, _$[$0-2].first_column) 
+case 24: case 25:
+this.$=new print.default($$[$0-2],_$[$0-4].first_line,_$[$0-4].first_column);
 break;
 case 26:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.REPETIR, _$[$0-2].first_line, _$[$0-2].first_column) 
+this.$= new declaracion.default($$[$0-1],_$[$0-1].first_line,_$[$0-1].first_column,$$[$0]);
 break;
 case 27:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.CONCAT, _$[$0-2].first_line, _$[$0-2].first_column) 
+this.$= new declaracion.default($$[$0-3],_$[$0-3].first_line,_$[$0-3].first_column,$$[$0-2],$$[$0]);
 break;
 case 28:
- this.$ = new Operacion($$[$0-2], $$[$0], Operador.MODULO, _$[$0-2].first_line, _$[$0-2].first_column) 
+this.$= new Tipo.default(Tipo.tipoDato.ENTERO);
 break;
 case 29:
- this.$ = $$[$0-1] 
+this.$= new Tipo.default(Tipo.tipoDato.CARACTER);
 break;
 case 30:
- this.$ = new Operacion($$[$0], $$[$0], Operador.NEGATIVO, _$[$0-1].first_line, _$[$0-1].first_column) 
+this.$= new Tipo.default(Tipo.tipoDato.BOOLEANO);
 break;
 case 31:
- this.$ = new Primitive(Number($$[$0]), Type.INT, _$[$0].first_column, _$[$0].first_column) 
+this.$= new Tipo.default(Tipo.tipoDato.DECIMAL);
 break;
 case 32:
- this.$ = new Primitive(Number($$[$0]), Type.DOUBLE, _$[$0].first_column, _$[$0].first_column) 
+this.$= new Tipo.default(Tipo.tipoDato.CADENA);
 break;
 case 33:
- this.$ = new Primitive($$[$0], Type.STRING, _$[$0].first_column, _$[$0].first_column) 
+this.$=new asignacion.default($$[$0-2],$$[$0],_$[$0-2].first_line,_$[$0-2].first_column);
 break;
 case 34:
- this.$ = new Primitive($$[$0], Type.CHAR, _$[$0].first_column, _$[$0].first_column) 
+this.$= new aritmeticas.default(aritmeticas.Operadores.SUMA,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
 break;
 case 35:
- this.$ = new Primitive(true, Type.BOOLEAN, _$[$0].first_column, _$[$0].first_column) 
+this.$= new aritmeticas.default(aritmeticas.Operadores.RESTA,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
 break;
 case 36:
- this.$ = new Primitive(false, Type.BOOLEAN, _$[$0].first_column, _$[$0].first_column) 
+this.$= new aritmeticas.default(aritmeticas.Operadores.MULTIPLICACION,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
 break;
 case 37:
- this.$ = new Primitive(null, Type.NULL, _$[$0].first_column, _$[$0].first_column) 
+this.$= new aritmeticas.default(aritmeticas.Operadores.DIVISION,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 38:
+this.$= new aritmeticas.default(aritmeticas.Operadores.MODULADOR,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 40:
+this.$=new aritmeticas.default(aritmeticas.Operadores.MENOSNUM,_$[$0-1].first_line,_$[$0-1].first_column,$$[$0]);
+break;
+case 41:
+this.$= new relacional.default(relacional.Relacionales.IGUAL,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 42:
+this.$= new relacional.default(relacional.Relacionales.DIFERENTE,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 43:
+this.$= new relacional.default(relacional.Relacionales.MAYOR,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 44:
+this.$= new relacional.default(relacional.Relacionales.MENOR,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 45:
+this.$= new relacional.default(relacional.Relacionales.MAYORIGUAL,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 46:
+this.$= new relacional.default(relacional.Relacionales.MENORIGUAL,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 47:
+this.$=new logicas.default(logicas.Logicas.AND,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 48:
+this.$=new logicas.default(logicas.Logicas.OR,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 49:
+this.$=new logicas.default(logicas.Logicas.NOT,_$[$0-1].first_line,_$[$0-1].first_column,$$[$0]);
+break;
+case 50:
+this.$= new unionCadenas.default(unionCadenas.Operadores.CONCATENACION,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 51:
+this.$= new unionCadenas.default(unionCadenas.Operadores.DUPLICIDAD,_$[$0-2].first_line,_$[$0-2].first_column,$$[$0-2],$$[$0]);
+break;
+case 53:
+this.$= new primitivo.default(new Tipo.default(Tipo.tipoDato.ENTERO),$$[$0],_$[$0].first_line,_$[$0].first_column);
+break;
+case 54:
+this.$= new primitivo.default(new Tipo.default(Tipo.tipoDato.DECIMAL),$$[$0],_$[$0].first_line,_$[$0].first_column);
+break;
+case 55:
+this.$= new primitivo.default(new Tipo.default(Tipo.tipoDato.CADENA),$$[$0],_$[$0].first_line,_$[$0].first_column);
+break;
+case 56:
+this.$= new primitivo.default(new Tipo.default(Tipo.tipoDato.BOOLEANO),$$[$0],_$[$0].first_line,_$[$0].first_column);
+break;
+case 57:
+this.$= new primitivo.default(new Tipo.default(Tipo.tipoDato.CARACTER),$$[$0].replace(/['"]+/g, ""),_$[$0].first_line,_$[$0].first_column);
+break;
+case 58:
+this.$= new primitivo.default(new Tipo.default(Tipo.tipoDato.NULO),$$[$0],_$[$0].first_line,_$[$0].first_column);
+break;
+case 60:
+this.$=new identificador.default($$[$0],_$[$0].first_line,_$[$0].first_column);
+break;
+case 63:
+this.$=new funcNativa.default($$[$0-3],$$[$0-1],_$[$0-3].first_line,_$[$0-3].first_column); 
+break;
+case 64:
+this.$=new funcNativa.default($$[$0-5],$$[$0-1],_$[$0-5].first_line,_$[$0-5].first_column); 
+break;
+case 65:
+this.$= new condIf.default(_$[$0-4].first_line,_$[$0-4].first_column,$$[$0-2],$$[$0],undefined,undefined);
+break;
+case 66:
+this.$= new condIf.default(_$[$0-6].first_line,_$[$0-6].first_column,$$[$0-4],$$[$0-2],$$[$0],undefined);
+break;
+case 67:
+this.$= new condIf.default(_$[$0-6].first_line,_$[$0-6].first_column,$$[$0-4],$$[$0-2],undefined,$$[$0]);
+break;
+case 68:
+this.$=new condWhile.default($$[$0-2],$$[$0],_$[$0-4].first_line,_$[$0-4].first_column);
+break;
+case 69:
+this.$=new condDoWhile.default($$[$0-2],$$[$0-5],_$[$0-6].first_line,_$[$0-6].first_column);
+break;
+case 70:
+this.$=new condTernario.default($$[$0-4],$$[$0-2],$$[$0],_$[$0-4].first_line,_$[$0-4].first_column);
+break;
+case 71:
+this.$=new condBreak.default(_$[$0-1].first_line,_$[$0-1].first_column); 
+break;
+case 72:
+this.$=new condContinue.default(_$[$0-1].first_line,_$[$0-1].first_column); 
+break;
+case 73:
+this.$=new condReturn.default(_$[$0].first_line,_$[$0].first_column); 
+break;
+case 74:
+this.$=new condReturn.default(_$[$0-1].first_line,_$[$0-1].first_column,$$[$0]); 
+break;
+case 75:
+this.$=new condSwitch.default(_$[$0-7].first_line,_$[$0-7].first_column,$$[$0-5],$$[$0-2],$$[$0-1]);
+break;
+case 76:
+this.$=new condSwitch.default(_$[$0-6].first_line,_$[$0-6].first_column,$$[$0-4],$$[$0-1],undefined);
+break;
+case 77:
+this.$=new condSwitch.default(_$[$0-6].first_line,_$[$0-6].first_column,$$[$0-4],undefined,$$[$0-1]);
+break;
+case 80:
+this.$=new condCase.default(_$[$0-3].first_line,_$[$0-3].first_column,$$[$0-2],$$[$0]);
+break;
+case 81:
+this.$=new condDefault.default(_$[$0-2].first_line,_$[$0-2].first_column,$$[$0]);
+break;
+case 82:
+this.$=new Incremento.default($$[$0-1],_$[$0-1].first_line,_$[$0-1].first_column);
+break;
+case 83:
+this.$=new Decremento.default($$[$0-1],_$[$0-1].first_line,_$[$0-1].first_column);
+break;
+case 84:
+this.$=new condFor.default($$[$0-6],$$[$0-4],$$[$0-2],$$[$0],_$[$0-8].first_line,_$[$0-8].first_column);
+break;
+case 90:
+this.$=new metodos.default(new Tipo.default(Tipo.tipoDato.VOID),_$[$0-5].first_line,_$[$0-5].first_column,$$[$0-4],$$[$0-2],$$[$0]);
+break;
+case 91:
+this.$=new metodos.default(new Tipo.default(Tipo.tipoDato.VOID),_$[$0-4].first_line,_$[$0-4].first_column,$$[$0-3],[],$$[$0]);
+break;
+case 92:
+$$[$0-3].push({tipato:$$[$0-1],identificador:$$[$0]});this.$=$$[$0-3];
+break;
+case 93:
+$$[$0-5].push({tipato:$$[$0-3],identificador:$$[$0],arreglo:true});this.$=$$[$0-5];
+break;
+case 94:
+$$[$0-6].push({tipato:$$[$0-2],identificador:$$[$0],lista:true});this.$=$$[$0-6];
+break;
+case 95:
+this.$=[{tipato:$$[$0-3],identificador:$$[$0],arreglo:true}];
+break;
+case 96:
+this.$=[{tipato:$$[$0-2],identificador:$$[$0],lista:true}];
+break;
+case 97:
+this.$=[{tipato:$$[$0-1],identificador:$$[$0]}];
+break;
+case 98:
+this.$=new llamadas.default($$[$0-3],$$[$0-1],_$[$0-3].first_line,_$[$0-3].first_column);
+break;
+case 99:
+this.$=new llamadas.default($$[$0-2],[],_$[$0-2].first_line,_$[$0-2].first_column);
+break;
+case 100: case 108:
+$$[$0-2].push($$[$0]);this.$=$$[$0-2];
+break;
+case 101: case 109:
+this.$=[$$[$0]];
+break;
+case 102:
+this.$=new ejecucion.default($$[$0-3],$$[$0-1],_$[$0-4].first_line,_$[$0-4].first_column);
+break;
+case 103:
+this.$=new ejecucion.default($$[$0-2],[],_$[$0-3].first_line,_$[$0-3].first_column);
+break;
+case 104:
+this.$=new funciones.default($$[$0-5],_$[$0-5].first_line,_$[$0-5].first_column,$$[$0-4],$$[$0-2],$$[$0]);
+break;
+case 105:
+this.$=new funciones.default($$[$0-4],_$[$0-4].first_line,_$[$0-4].first_column,$$[$0-3],[],$$[$0]);
+break;
+case 106:
+this.$=new vectores.default($$[$0-9],$$[$0-6],true,_$[$0-9].first_line,_$[$0-9].first_column,$$[$0-1],$$[$0-3]);
+break;
+case 107:
+this.$=new vectores.default($$[$0-7],$$[$0-4],false,_$[$0-7].first_line,_$[$0-7].first_column,undefined,undefined,$$[$0-1]);
+break;
+case 110:
+this.$=new accesoVector.default($$[$0-3],$$[$0-1],_$[$0-3].first_line,_$[$0-3].first_column);
+break;
+case 111:
+this.$=new modiVector.default($$[$0-5], $$[$0-3], $$[$0],_$[$0-5].first_line,_$[$0-5].first_column);
+break;
+case 119:
+this.$=[];
 break;
 }
 },
-table: [{3:1,4:2,6:3,7:4,8:$V0,12:$V1},{1:[3]},{5:[1,7],6:8,7:4,8:$V0,12:$V1},o($V2,[2,3]),o($V2,[2,4]),{9:[1,9]},{9:[1,10]},{1:[2,1]},o($V2,[2,2]),{9:$V3,10:11,14:12,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,10:27,14:12,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{11:[1,28],13:$Vd},o($Ve,[2,8],{19:$Vf,20:$Vg,22:$Vh,23:$Vi,24:$Vj,25:$Vk,26:$Vl,27:$Vm,28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vu,[2,9]),o($Vu,[2,10]),o($Vu,[2,11]),o($Vu,[2,12]),o($Vu,[2,31]),o($Vu,[2,32]),o($Vu,[2,33]),o($Vu,[2,34]),o($Vu,[2,35]),o($Vu,[2,36]),o($Vu,[2,37]),{9:$V3,14:45,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:46,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:47,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{11:[1,48],13:$Vd},o($V2,[2,5]),{9:$V3,14:49,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:50,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:51,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:52,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:53,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:54,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:55,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:56,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:57,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:58,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:59,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:60,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:61,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:62,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:63,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},{9:$V3,14:64,15:13,16:14,17:15,18:16,21:$V4,29:$V5,35:$V6,36:$V7,37:$V8,38:$V9,39:$Va,40:$Vb,41:$Vc},o($Vv,[2,15],{22:$Vh,23:$Vi,24:$Vj,25:$Vk,26:$Vl,27:$Vm,28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),{11:[1,65],19:$Vf,20:$Vg,22:$Vh,23:$Vi,24:$Vj,25:$Vk,26:$Vl,27:$Vm,28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt},o($Vu,[2,30]),o($V2,[2,6]),o($Ve,[2,7],{19:$Vf,20:$Vg,22:$Vh,23:$Vi,24:$Vj,25:$Vk,26:$Vl,27:$Vm,28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vv,[2,13],{22:$Vh,23:$Vi,24:$Vj,25:$Vk,26:$Vl,27:$Vm,28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o([11,13,20],[2,14],{19:$Vf,22:$Vh,23:$Vi,24:$Vj,25:$Vk,26:$Vl,27:$Vm,28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vw,[2,16],{28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vw,[2,17],{28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vw,[2,18],{28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vw,[2,19],{28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vw,[2,20],{28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vw,[2,21],{28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,33:$Vs,34:$Vt}),o($Vx,[2,22],{30:$Vp,31:$Vq,32:$Vr,34:$Vt}),o($Vx,[2,23],{30:$Vp,31:$Vq,32:$Vr,34:$Vt}),o($Vy,[2,24],{32:$Vr,34:$Vt}),o($Vy,[2,25],{32:$Vr,34:$Vt}),o([11,13,19,20,22,23,24,25,26,27,28,29,30,31,32,33],[2,26],{34:$Vt}),o([11,13,19,20,22,23,24,25,26,27,33],[2,27],{28:$Vn,29:$Vo,30:$Vp,31:$Vq,32:$Vr,34:$Vt}),o($Vu,[2,28]),o($Vu,[2,29])],
-defaultActions: {7:[2,1]},
+table: [{2:$V0,3:1,4:2,6:3,7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,27:$V1,28:$V2,29:35,31:$V3,32:26,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{1:[3]},{2:$V0,5:[1,63],6:64,7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,27:$V1,28:$V2,29:35,31:$V3,32:26,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($Vz,[2,3]),o($Vz,[2,4]),{9:[1,65]},{9:[1,66]},o($Vz,[2,7]),o($Vz,[2,8]),o($Vz,[2,9]),o($Vz,[2,10]),o($Vz,[2,11]),{9:[1,67]},o($Vz,[2,13]),{9:[1,68]},{9:[1,69]},o($Vz,[2,16]),o($Vz,[2,17]),o($VA,$VB,{9:[1,70]}),{9:[1,71]},o($Vz,[2,20]),{9:[1,72]},{9:[1,73]},{9:[1,74]},{28:[1,75]},{28:[1,76]},{33:[1,77],63:[1,78],68:$VC},o($VA,$VD,{28:$VE,34:$VF,63:[1,82]}),{28:[1,83]},{28:[1,84]},{71:85,81:$VG},{9:[1,87]},{9:[1,88]},{9:[2,73],22:91,28:$V2,29:89,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{28:[1,93]},{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX,88:[1,94],89:[1,95]},{28:[1,112]},{33:[1,113]},{33:[1,114]},o($VY,[2,28]),o($VY,[2,29]),o($VY,[2,30]),o($VY,[2,31]),o($VY,[2,32]),{22:91,28:$V2,29:115,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:116,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:117,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($VZ,[2,52]),o($VZ,[2,53]),o($VZ,[2,54]),o($VZ,[2,55]),o($VZ,[2,56]),o($VZ,[2,57]),o($VZ,[2,58]),{22:91,28:$V2,29:119,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,64:118,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($VZ,[2,62]),{28:[1,120]},{28:[2,112]},{28:[2,113]},{28:[2,114]},{28:[2,115]},{28:[2,116]},{28:[2,117]},{1:[2,1]},o($Vz,[2,2]),o($Vz,[2,5]),o($Vz,[2,6]),o($Vz,[2,12]),o($Vz,[2,14]),o($Vz,[2,15]),o($Vz,[2,18]),o($Vz,[2,19]),o($Vz,[2,21]),o($Vz,[2,22]),o($Vz,[2,23]),{22:91,28:$V2,29:121,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:122,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{9:$V_,28:[1,124],34:$V$},{65:[1,125]},{69:[1,126]},{22:91,28:$V2,29:127,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:130,30:[1,129],32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,97:128,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:131,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:132,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:133,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{73:[1,134]},{2:$V0,4:135,6:3,7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,27:$V1,28:$V2,29:35,31:$V3,32:26,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,84:[1,136],90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($Vz,[2,71]),o($Vz,[2,72]),{9:[2,74],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},o($VZ,$VD,{28:$VE,63:$V01}),o($VZ,$VB),{68:$VC},{22:91,28:$V2,29:138,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($V11,[2,82]),o($V11,[2,83]),{22:91,28:$V2,29:139,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:140,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:141,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:142,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:143,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:144,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:145,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:146,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:147,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:148,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:149,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:150,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:151,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:152,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:153,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:154,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{8:156,10:157,32:158,33:[1,159],35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,91:155},{28:[1,160]},{28:[1,161]},{30:[1,162],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},o($VZ,[2,40]),o($V21,[2,49],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,54:$VV,55:$VW}),{65:[1,163],95:$V31},o($V41,[2,109],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX}),{22:91,28:$V2,29:165,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{30:[1,166],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{30:[1,167],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{22:91,28:$V2,29:168,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{30:[1,170],32:171,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,94:169,96:$V51},{33:[1,173]},{28:[1,174]},o($V11,[2,33],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX}),{30:[1,175],95:$V61},o($VZ,[2,99]),o($V71,[2,101],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX}),{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,65:[1,177],75:$VX},{30:[1,178],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{30:[1,179],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{28:[1,180]},{2:$V0,6:64,7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,27:$V1,28:$V2,29:35,31:$V3,32:26,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,84:[1,181],90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($V81,[2,119]),{22:91,28:$V2,29:182,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{30:[1,183],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},o($V91,[2,34],{42:$VK,43:$VL,44:$VM}),o($V91,[2,35],{42:$VK,43:$VL,44:$VM}),o($VZ,[2,36]),o($VZ,[2,37]),o($VZ,[2,38]),o($Va1,[2,41],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),o($Va1,[2,42],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),o($Va1,[2,43],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),o($Va1,[2,44],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),o($Va1,[2,45],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),o($Va1,[2,46],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),o($V21,[2,47],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,54:$VV,55:$VW}),o([9,30,52,65,75,76,88,89,95],[2,48],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,54:$VV,55:$VW}),o($Va1,[2,50],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),o($Va1,[2,51],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM}),{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX,76:[1,184]},{9:[1,185]},{9:[2,85]},{9:[2,86]},{33:[1,186]},{34:$VF},{30:[1,188],32:171,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,94:187,96:$V51},{22:91,28:$V2,29:130,30:[1,190],32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,97:189,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($VZ,[2,39]),o($VZ,[2,59]),{22:91,28:$V2,29:191,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{30:[1,192],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{9:[1,193]},{9:[1,194]},{9:[2,27],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{30:[1,195],95:$Vb1},{71:197,81:$VG},{33:[1,199],63:[1,198]},{48:[1,200]},{34:[1,201]},{22:91,28:$V2,29:202,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($VZ,[2,98]),{22:91,28:$V2,29:203,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($VA,$Vc1,{34:[1,204]}),{71:205,81:$VG},{71:206,81:$VG},{22:91,28:$V2,29:207,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($V81,[2,118]),{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,65:[1,208],75:$VX},{81:[1,209]},{22:91,28:$V2,29:210,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{22:91,28:$V2,29:211,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{9:$V_,34:$V$},{30:[1,212],95:$Vb1},{71:213,81:$VG},{30:[1,214],95:$V61},{9:[2,103]},o($V41,[2,108],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX}),o($VZ,[2,63]),o($Vz,[2,24]),o($Vz,[2,25]),{71:215,81:$VG},{32:216,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,96:[1,217]},o($Vz,[2,105]),{65:[1,218]},o($V71,[2,97]),{32:219,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9},{63:[1,221],99:[1,220]},{30:[1,222],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},o($V71,[2,100],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX}),{22:91,28:$V2,29:223,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($Vz,[2,65],{72:[1,224]}),o($Vz,[2,68]),{30:[1,225],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},o($VZ,$Vc1),{82:226,83:227,85:228,86:$Vd1,87:$Ve1},o([9,30,65,75,76,88,89,95],[2,70],{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW}),{9:[1,231],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{71:232,81:$VG},o($Vz,[2,91]),{9:[2,102]},o($Vz,[2,104]),{33:[1,233],63:[1,234]},{48:[1,235]},{33:[1,236]},{47:[1,237]},{32:238,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9},{22:91,28:$V2,29:119,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,64:239,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($VZ,[2,64]),{9:[2,111],40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX},{11:241,70:$Vj,71:240,81:$VG},{9:[1,242]},{83:243,84:[1,244],85:245,86:$Vd1,87:$Ve1},{84:[1,246]},o($Vf1,[2,79]),{76:[1,247]},{22:91,28:$V2,29:248,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{10:252,18:250,19:251,22:91,28:$V2,29:35,32:92,33:[1,253],35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,92:249,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},o($Vz,[2,90]),o($V71,[2,92]),{65:[1,254]},{32:255,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9},o($V71,[2,95]),{33:[1,256]},{63:[1,257]},{65:[1,258],95:$V31},o($Vz,[2,66]),o($Vz,[2,67]),o($Vz,[2,69]),{84:[1,259]},o($Vz,[2,76]),o($Vf1,[2,78]),o($Vz,[2,77]),{2:$V0,4:260,6:3,7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,27:$V1,28:$V2,29:35,31:$V3,32:26,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,75:$VX,76:[1,261]},{30:[1,262]},{30:[2,87]},{30:[2,88]},{30:[2,89]},o($VA,$VD,{28:$VE,34:$VF,63:$V01}),{33:[1,263]},{47:[1,264]},o($V71,[2,96]),{22:91,28:$V2,29:265,32:92,33:$VH,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{9:[2,107]},o($Vz,[2,75]),{2:$V0,6:64,7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,27:$V1,28:$V2,29:35,31:$V3,32:26,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,84:[2,81],90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{2:$V0,4:266,6:3,7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,27:$V1,28:$V2,29:35,31:$V3,32:26,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,56:47,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,66:55,67:56,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy},{71:267,81:$VG},o($V71,[2,93]),{33:[1,268]},{40:$VI,41:$VJ,42:$VK,43:$VL,44:$VM,45:$VN,46:$VO,47:$VP,48:$VQ,49:$VR,50:$VS,51:$VT,52:$VU,54:$VV,55:$VW,65:[1,269],75:$VX},o($Vf1,[2,80],{7:4,8:5,10:6,11:7,12:8,13:9,14:10,15:11,16:12,17:13,18:14,19:15,20:16,21:17,22:18,23:19,24:20,25:21,26:22,32:26,29:35,56:47,66:55,67:56,6:64,2:$V0,27:$V1,28:$V2,31:$V3,33:$V4,35:$V5,36:$V6,37:$V7,38:$V8,39:$V9,41:$Va,53:$Vb,57:$Vc,58:$Vd,59:$Ve,60:$Vf,61:$Vg,62:$Vh,63:$Vi,70:$Vj,73:$Vk,74:$Vl,77:$Vm,78:$Vn,79:$Vo,80:$Vp,90:$Vq,93:$Vr,98:$Vs,100:$Vt,101:$Vu,102:$Vv,103:$Vw,104:$Vx,105:$Vy}),o($Vz,[2,84]),o($V71,[2,94]),{9:[2,106]}],
+defaultActions: {57:[2,112],58:[2,113],59:[2,114],60:[2,115],61:[2,116],62:[2,117],63:[2,1],156:[2,85],157:[2,86],190:[2,103],214:[2,102],250:[2,87],251:[2,88],252:[2,89],258:[2,107],269:[2,106]},
 parseError: function parseError (str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -924,16 +5470,33 @@ parseError: function parseError (str, hash) {
         throw error;
     }
 },
-parse: function parse(input) {
-    var self = this, stack = [0], tstack = [], vstack = [null], lstack = [], table = this.table, yytext = '', yylineno = 0, yyleng = 0, recovering = 0, TERROR = 2, EOF = 1;
+parse: function parse (input) {
+    var self = this,
+        stack = [0],
+        tstack = [], // token stack
+        vstack = [null], // semantic value stack
+        lstack = [], // location stack
+        table = this.table,
+        yytext = '',
+        yylineno = 0,
+        yyleng = 0,
+        recovering = 0,
+        TERROR = 2,
+        EOF = 1;
+
     var args = lstack.slice.call(arguments, 1);
+
+    //this.reductionCount = this.shiftCount = 0;
+
     var lexer = Object.create(this.lexer);
     var sharedState = { yy: {} };
+    // copy state
     for (var k in this.yy) {
-        if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
-            sharedState.yy[k] = this.yy[k];
-        }
+      if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
+        sharedState.yy[k] = this.yy[k];
+      }
     }
+
     lexer.setInput(input, sharedState.yy);
     sharedState.yy.lexer = lexer;
     sharedState.yy.parser = this;
@@ -942,133 +5505,249 @@ parse: function parse(input) {
     }
     var yyloc = lexer.yylloc;
     lstack.push(yyloc);
+
     var ranges = lexer.options && lexer.options.ranges;
+
     if (typeof sharedState.yy.parseError === 'function') {
         this.parseError = sharedState.yy.parseError;
     } else {
         this.parseError = Object.getPrototypeOf(this).parseError;
     }
-    function popStack(n) {
+
+    function popStack (n) {
         stack.length = stack.length - 2 * n;
         vstack.length = vstack.length - n;
         lstack.length = lstack.length - n;
     }
-    _token_stack:
-        var lex = function () {
-            var token;
-            token = lexer.lex() || EOF;
-            if (typeof token !== 'number') {
-                token = self.symbols_[token] || token;
-            }
-            return token;
-        };
+
+_token_stack:
+    var lex = function () {
+        var token;
+        token = lexer.lex() || EOF;
+        // if token isn't its numeric value, convert
+        if (typeof token !== 'number') {
+            token = self.symbols_[token] || token;
+        }
+        return token;
+    }
+
     var symbol, preErrorSymbol, state, action, a, r, yyval = {}, p, len, newState, expected;
     while (true) {
+        // retreive state number from top of stack
         state = stack[stack.length - 1];
+
+        // use default actions if available
         if (this.defaultActions[state]) {
             action = this.defaultActions[state];
         } else {
             if (symbol === null || typeof symbol == 'undefined') {
                 symbol = lex();
             }
+            // read action for current state and first input
             action = table[state] && table[state][symbol];
         }
-                    if (typeof action === 'undefined' || !action.length || !action[0]) {
-                var errStr = '';
+
+_handle_error:
+        // handle parse error
+        if (typeof action === 'undefined' || !action.length || !action[0]) {
+            var error_rule_depth;
+            var errStr = '';
+
+            // Return the rule stack depth where the nearest error rule can be found.
+            // Return FALSE when no error recovery rule was found.
+            function locateNearestErrorRecoveryRule(state) {
+                var stack_probe = stack.length - 1;
+                var depth = 0;
+
+                // try to recover from error
+                for(;;) {
+                    // check for error recovery rule in this state
+                    if ((TERROR.toString()) in table[state]) {
+                        return depth;
+                    }
+                    if (state === 0 || stack_probe < 2) {
+                        return false; // No suitable error recovery rule available.
+                    }
+                    stack_probe -= 2; // popStack(1): [symbol, action]
+                    state = stack[stack_probe];
+                    ++depth;
+                }
+            }
+
+            if (!recovering) {
+                // first see if there's any chance at hitting an error recovery rule:
+                error_rule_depth = locateNearestErrorRecoveryRule(state);
+
+                // Report error
                 expected = [];
                 for (p in table[state]) {
                     if (this.terminals_[p] && p > TERROR) {
-                        expected.push('\'' + this.terminals_[p] + '\'');
+                        expected.push("'"+this.terminals_[p]+"'");
                     }
                 }
                 if (lexer.showPosition) {
-                    errStr = 'Parse error on line ' + (yylineno + 1) + ':\n' + lexer.showPosition() + '\nExpecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'';
+                    errStr = 'Parse error on line '+(yylineno+1)+":\n"+lexer.showPosition()+"\nExpecting "+expected.join(', ') + ", got '" + (this.terminals_[symbol] || symbol)+ "'";
                 } else {
-                    errStr = 'Parse error on line ' + (yylineno + 1) + ': Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
+                    errStr = 'Parse error on line '+(yylineno+1)+": Unexpected " +
+                                  (symbol == EOF ? "end of input" :
+                                              ("'"+(this.terminals_[symbol] || symbol)+"'"));
                 }
                 this.parseError(errStr, {
                     text: lexer.match,
                     token: this.terminals_[symbol] || symbol,
                     line: lexer.yylineno,
                     loc: yyloc,
-                    expected: expected
+                    expected: expected,
+                    recoverable: (error_rule_depth !== false)
                 });
+            } else if (preErrorSymbol !== EOF) {
+                error_rule_depth = locateNearestErrorRecoveryRule(state);
             }
-        if (action[0] instanceof Array && action.length > 1) {
-            throw new Error('Parse Error: multiple actions possible at state: ' + state + ', token: ' + symbol);
-        }
-        switch (action[0]) {
-        case 1:
-            stack.push(symbol);
-            vstack.push(lexer.yytext);
-            lstack.push(lexer.yylloc);
-            stack.push(action[1]);
-            symbol = null;
-            if (!preErrorSymbol) {
+
+            // just recovered from another error
+            if (recovering == 3) {
+                if (symbol === EOF || preErrorSymbol === EOF) {
+                    throw new Error(errStr || 'Parsing halted while starting to recover from another error.');
+                }
+
+                // discard current lookahead and grab another
                 yyleng = lexer.yyleng;
                 yytext = lexer.yytext;
                 yylineno = lexer.yylineno;
                 yyloc = lexer.yylloc;
-                if (recovering > 0) {
-                    recovering--;
-                }
-            } else {
-                symbol = preErrorSymbol;
-                preErrorSymbol = null;
+                symbol = lex();
             }
-            break;
-        case 2:
-            len = this.productions_[action[1]][1];
-            yyval.$ = vstack[vstack.length - len];
-            yyval._$ = {
-                first_line: lstack[lstack.length - (len || 1)].first_line,
-                last_line: lstack[lstack.length - 1].last_line,
-                first_column: lstack[lstack.length - (len || 1)].first_column,
-                last_column: lstack[lstack.length - 1].last_column
-            };
-            if (ranges) {
-                yyval._$.range = [
-                    lstack[lstack.length - (len || 1)].range[0],
-                    lstack[lstack.length - 1].range[1]
-                ];
+
+            // try to recover from error
+            if (error_rule_depth === false) {
+                throw new Error(errStr || 'Parsing halted. No suitable error recovery rule available.');
             }
-            r = this.performAction.apply(yyval, [
-                yytext,
-                yyleng,
-                yylineno,
-                sharedState.yy,
-                action[1],
-                vstack,
-                lstack
-            ].concat(args));
-            if (typeof r !== 'undefined') {
-                return r;
-            }
-            if (len) {
-                stack = stack.slice(0, -1 * len * 2);
-                vstack = vstack.slice(0, -1 * len);
-                lstack = lstack.slice(0, -1 * len);
-            }
-            stack.push(this.productions_[action[1]][0]);
-            vstack.push(yyval.$);
-            lstack.push(yyval._$);
-            newState = table[stack[stack.length - 2]][stack[stack.length - 1]];
-            stack.push(newState);
-            break;
-        case 3:
-            return true;
+            popStack(error_rule_depth);
+
+            preErrorSymbol = (symbol == TERROR ? null : symbol); // save the lookahead token
+            symbol = TERROR;         // insert generic error symbol as new lookahead
+            state = stack[stack.length-1];
+            action = table[state] && table[state][TERROR];
+            recovering = 3; // allow 3 real symbols to be shifted before reporting a new error
         }
+
+        // this shouldn't happen, unless resolve defaults are off
+        if (action[0] instanceof Array && action.length > 1) {
+            throw new Error('Parse Error: multiple actions possible at state: '+state+', token: '+symbol);
+        }
+
+        switch (action[0]) {
+            case 1: // shift
+                //this.shiftCount++;
+
+                stack.push(symbol);
+                vstack.push(lexer.yytext);
+                lstack.push(lexer.yylloc);
+                stack.push(action[1]); // push state
+                symbol = null;
+                if (!preErrorSymbol) { // normal execution/no error
+                    yyleng = lexer.yyleng;
+                    yytext = lexer.yytext;
+                    yylineno = lexer.yylineno;
+                    yyloc = lexer.yylloc;
+                    if (recovering > 0) {
+                        recovering--;
+                    }
+                } else {
+                    // error just occurred, resume old lookahead f/ before error
+                    symbol = preErrorSymbol;
+                    preErrorSymbol = null;
+                }
+                break;
+
+            case 2:
+                // reduce
+                //this.reductionCount++;
+
+                len = this.productions_[action[1]][1];
+
+                // perform semantic action
+                yyval.$ = vstack[vstack.length-len]; // default to $$ = $1
+                // default location, uses first token for firsts, last for lasts
+                yyval._$ = {
+                    first_line: lstack[lstack.length-(len||1)].first_line,
+                    last_line: lstack[lstack.length-1].last_line,
+                    first_column: lstack[lstack.length-(len||1)].first_column,
+                    last_column: lstack[lstack.length-1].last_column
+                };
+                if (ranges) {
+                  yyval._$.range = [lstack[lstack.length-(len||1)].range[0], lstack[lstack.length-1].range[1]];
+                }
+                r = this.performAction.apply(yyval, [yytext, yyleng, yylineno, sharedState.yy, action[1], vstack, lstack].concat(args));
+
+                if (typeof r !== 'undefined') {
+                    return r;
+                }
+
+                // pop off stack
+                if (len) {
+                    stack = stack.slice(0,-1*len*2);
+                    vstack = vstack.slice(0, -1*len);
+                    lstack = lstack.slice(0, -1*len);
+                }
+
+                stack.push(this.productions_[action[1]][0]);    // push nonterminal (reduce)
+                vstack.push(yyval.$);
+                lstack.push(yyval._$);
+                // goto new state = table[STATE][NONTERMINAL]
+                newState = table[stack[stack.length-2]][stack[stack.length-1]];
+                stack.push(newState);
+                break;
+
+            case 3:
+                // accept
+                return true;
+        }
+
     }
+
     return true;
 }};
 
-    const { Attribute } = require('../scripts/expressions/attribute')
-    const { Objeto } = require('../scripts/expressions/object')
-    const { Operacion, Operador } = require('../scripts/expressions/operation')
-    const { Primitive } = require('../scripts/expressions/primitive')
-    const { Print } = require('../scripts/instructions/print')
-    const { Type } = require('../scripts/ast/type')
-    const { setConsole } = require('../scripts/shared')
+//codigo js
+const print=require('./Instrucciones/print');
+const primitivo= require('./Expresiones/Primitivo');
+const errores= require('./Excepciones/Errores');
+const inicio= require('./Excepciones/Listado_Errores');
+const aritmeticas= require('./Expresiones/Aritmetica');
+const unionCadenas= require('./Expresiones/Cadenas');
+const Tipo= require('./TS/Tipo');
+const logicas= require("./Expresiones/Logica");
+const relacional= require("./Expresiones/Relacional");
+const declaracion= require("./Instrucciones/Declaracion");
+const identificador=require("./Expresiones/Identificador");
+const asignacion= require("./Instrucciones/Asignacion");
+const condIf= require("./Instrucciones/Condicionales/condIf");
+const condWhile= require("./Instrucciones/Ciclicas/condWhile");
+const condDoWhile = require("./Instrucciones/Ciclicas/condDoWhile");
+const condTernario= require("./Instrucciones/Condicionales/condIfTernario");
+const condBreak= require("./Instrucciones/Break");
+const condContinue= require("./Instrucciones/Continue");
+const condReturn= require("./Instrucciones/Return");
+const condSwitch= require("./Instrucciones/Condicionales/condSwitch");
+const condDefault= require("./Instrucciones/Condicionales/condSwitchDefault");
+const condCase= require("./Instrucciones/Condicionales/condSwitchCase");
+const Incremento= require("./Instrucciones/Incremento");
+const Decremento= require("./Instrucciones/Decremento");
+const condFor= require("./Instrucciones/Ciclicas/condFor");
+const metodos= require("./Instrucciones/Metodos");
+const llamadas= require("./Instrucciones/LlamadaFuncMetd");
+const ejecucion= require("./Instrucciones/Exec");
+const funciones= require("./Instrucciones/Funciones");
+const vectores=require('./Instrucciones/declaracionVectores');
+const accesoVector= require('./Instrucciones/accesoVector');
+const modiVector = require('./Instrucciones/asignacionVector');
+const listas = require('./Instrucciones/declaracionListas');
+const accesoLista = require('./Instrucciones/accesoLista');
+const modiLista = require('./Instrucciones/asignacionLista');
+const agregarLista= require('./Instrucciones/agregarLista');
+const funcNativa= require('./Instrucciones/funcNativa');
+const casteo= require('./Instrucciones/casteo');
 /* generated by jison-lex 0.3.4 */
 var lexer = (function(){
 var lexer = ({
@@ -1397,92 +6076,158 @@ options: {"case-insensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:// COMENTARIO SIMPLE
+case 0:
 break;
-case 1:// COMENTARIO MULTIPLE
+case 1:
 break;
-case 2:return 8;
+case 2:
 break;
-case 3:return 12;
+case 3:
 break;
-case 4:return 41;
+case 4:return 70;
 break;
-case 5:return 39;
+case 5:return 72;
 break;
-case 6:return 40;
+case 6:return 27;
 break;
-case 7:return 9;
+case 7:return 31;
 break;
-case 8:return 11;
+case 8:return 62
 break;
-case 9:return '[';
+case 9:return 35;
 break;
-case 10:return ']';
+case 10:return 36;
 break;
-case 11:return 13;
+case 11:return 38;
 break;
-case 12:return '.';
+case 12:return 37;
 break;
-case 13:return 28;
+case 13:return 39;
 break;
-case 14:return 29;
+case 14:return 73;
 break;
-case 15:return 30;
+case 15:return 74;
 break;
-case 16:return 31;
+case 16:return 77;
 break;
-case 17:return 34;
+case 17:return 78;
 break;
-case 18:return 27;
+case 18:return 79;
 break;
-case 19:return 25;
+case 19:return 80;
 break;
-case 20:return 26;
+case 20:return 86;
 break;
-case 21:return 24;
+case 21:return 87;
 break;
-case 22:return 22;
+case 22:return 90;
 break;
-case 23:return 23;
+case 23:return 93;
 break;
-case 24:return 19;
+case 24:return 99;
 break;
-case 25:return 20;
+case 25:return 96;
 break;
-case 26:return 21;
+case 26:return 'RESADD';
 break;
-case 27:return 33;
+case 27:return 100; //listo
 break;
-case 28:return 32;
+case 28:return 101; //listo
 break;
-case 29:return 36;
+case 29:return 102; //listo
 break;
-case 30:return 35;
+case 30:return 'RESCAROFPOS';
 break;
-case 31:return 'identificador';
+case 31:return 'RESSUBSTRING';
 break;
-case 32:
-                            yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2)
-                            return 37
-                        
+case 32:return 69;
 break;
-case 33:
-                            yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2)
-                            return 38
-                        
+case 33:return 'RESTOINT'; //listo
 break;
-case 34:// TABS, RETORNO Y SALTOS
+case 34:return 'RESTODOU';
 break;
-case 35:// Espacios en blanco
+case 35:return 105; //listo
 break;
-case 36: setConsole(`Error léxico (${yy_.yytext}), en la línea ${yy_.yylloc.first_line} y columna ${yy_.yylloc.first_column}\n`) 
+case 36:return 81;
 break;
-case 37:return 5;
+case 37:return 95;
+break;
+case 38:return 84;
+break;
+case 39:return 52;
+break;
+case 40:return 51;
+break;
+case 41:return 54
+break;
+case 42:return 9;
+break;
+case 43:return 28;
+break;
+case 44:return 30;
+break;
+case 45:return 63;
+break;
+case 46:return 65;
+break;
+case 47:return 88
+break;
+case 48:return 40;
+break;
+case 49:return 89
+break;
+case 50:return 41;
+break;
+case 51:return 43;
+break;
+case 52:return 42;
+break;
+case 53:return 44;
+break;
+case 54:return 45;
+break;
+case 55:return 50;
+break;
+case 56:return 49;
+break;
+case 57:return 34;
+break;
+case 58:return 46;
+break;
+case 59:return 53;
+break;
+case 60:return 48;
+break;
+case 61:return 47;
+break;
+case 62:return 55;
+break;
+case 63:return 75;
+break;
+case 64:return 76;
+break;
+case 65:return 68;
+break;
+case 66: yy_.yytext=yy_.yytext.substr(1,yy_.yyleng-2); return 59; 
+break;
+case 67:return 58;
+break;
+case 68:return 57;
+break;
+case 69:return 61;
+break;
+case 70:return 60;
+break;
+case 71:return 33;
+break;
+case 72:return 5;
+break;
+case 73:console.log("error Lexico")
 break;
 }
 },
-rules: [/^(?:[/][*][^]*[*][/])/i,/^(?:[/][/].*)/i,/^(?:print\b)/i,/^(?:println\b)/i,/^(?:null\b)/i,/^(?:true\b)/i,/^(?:false\b)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:,)/i,/^(?:\.)/i,/^(?:\+)/i,/^(?:-)/i,/^(?:\*)/i,/^(?:\/)/i,/^(?:%)/i,/^(?:>=)/i,/^(?:<=)/i,/^(?:>)/i,/^(?:<)/i,/^(?:!=)/i,/^(?:==)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:!)/i,/^(?:&)/i,/^(?:\^)/i,/^(?:[0-9]+([.][0-9]+)\b)/i,/^(?:[0-9]+\b)/i,/^(?:([a-zA-Z])[a-zA-Z0-9_]*)/i,/^(?:("((\\([\'\"\\bfnrtv]))|([^\"\\]+))"))/i,/^(?:('((\\([\'\"\\bfnrtv]))|([^\"\\]+))'))/i,/^(?:[\t\n\r]+)/i,/^(?:\s+)/i,/^(?:.)/i,/^(?:$)/i],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37],"inclusive":true}}
+rules: [/^(?:[ \r\t]+)/i,/^(?:\n+)/i,/^(?:\/\/.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:if\b)/i,/^(?:else\b)/i,/^(?:print\b)/i,/^(?:println\b)/i,/^(?:null\b)/i,/^(?:int\b)/i,/^(?:char\b)/i,/^(?:double\b)/i,/^(?:boolean\b)/i,/^(?:string\b)/i,/^(?:while\b)/i,/^(?:do\b)/i,/^(?:break\b)/i,/^(?:continue\b)/i,/^(?:return\b)/i,/^(?:switch\b)/i,/^(?:case\b)/i,/^(?:default\b)/i,/^(?:for\b)/i,/^(?:void\b)/i,/^(?:new\b)/i,/^(?:list\b)/i,/^(?:add\b)/i,/^(?:tolowercase\b)/i,/^(?:touppercase\b)/i,/^(?:length\b)/i,/^(?:caracterOfPosition\b)/i,/^(?:substring\b)/i,/^(?:parse\b)/i,/^(?:toint\b)/i,/^(?:todouble\b)/i,/^(?:typeof\b)/i,/^(?:\{)/i,/^(?:,)/i,/^(?:\})/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:&)/i,/^(?:;)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\+\+)/i,/^(?:\+)/i,/^(?:--)/i,/^(?:-)/i,/^(?:\/)/i,/^(?:\*)/i,/^(?:%)/i,/^(?:==)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:=)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:<)/i,/^(?:>)/i,/^(?:\^)/i,/^(?:\?)/i,/^(?::)/i,/^(?:\.)/i,/^(?:"[^\"]*")/i,/^(?:[0-9]+(\.[0-9]+)\b)/i,/^(?:[0-9]+\b)/i,/^(?:'[^\']')/i,/^(?:(true|false)\b)/i,/^(?:([a-zA-Z])[a-zA-Z0-9_]*)/i,/^(?:$)/i,/^(?:.)/i],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73],"inclusive":true}}
 });
 return lexer;
 })();
@@ -1496,9 +6241,9 @@ return new Parser;
 
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = grammar;
-exports.Parser = grammar.Parser;
-exports.parse = function () { return grammar.parse.apply(grammar, arguments); };
+exports.parser = analizador;
+exports.Parser = analizador.Parser;
+exports.parse = function () { return analizador.parse.apply(analizador, arguments); };
 exports.main = function commonjsMain (args) {
     if (!args[1]) {
         console.log('Usage: '+args[0]+' FILE');
@@ -1512,13 +6257,90 @@ if (typeof module !== 'undefined' && require.main === module) {
 }
 }
 }).call(this)}).call(this,require('_process'))
-},{"../scripts/ast/type":8,"../scripts/expressions/attribute":9,"../scripts/expressions/object":10,"../scripts/expressions/operation":11,"../scripts/expressions/primitive":12,"../scripts/instructions/print":13,"../scripts/shared":14,"_process":3,"fs":1,"path":2}],5:[function(require,module,exports){
+},{"./Excepciones/Errores":6,"./Excepciones/Listado_Errores":7,"./Expresiones/Aritmetica":8,"./Expresiones/Cadenas":9,"./Expresiones/Identificador":10,"./Expresiones/Logica":11,"./Expresiones/Primitivo":12,"./Expresiones/Relacional":13,"./Instrucciones/Asignacion":14,"./Instrucciones/Break":15,"./Instrucciones/Ciclicas/condDoWhile":16,"./Instrucciones/Ciclicas/condFor":17,"./Instrucciones/Ciclicas/condWhile":18,"./Instrucciones/Condicionales/condIf":19,"./Instrucciones/Condicionales/condIfTernario":20,"./Instrucciones/Condicionales/condSwitch":21,"./Instrucciones/Condicionales/condSwitchCase":22,"./Instrucciones/Condicionales/condSwitchDefault":23,"./Instrucciones/Continue":24,"./Instrucciones/Declaracion":25,"./Instrucciones/Decremento":26,"./Instrucciones/Exec":27,"./Instrucciones/Funciones":28,"./Instrucciones/Incremento":29,"./Instrucciones/LlamadaFuncMetd":30,"./Instrucciones/Metodos":31,"./Instrucciones/Return":32,"./Instrucciones/accesoLista":33,"./Instrucciones/accesoVector":34,"./Instrucciones/agregarLista":35,"./Instrucciones/asignacionLista":36,"./Instrucciones/asignacionVector":37,"./Instrucciones/casteo":38,"./Instrucciones/declaracionListas":39,"./Instrucciones/declaracionVectores":40,"./Instrucciones/funcNativa":41,"./Instrucciones/print":42,"./TS/Tipo":44,"_process":3,"fs":1,"path":2}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ast_1 = require("./ast/ast");
-var scope_1 = require("./ast/scope");
+function obtenerValor(valor) {
+    if (valor != undefined) {
+        switch (valor) {
+            case 0:
+                return 'int';
+            case 1:
+                return 'double';
+            case 2:
+                return 'boolean';
+            case 3:
+                return 'char';
+            case 4:
+                return 'string';
+            case 4:
+                return 'void';
+            default:
+                return 'no';
+        }
+    }
+}
+exports.default = obtenerValor;
+
+},{}],48:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.reporteTabla = void 0;
+var reporteTabla = /** @class */ (function () {
+    function reporteTabla(identificador, valor, forma, tipo, entorno, linea, columna) {
+        this.identificador = identificador.toLowerCase();
+        this.forma = forma;
+        this.tipo = tipo;
+        this.entorno = entorno;
+        this.linea = linea;
+        this.columna = columna;
+        this.valor = valor;
+    }
+    reporteTabla.prototype.getIdentificador = function () {
+        return this.identificador;
+    };
+    reporteTabla.prototype.getForma = function () {
+        return this.forma;
+    };
+    reporteTabla.prototype.getTipo = function () {
+        return this.tipo;
+    };
+    reporteTabla.prototype.getEntorno = function () {
+        return this.entorno;
+    };
+    reporteTabla.prototype.getLinea = function () {
+        return this.linea;
+    };
+    reporteTabla.prototype.getColumna = function () {
+        return this.columna;
+    };
+    reporteTabla.prototype.getValor = function () {
+        return this.valor;
+    };
+    reporteTabla.prototype.setLinea = function (linea) {
+        this.linea = linea;
+    };
+    reporteTabla.prototype.setColumna = function (col) {
+        this.columna = col;
+    };
+    reporteTabla.prototype.setValor = function (val) {
+        this.valor = val;
+    };
+    reporteTabla.prototype.setEntorno = function (ent) {
+        this.entorno = ent;
+    };
+    return reporteTabla;
+}());
+exports.reporteTabla = reporteTabla;
+
+},{}],49:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var parser = require('./Analizador/analizador');
 var shared_1 = require("./shared");
-var grammar = require('../jison/grammar');
+var file = document.querySelector('#file');
+var open_file = document.querySelector('#open_file');
+var clear_file = document.querySelector('#clear_file');
 var analize = document.querySelector('#analize');
 var compile = document.querySelector('#compile');
 var reports = document.querySelector('#reports');
@@ -1527,31 +6349,41 @@ var errors_table = document.querySelector('#errors_table');
 var grammar_table = document.querySelector('#grammar_table');
 var show_ast = document.querySelector('#show_ast');
 var my_source = document.querySelector('#my_source');
+var hideSubmenu = function (selector, idx) {
+    document.querySelectorAll(selector)[idx].classList.toggle('submenu--hide');
+};
+file === null || file === void 0 ? void 0 : file.addEventListener('click', function () {
+    hideSubmenu('.submenu', 0);
+});
+open_file === null || open_file === void 0 ? void 0 : open_file.addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file)
+        return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        var target = e.target;
+        if (target !== undefined && target !== null) {
+            var content = "" + target.result;
+            my_source.value = content;
+        }
+    };
+    reader.readAsText(file);
+    hideSubmenu('.submenu', 0);
+}, false);
+clear_file === null || clear_file === void 0 ? void 0 : clear_file.addEventListener('click', function () {
+    hideSubmenu('.submenu', 0);
+});
 analize === null || analize === void 0 ? void 0 : analize.addEventListener('click', function () {
     shared_1.setConsole('Interpretando la entrada...\n\n');
     var source = my_source.value;
     var result = analize_source(source);
     console.log(result);
-    var globalScope = new scope_1.Scope(null);
-    var ast = new ast_1.AST(result);
-    result.forEach(function (res) {
-        res.exec(globalScope, ast);
-    });
 });
 compile === null || compile === void 0 ? void 0 : compile.addEventListener('click', function () {
     shared_1.setConsole('Compilando la entrada...\n\n');
-    var source = my_source.value;
-    var result = analize_source(source);
-    console.log(result);
-    var globalScope = new scope_1.Scope(null);
-    var ast = new ast_1.AST(result);
-    result.forEach(function (res) {
-        res.translate(globalScope, ast);
-    });
 });
 reports === null || reports === void 0 ? void 0 : reports.addEventListener('click', function () {
-    var _a;
-    (_a = document.querySelector('#submenu')) === null || _a === void 0 ? void 0 : _a.classList.toggle('submenu--hide');
+    hideSubmenu('.submenu', 0);
 });
 symbols_table === null || symbols_table === void 0 ? void 0 : symbols_table.addEventListener('click', function () { });
 errors_table === null || errors_table === void 0 ? void 0 : errors_table.addEventListener('click', function () { });
@@ -1559,373 +6391,10 @@ grammar_table === null || grammar_table === void 0 ? void 0 : grammar_table.addE
 show_ast === null || show_ast === void 0 ? void 0 : show_ast.addEventListener('click', function () { });
 var analize_source = function (source) {
     console.log('ANALIZANDO...');
-    return grammar.parse(source);
+    return parser.parse(source);
 };
 
-},{"../jison/grammar":4,"./ast/ast":6,"./ast/scope":7,"./shared":14}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AST = void 0;
-var AST = /** @class */ (function () {
-    function AST(instructions) {
-        this.instructions = instructions;
-        this.structs = [];
-        this.functions = [];
-    }
-    return AST;
-}());
-exports.AST = AST;
-
-},{}],7:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Scope = void 0;
-var Scope = /** @class */ (function () {
-    function Scope(preview) {
-        this.table = {};
-        this.preview = preview;
-    }
-    Scope.prototype.addScope = function (id, symbol) { };
-    Scope.prototype.deleteScope = function (id) {
-        return false;
-    };
-    Scope.prototype.exist = function (id) {
-        return false;
-    };
-    Scope.prototype.existInCurrent = function (id) { };
-    Scope.prototype.getSymbol = function (id) { };
-    Scope.prototype.replace = function (id, newSymbol) { };
-    return Scope;
-}());
-exports.Scope = Scope;
-
-},{}],8:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Type = void 0;
-var Type;
-(function (Type) {
-    Type[Type["STRING"] = 0] = "STRING";
-    Type[Type["CHAR"] = 1] = "CHAR";
-    Type[Type["INT"] = 2] = "INT";
-    Type[Type["DOUBLE"] = 3] = "DOUBLE";
-    Type[Type["BOOL"] = 4] = "BOOL";
-    Type[Type["VOID"] = 5] = "VOID";
-    Type[Type["STRUCT"] = 6] = "STRUCT";
-    Type[Type["NULL"] = 7] = "NULL";
-    Type[Type["ATTRIBUTO"] = 8] = "ATTRIBUTO";
-    Type[Type["ARRAY"] = 9] = "ARRAY";
-})(Type = exports.Type || (exports.Type = {}));
-
-},{}],9:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Attribute = void 0;
-var Attribute = /** @class */ (function () {
-    function Attribute(id, value, line, column) {
-        this.id = id;
-        this.value = value;
-        this.line = line;
-        this.column = column;
-    }
-    return Attribute;
-}());
-exports.Attribute = Attribute;
-
-},{}],10:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Objeto = void 0;
-var scope_1 = require("../ast/scope");
-var Objeto = /** @class */ (function () {
-    function Objeto(id, text, line, column, attributes, objetos) {
-        this.id = id;
-        this.text = text;
-        this.line = line;
-        this.column = column;
-        this.attributes = attributes;
-        this.objetos = objetos;
-        this.scope = new scope_1.Scope(null);
-    }
-    return Objeto;
-}());
-exports.Objeto = Objeto;
-
-},{"../ast/scope":7}],11:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Operacion = exports.Operador = void 0;
-var type_1 = require("../ast/type");
-var shared_1 = require("../shared");
-var Operador;
-(function (Operador) {
-    Operador[Operador["SUMA"] = 0] = "SUMA";
-    Operador[Operador["RESTA"] = 1] = "RESTA";
-    Operador[Operador["MULTIPLICACION"] = 2] = "MULTIPLICACION";
-    Operador[Operador["DIVISION"] = 3] = "DIVISION";
-    Operador[Operador["MODULO"] = 4] = "MODULO";
-    Operador[Operador["NEGATIVO"] = 5] = "NEGATIVO";
-    Operador[Operador["REPETIR"] = 6] = "REPETIR";
-    Operador[Operador["CONCAT"] = 7] = "CONCAT";
-    Operador[Operador["MAYOR"] = 8] = "MAYOR";
-    Operador[Operador["MENOR"] = 9] = "MENOR";
-    Operador[Operador["MAYOR_IGUAL"] = 10] = "MAYOR_IGUAL";
-    Operador[Operador["MENOR_IGUAL"] = 11] = "MENOR_IGUAL";
-    Operador[Operador["IGUAL"] = 12] = "IGUAL";
-    Operador[Operador["DIFERENTE"] = 13] = "DIFERENTE";
-    Operador[Operador["OR"] = 14] = "OR";
-    Operador[Operador["AND"] = 15] = "AND";
-    Operador[Operador["NOT"] = 16] = "NOT";
-    Operador[Operador["DESCONOCIDO"] = 17] = "DESCONOCIDO";
-})(Operador = exports.Operador || (exports.Operador = {}));
-var Operacion = /** @class */ (function () {
-    function Operacion(op_izq, op_der, operador, line, column) {
-        this.op_izq = op_izq;
-        this.op_der = op_der;
-        this.operador = operador;
-        this.line = line;
-        this.column = column;
-    }
-    Operacion.prototype.getType = function (scope, tree) {
-        var value = this.getValue(scope, tree);
-        if (typeof value === 'boolean')
-            return type_1.Type.BOOL;
-        else if (typeof value === 'string')
-            return type_1.Type.STRING;
-        else if (typeof value === 'number') {
-            if (this.isInt(Number(value)))
-                return type_1.Type.INT;
-            return type_1.Type.DOUBLE;
-        }
-        else if (value === null)
-            return type_1.Type.NULL;
-        return type_1.Type.VOID;
-    };
-    Operacion.prototype.getValue = function (scope, tree) {
-        if (this.operador !== Operador.NEGATIVO &&
-            this.operador !== Operador.NOT) {
-            var op1 = this.op_izq.getValue(scope, tree);
-            var op2 = this.op_der.getValue(scope, tree);
-            /* ********** ********** **********
-             * ARITMETICAS
-             ********** ********** ********** */
-            if (this.operador === Operador.SUMA) {
-                if (typeof op1 === 'number' && typeof op2 === 'number')
-                    return op1 + op2;
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba sumar int o double");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.RESTA) {
-                if (typeof op1 === 'number' && typeof op2 === 'number')
-                    return op1 - op2;
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba restar int o double");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.MULTIPLICACION) {
-                if (typeof op1 === 'number' && typeof op2 === 'number')
-                    return op1 * op2;
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba multiplicar int o double");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.DIVISION) {
-                if (typeof op1 === 'number' && typeof op2 === 'number') {
-                    if (op2 === 0) {
-                        shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): " + op1 + " no es divisible entre 0");
-                        return null;
-                    }
-                    return op1 / op2;
-                }
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba dividir int o double");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.MODULO) {
-                if (typeof op1 === 'number' && typeof op2 === 'number') {
-                    if (op2 === 0) {
-                        shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): " + op1 + " no es divisible entre 0");
-                        return null;
-                    }
-                    return op1 % op2;
-                }
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba dividir int o double");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.REPETIR) {
-                if (typeof op1 === 'string' && typeof op2 === 'number') {
-                    return op1.repeat(op2);
-                }
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba operar (string, int)");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.CONCAT) {
-                if (typeof op1 === 'string' && typeof op2 === 'string')
-                    return "" + op1 + op2;
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (): Se esperaba concatenar string");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.AND) {
-                /* ********** ********** **********
-                 * LÓGICAS
-                 ********** ********** ********** */
-                if (typeof op1 === 'boolean' && typeof op2 === 'boolean')
-                    return op1 && op2;
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (): Se esperaba operar boolean");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.OR) {
-                if (typeof op1 === 'boolean' && typeof op2 === 'boolean')
-                    return op1 || op2;
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (): Se esperaba operar boolean");
-                    return null;
-                }
-            }
-            else if (this.operador === Operador.IGUAL) {
-                /* ********** ********** **********
-                 * RELACIONALES
-                 ********** ********** ********** */
-                return op1 == op2;
-            }
-            else if (this.operador === Operador.DIFERENTE) {
-                return op1 != op2;
-            }
-            else if (this.operador === Operador.MENOR) {
-                return op1 < op2;
-            }
-            else if (this.operador === Operador.MENOR_IGUAL) {
-                return op1 <= op2;
-            }
-            else if (this.operador === Operador.MAYOR) {
-                return op1 > op2;
-            }
-            else if (this.operador === Operador.MAYOR_IGUAL) {
-                return op1 >= op2;
-            }
-        }
-        else {
-            /* ********** ********** **********
-             * UNARIOS
-             ********** ********** ********** */
-            var op1 = this.op_izq.getValue(scope, tree);
-            if (this.operador == Operador.NEGATIVO) {
-                if (typeof (op1 === 'number'))
-                    return op1 * -1;
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba que " + op1 + " sea tipo int o double");
-                    return null;
-                }
-            }
-            else if (this.operador == Operador.NOT) {
-                if (typeof (op1 === 'boolean'))
-                    return !Boolean(op1);
-                else {
-                    shared_1.setConsole("Error sem\u00E1ntico (" + this.line + "," + this.column + "): Se esperaba que " + op1 + " sea tipo boolean");
-                    return null;
-                }
-            }
-        }
-        return null;
-    };
-    Operacion.prototype.translate = function (scope, tree) {
-        throw new Error('Method not implemented.');
-    };
-    Operacion.prototype.isInt = function (n) {
-        return Number(n) === n && n % 1 === 0;
-    };
-    return Operacion;
-}());
-exports.Operacion = Operacion;
-
-},{"../ast/type":8,"../shared":14}],12:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Primitive = void 0;
-var type_1 = require("../ast/type");
-var Primitive = /** @class */ (function () {
-    function Primitive(value, type, line, column) {
-        this.line = line;
-        this.type = type;
-        this.column = column;
-        this.value = value;
-    }
-    Primitive.prototype.getType = function (scope, tree) {
-        // TODO: Return this.type & match to Operation class
-        var value = this.getValue(scope, tree);
-        if (typeof value === 'boolean')
-            return type_1.Type.BOOL;
-        else if (typeof value === 'string')
-            return type_1.Type.STRING;
-        else if (typeof value === 'number') {
-            if (this.isInt(Number(value)))
-                return type_1.Type.INT;
-            return type_1.Type.DOUBLE;
-        }
-        else if (value === null)
-            return type_1.Type.NULL;
-        return type_1.Type.VOID;
-    };
-    Primitive.prototype.getValue = function (scope, tree) {
-        return this.value;
-    };
-    Primitive.prototype.translate = function (scope, tree) {
-        throw new Error('Method not implemented.');
-    };
-    Primitive.prototype.isInt = function (n) {
-        return Number(n) === n && n % 1 === 0;
-    };
-    return Primitive;
-}());
-exports.Primitive = Primitive;
-
-},{"../ast/type":8}],13:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Print = void 0;
-var shared_1 = require("../shared");
-var Print = /** @class */ (function () {
-    function Print(expressions, line, column, newLine) {
-        if (newLine === void 0) { newLine = false; }
-        this.expressions = expressions;
-        this.line = line;
-        this.column = column;
-        this.newLine = newLine;
-    }
-    Print.prototype.exec = function (scope, tree) {
-        var _this = this;
-        this.expressions.forEach(function (expr) {
-            var value = expr.getValue(scope, tree);
-            if (value !== null) {
-                shared_1.setConsole(value);
-            }
-            else
-                shared_1.setConsole("Error sem\u00E1ntico (" + _this.line + ", " + _this.column + "): No se pueden imprimir valores nulos");
-        });
-        if (this.newLine)
-            shared_1.setConsole('\n');
-    };
-    Print.prototype.translate = function (scope, tree) {
-        throw new Error('Method not implemented.');
-    };
-    return Print;
-}());
-exports.Print = Print;
-
-},{"../shared":14}],14:[function(require,module,exports){
+},{"./Analizador/analizador":46,"./shared":50}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setConsole = exports.setResult = void 0;
@@ -1944,5 +6413,5 @@ var setConsole = function (res) {
 };
 exports.setConsole = setConsole;
 
-},{}]},{},[5])(5)
+},{}]},{},[49])(49)
 });

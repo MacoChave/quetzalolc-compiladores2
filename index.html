@@ -17,6 +17,18 @@
 		<nav class="container__menu">
 			<ul class="menu">
 				<li class="menu__item">
+					<a id="file" class="menu__link">Archivo</a>
+					<ul class="submenu submenu--hide">
+						<li class="submenu__item">
+							<label for="open_file" class="submenu__link">Abrir</lab>
+								<input type="file" name="open_file" id="open_file" hidden>
+						</li>
+						<li class="submenu__item">
+							<a id="clear_file" class="submenu__link">Limpiar</a>
+						</li>
+					</ul>
+				</li>
+				<li class="menu__item">
 					<a id="analize" class="menu__link">Interpretar</a>
 				</li>
 				<li class="menu__item">
@@ -24,7 +36,7 @@
 				</li>
 				<li class="menu__item">
 					<a id="reports" class="menu__link">Reportes</a>
-					<ul class="submenu submenu--hide" id="submenu">
+					<ul class="submenu submenu--hide">
 						<li class="submenu__item">
 							<a id="symbols_table" class="submenu__link"
 								>Tabla de simbolos</a

@@ -99,7 +99,10 @@ case 5: case 6: case 12: case 14: case 15: case 18: case 19: case 21: case 22: c
 this.$=$$[$0-1];
 break;
 case 23:
-inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",_$[$0-1].first_line,_$[$0-1].first_column));console.log("sinta "); this.$=false;
+
+                                            inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",_$[$0-1].first_line,_$[$0-1].first_column));console.log("sinta ");
+                                            this.$=false;
+                                        
 break;
 case 24: case 25:
 this.$=new print.default($$[$0-2],_$[$0-4].first_line,_$[$0-4].first_column);
@@ -582,7 +585,7 @@ const errores= require('./Excepciones/Errores');
 const inicio= require('./Excepciones/Listado_Errores');
 const aritmeticas= require('./Expresiones/Aritmetica');
 const unionCadenas= require('./Expresiones/Cadenas');
-const Tipo= require('./Simbolos/Tipo');
+const Tipo= require('./TS/Tipo');
 const logicas= require("./Expresiones/Logica");
 const relacional= require("./Expresiones/Relacional");
 const declaracion= require("./Instrucciones/Declaracion");

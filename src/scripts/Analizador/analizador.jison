@@ -10,7 +10,7 @@ const errores= require('./Excepciones/Errores');
 const inicio= require('./Excepciones/Listado_Errores');
 const aritmeticas= require('./Expresiones/Aritmetica');
 const unionCadenas= require('./Expresiones/Cadenas');
-const Tipo= require('./Simbolos/Tipo');
+const Tipo= require('./TS/Tipo');
 const logicas= require("./Expresiones/Logica");
 const relacional= require("./Expresiones/Relacional");
 const declaracion= require("./Instrucciones/Declaracion");
@@ -251,7 +251,10 @@ INSTRUCCION:
     |FUNCIONES                          {$$=$1;}
     |VECTORES PTCOMA                    {$$=$1;}
     |ASIGVECTORES PTCOMA                {$$=$1;}
-    |error PTCOMA {inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));console.log("sinta "); $$=false;}
+        |error PTCOMA                   {
+                                            inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));console.log("sinta ");
+                                            $$=false;
+                                        }
     ;
 IMPRIMIR: RESPRINT PARABRE EXPRESION PARCIERRA  PTCOMA         {$$=new print.default($3,@1.first_line,@1.first_column);}
         | RESPRINTLN PARABRE EXPRESION PARCIERRA  PTCOMA         {$$=new print.default($3,@1.first_line,@1.first_column);}
