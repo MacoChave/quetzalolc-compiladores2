@@ -7,7 +7,7 @@
 const print=require('./Instrucciones/print');
 const primitivo= require('./Expresiones/Primitivo');
 const errores= require('./Excepciones/Errores');
-//const inicio= require('./Excepciones/Listado_Errores');
+const inicio= require('./Excepciones/Listado_Errores');
 const aritmeticas= require('./Expresiones/Aritmetica');
 const unionCadenas= require('./Expresiones/Cadenas');
 const Tipo= require('./Simbolos/Tipo');
@@ -99,7 +99,9 @@ const casteo= require('./Instrucciones/casteo');
 ")"             return 'PARCIERRA';
 "["             return 'CORCHABRE';
 "]"             return 'CORCHCIERRA';
+"++"            return 'MASINC'
 "+"             return 'MAS';
+"--"            return 'MENOSDES'
 "-"             return 'MENOS';
 "/"             return 'DIVI';
 "*"             return 'POR';
@@ -112,7 +114,7 @@ const casteo= require('./Instrucciones/casteo');
 "!"             return 'NOT';
 "<"             return 'MENOR';
 ">"             return 'MAYOR';
-"^"             return 'DUPLICADOR';
+"^"             return 'DUPLI';
 "?"             return 'INTERROGACION';
 ":"             return 'DOSPUNTOS';
 "."             return 'PUNTO';
@@ -138,11 +140,12 @@ const casteo= require('./Instrucciones/casteo');
 %left 'OR'
 %left 'AND'
 %left 'NOT'
-%left 'MAYOR' 'MENOR' 'MAYORIGUAL' 'MENORIGUAL' 'COMPARACION' 'DIFERENTE'
+%left 'MAYOR' 'MENOR' 'MAYORIGUAL' 'MENORIGUAL' 'COMPARACION' 'DIFERENTE' 'CONCAD' 'DUPLI'
 %left 'MAS' 'MENOS'
 %left 'POR' 'DIVI' 'MOD'
 %right 'POTENCIA'
 %right 'UMENOS'
+%left 'MASINC' 'MENOSDES'
 
 %start INI
 //Inicio
@@ -187,8 +190,8 @@ typeof resTypeof
 toString resTostring
 tochararray resTochararray
 exec resExec
-++ masmas
--- menosmenos
+++ MASINC
+-- MENOSDES
 [ corchete abierto
 ] corchete cerrado
 entero
@@ -247,10 +250,7 @@ INSTRUCCION:
     |EJECUTAR PTCOMA                    {$$=$1;}
     |FUNCIONES                          {$$=$1;}
     |VECTORES PTCOMA                    {$$=$1;}
-    |LISTAS PTCOMA                      {$$=$1;}
     |ASIGVECTORES PTCOMA                {$$=$1;}
-    |ASIGLISTAS PTCOMA                  {$$=$1;}
-    |AGREGARLISTA PTCOMA                {$$=$1;}
     |error PTCOMA {inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));console.log("sinta "); $$=false;}
     ;
 IMPRIMIR: RESPRINT PARABRE EXPRESION PARCIERRA  PTCOMA         {$$=new print.default($3,@1.first_line,@1.first_column);}
@@ -296,7 +296,7 @@ EXPRESION:
 
     //CADENAS
     |EXPRESION CONCAD EXPRESION         {$$= new unionCadenas.default(unionCadenas.Operadores.CONCATENACION,@1.first_line,@1.first_column,$1,$3);}
-    |EXPRESION DUPLICADOR EXPRESION     {$$= new unionCadenas.default(unionCadenas.Operadores.DUPLICIDAD,@1.first_line,@1.first_column,$1,$3);}
+    |EXPRESION DUPLI EXPRESION          {$$= new unionCadenas.default(unionCadenas.Operadores.DUPLICIDAD,@1.first_line,@1.first_column,$1,$3);}
     |IFTERNARIO                         {$$=$1;}
 
     //NATIVO
@@ -309,15 +309,11 @@ EXPRESION:
     
     //VARIABLES, FUNCIONES Y VECTORES
     |CORCHABRE LISTAVALORES CORCHCIERRA {$$=$2;}
-    |IDENTIFICADOR              {$$=new identificador.default($1,@1.first_line,@1.first_column);}         
-    |CONDINCREMENTO             {$$=$1;}
-    |CONDECREMENTO              {$$=$1;}
+    |IDENTIFICADOR              {$$=new identificador.default($1,@1.first_line,@1.first_column);}
     |LLAMADA                    {$$=$1;}
     |ACCESOVECTOR               {$$=$1;}
     |FUNCNATIVA PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$3,@1.first_line,@1.first_column); }
-    |FUNCNATIVA PUNTO RESPARSE PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$5,@1.first_line,@1.first_column); }
-    |PARABRE TIPODATO PARCIERRA EXPRESION {$$=new casteo.default($2,$4,@1.first_line,@1.first_column);}
- 
+    |TIPODATO PUNTO RESPARSE PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$5,@1.first_line,@1.first_column); } 
     ;
 CONDICIONIF:
     RESIF PARABRE EXPRESION /*COND1*/PARCIERRA BLOQUEINSTRUCCION                                                        {$$= new condIf.default(@1.first_line,@1.first_column,$3,$5,undefined,undefined);}
@@ -359,10 +355,10 @@ DEFECTO:
     RESDEFAULT DOSPUNTOS INSTRUCCIONES                                              {$$=new condDefault.default(@1.first_line,@1.first_column,$3);}  
     ;
 CONDINCREMENTO:
-    EXPRESION MAS MAS                                                              {$$=new Incremento.default($1,@1.first_line,@1.first_column);}
+    EXPRESION MASINC                                                              {$$=new Incremento.default($1,@1.first_line,@1.first_column);}
     ;
 CONDECREMENTO:
-    EXPRESION MENOS MENOS                                                           {$$=new Decremento.default($1,@1.first_line,@1.first_column);}
+    EXPRESION MENOSDES                                                           {$$=new Decremento.default($1,@1.first_line,@1.first_column);}
     ;
 CONDFOR:
     RESFOR PARABRE DECLASIG PTCOMA EXPRESION PTCOMA ACTUALIZACION PARCIERRA BLOQUEINSTRUCCION {$$=new condFor.default($3,$5,$7,$9,@1.first_line,@1.first_column);}
@@ -425,41 +421,8 @@ FUNCNATIVA:
     |RESTRUN        {$$=$1;}
     |RESROUND       {$$=$1;}
     |RESTYPE        {$$=$1;}
-    |RESSTRING      {$$=$1;}
-    |RESINT         {$$=$1;}
-    |RESDOUBLE      {$$=$1;}
-    |RESBOOL        {$$=$1;}
     ;
 BLOQUEINSTRUCCION:
     LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=$2;}
     |LLAVEABRE LLAVECIERRA              {$$=[];}
     ;
-    /*
-    |TIPODATO
-    TIPODATO:
-        RESINT
-        |RESCHAR
-        |RESSTRING
-        |RESBOOL
-        |RESDOUBLE
-    |DECLARACION
-    DECLARACION:
-        TIPODATO IDENTIFICADOR 
-        |TIPODATO IDENTIFICADOR IGUAL EXPRESION PTCOMA
-        |ERROR PTCOMA
-    a=b;
-    |ASIGNACION:
-        IDENTIFICADOR IGUAL EXPRESION PTCOMA
-
-    DECONTROL:
-        |IF
-        |SWITCH
-    CICLICAS:
-        |WHILE
-        |DOWHILE
-        |FOR
-    IF:
-        RESIF PARABRE EXPRESION PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA
-        |RESIF PARABRE EXPRESION PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA else lalveabre instrucciones llavecierra
-        |RESIF PARABRE EXPRESION PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA else IF
-    */
