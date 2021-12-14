@@ -256,9 +256,21 @@ INSTRUCCION:
                                             $$=false;
                                         }
     ;
-IMPRIMIR: RESPRINT PARABRE EXPRESION PARCIERRA  PTCOMA         {$$=new print.default($3,@1.first_line,@1.first_column);}
-        | RESPRINTLN PARABRE EXPRESION PARCIERRA  PTCOMA         {$$=new print.default($3,@1.first_line,@1.first_column);}
+IMPRIMIR: RESPRINT PARABRE IMPRIMIR_ARGS PARCIERRA  PTCOMA         {$$=new print.default($3, false,@1.first_line,@1.first_column);}
+        | RESPRINTLN PARABRE IMPRIMIR_ARGS PARCIERRA  PTCOMA         {$$=new print.default($3, true,@1.first_line,@1.first_column);}
 ;//{};
+
+IMPRIMIR_ARGS
+    : IMPRIMIR_ARGS COMA EXPRESION
+        {
+            $1.push($3)
+            $$ = $1
+        }
+    | EXPRESION
+        {
+            $$ = [$1]
+        }
+    ;
 
 DECLARACION:
     TIPODATO IDENTIFICADOR        {$$= new declaracion.default($1,@1.first_line,@1.first_column,$2);}
