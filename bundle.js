@@ -1509,7 +1509,7 @@ var Operadores;
     Operadores[Operadores["MENOSNUM"] = 5] = "MENOSNUM";
 })(Operadores = exports.Operadores || (exports.Operadores = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],9:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],9:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1695,7 +1695,7 @@ var Operadores;
     Operadores[Operadores["DUPLICIDAD"] = 1] = "DUPLICIDAD";
 })(Operadores = exports.Operadores || (exports.Operadores = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],10:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],10:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1765,7 +1765,7 @@ var Identificador = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Identificador;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],11:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1878,7 +1878,7 @@ var Logicas;
     Logicas[Logicas["NOT"] = 2] = "NOT";
 })(Logicas = exports.Logicas || (exports.Logicas = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],12:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],12:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1937,7 +1937,7 @@ var Primitivo = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Primitivo;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],13:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],13:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2065,7 +2065,7 @@ var Relacionales;
     Relacionales[Relacionales["MENORIGUAL"] = 5] = "MENORIGUAL";
 })(Relacionales = exports.Relacionales || (exports.Relacionales = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],14:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],14:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2149,7 +2149,7 @@ var Asignacion = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Asignacion;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],15:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],15:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2210,7 +2210,7 @@ var Break = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Break;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],16:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],16:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2307,7 +2307,7 @@ var condWhile = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condWhile;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],17:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],17:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2418,7 +2418,7 @@ var condFor = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condFor;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],18:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],18:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2515,7 +2515,7 @@ var condWhile = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condWhile;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],19:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],19:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2677,7 +2677,7 @@ var condIf = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condIf;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],20:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],20:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2765,7 +2765,7 @@ var condIfTernario = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condIfTernario;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../TS/Tipo":44}],21:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../TS/Tipo":45}],21:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2879,7 +2879,7 @@ var condSwitch = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitch;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../Return":32}],22:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../Return":32}],22:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2976,7 +2976,7 @@ var condSwitchCase = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],23:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],23:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3060,7 +3060,7 @@ var condSwitchCase = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":44,"../../TS/tablaSimbolos":45,"../Return":32}],24:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],24:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3121,7 +3121,7 @@ var Continue = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Continue;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],25:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],25:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3254,7 +3254,7 @@ var Declaracion = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Declaracion;
 
-},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":43,"../TS/Tipo":44}],26:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":44,"../TS/Tipo":45}],26:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3358,7 +3358,7 @@ var Incremento = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Incremento;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":44}],27:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":45}],27:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3474,7 +3474,7 @@ var Exec = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Exec;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44,"../TS/tablaSimbolos":45,"./Declaracion":25,"./Metodos":31}],28:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45,"../TS/tablaSimbolos":46,"./Declaracion":25,"./Metodos":31}],28:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3562,7 +3562,7 @@ var Funciones = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Funciones;
 
-},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],29:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],29:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3666,7 +3666,7 @@ var Decremento = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Decremento;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":44}],30:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":45}],30:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3844,7 +3844,7 @@ var LlamadaFuncMetd = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = LlamadaFuncMetd;
 
-},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44,"../TS/tablaSimbolos":45,"./Declaracion":25,"./Funciones":28,"./Metodos":31,"./declaracionListas":39,"./declaracionVectores":40}],31:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45,"../TS/tablaSimbolos":46,"./Declaracion":25,"./Funciones":28,"./Metodos":31,"./declaracionListas":39,"./declaracionVectores":40}],31:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3932,7 +3932,7 @@ var Metodos = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Metodos;
 
-},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],32:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],32:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4004,7 +4004,7 @@ var Return = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Return;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":44}],33:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],33:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4083,7 +4083,7 @@ var accesoLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = accesoLista;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],34:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],34:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4160,7 +4160,7 @@ var accesoVector = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = accesoVector;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],35:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],35:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4243,7 +4243,7 @@ var agregarLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = agregarLista;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],36:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],36:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4336,7 +4336,7 @@ var asignacionLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = asignacionLista;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],37:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],37:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4427,7 +4427,7 @@ var asignacionVector = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = asignacionVector;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],38:[function(require,module,exports){
+},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],38:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4543,7 +4543,7 @@ var casteo = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = casteo;
 
-},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],39:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],39:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4638,7 +4638,7 @@ var declaracionListas = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = declaracionListas;
 
-},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":43}],40:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":44}],40:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4757,7 +4757,7 @@ var declaracionVectores = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = declaracionVectores;
 
-},{"../../Reportes/cambiarTipo":47,"../../Reportes/reporteTabla":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":43,"../TS/Tipo":44}],41:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":44,"../TS/Tipo":45}],41:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4922,7 +4922,7 @@ var funcNativa = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = funcNativa;
 
-},{"../../Reportes/cambiarTipo":47,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":44}],42:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":45}],42:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5000,7 +5000,115 @@ var Print = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Print;
 
-},{"../../shared":50,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":44}],43:[function(require,module,exports){
+},{"../../shared":51,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],43:[function(require,module,exports){
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var tablaSimbolos_1 = __importDefault(require("./tablaSimbolos"));
+var Metodos_1 = __importDefault(require("../Instrucciones/Metodos"));
+var Funciones_1 = __importDefault(require("../Instrucciones/Funciones"));
+var reporteTabla_1 = require("../../Reportes/reporteTabla");
+var cambiarTipo_1 = __importDefault(require("../../Reportes/cambiarTipo"));
+var Arbol = /** @class */ (function () {
+    function Arbol(instrucciones) {
+        this.consola = '';
+        this.instrucciones = instrucciones;
+        this.consola = '';
+        this.tablaGlobal = new tablaSimbolos_1.default();
+        this.errores = new Array();
+        this.funciones = new Array();
+        this.listaSimbolos = new Array();
+    }
+    Arbol.prototype.getSimbolos = function () {
+        return this.listaSimbolos;
+    };
+    Arbol.prototype.actualizarTabla = function (identificador, valor, linea, entorno, columna) {
+        for (var _i = 0, _a = this.listaSimbolos; _i < _a.length; _i++) {
+            var elemento = _a[_i];
+            if (elemento.getIdentificador().toString() == identificador.toLowerCase() &&
+                elemento.getEntorno().toString() == entorno.toString()) {
+                elemento.setValor(valor);
+                elemento.setLinea(linea);
+                elemento.setColumna(columna);
+                return true;
+            }
+        }
+        return false;
+    };
+    Arbol.prototype.BuscarTipo = function (identificador) {
+        for (var _i = 0, _a = this.listaSimbolos; _i < _a.length; _i++) {
+            var elemento = _a[_i];
+            if (elemento.getIdentificador() == identificador.toLowerCase()) {
+                return elemento.getForma().toString();
+            }
+        }
+        return 'as';
+    };
+    Arbol.prototype.getFuncion = function (identificador) {
+        for (var _i = 0, _a = this.funciones; _i < _a.length; _i++) {
+            var f = _a[_i];
+            if (f instanceof Metodos_1.default) {
+                if (identificador.toLowerCase() ==
+                    f.identificador.toLowerCase()) {
+                    if (!this.actualizarTabla(f.identificador.toString(), '', f.fila.toString(), '', f.columna.toString())) {
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(f.identificador, '', 'MetodoCreacion', 'void', '', f.fila.toString(), f.columna.toString());
+                        this.listaSimbolos.push(nuevoSimbolo);
+                    }
+                    return f;
+                }
+            }
+            else if (f instanceof Funciones_1.default) {
+                if (identificador.toLowerCase() ==
+                    f.identificador.toLowerCase()) {
+                    if (!this.actualizarTabla(f.identificador.toString(), '', f.fila.toString(), '', f.columna.toString())) {
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(f.identificador, '', 'FuncionCreacion', cambiarTipo_1.default(f.tipoDato.getTipo()) + '', '', f.fila.toString(), f.columna.toString());
+                        this.listaSimbolos.push(nuevoSimbolo);
+                    }
+                    return f;
+                }
+            }
+        }
+    };
+    Arbol.prototype.getfunciones = function () {
+        return this.funciones;
+    };
+    Arbol.prototype.setfunciones = function (value) {
+        this.funciones = value;
+    };
+    Arbol.prototype.geterrores = function () {
+        return this.errores;
+    };
+    Arbol.prototype.seterrores = function (value) {
+        this.errores = value;
+    };
+    Arbol.prototype.getinstrucciones = function () {
+        return this.instrucciones;
+    };
+    Arbol.prototype.setinstrucciones = function (value) {
+        this.instrucciones = value;
+    };
+    Arbol.prototype.getconsola = function () {
+        return this.consola;
+    };
+    Arbol.prototype.setconsola = function (value) {
+        this.consola = value;
+    };
+    Arbol.prototype.actualizaConsola = function (uptodate) {
+        this.consola = "" + this.consola + uptodate + "\n";
+    };
+    Arbol.prototype.gettablaGlobal = function () {
+        return this.tablaGlobal;
+    };
+    Arbol.prototype.settablaGlobal = function (value) {
+        this.tablaGlobal = value;
+    };
+    return Arbol;
+}());
+exports.default = Arbol;
+
+},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Instrucciones/Funciones":28,"../Instrucciones/Metodos":31,"./tablaSimbolos":46}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Simbolo = /** @class */ (function () {
@@ -5032,7 +5140,7 @@ var Simbolo = /** @class */ (function () {
 }());
 exports.default = Simbolo;
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tipoDato = void 0;
@@ -5063,7 +5171,7 @@ var tipoDato;
     tipoDato[tipoDato["NULO"] = 6] = "NULO";
 })(tipoDato = exports.tipoDato || (exports.tipoDato = {}));
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -5135,7 +5243,7 @@ var tablaSimbolos = /** @class */ (function () {
 }());
 exports.default = tablaSimbolos;
 
-},{"./Tipo":44}],46:[function(require,module,exports){
+},{"./Tipo":45}],47:[function(require,module,exports){
 (function (process){(function (){
 /* parser generated by jison 0.4.18 */
 /*
@@ -6279,7 +6387,7 @@ if (typeof module !== 'undefined' && require.main === module) {
 }
 }
 }).call(this)}).call(this,require('_process'))
-},{"./Excepciones/Errores":6,"./Excepciones/Listado_Errores":7,"./Expresiones/Aritmetica":8,"./Expresiones/Cadenas":9,"./Expresiones/Identificador":10,"./Expresiones/Logica":11,"./Expresiones/Primitivo":12,"./Expresiones/Relacional":13,"./Instrucciones/Asignacion":14,"./Instrucciones/Break":15,"./Instrucciones/Ciclicas/condDoWhile":16,"./Instrucciones/Ciclicas/condFor":17,"./Instrucciones/Ciclicas/condWhile":18,"./Instrucciones/Condicionales/condIf":19,"./Instrucciones/Condicionales/condIfTernario":20,"./Instrucciones/Condicionales/condSwitch":21,"./Instrucciones/Condicionales/condSwitchCase":22,"./Instrucciones/Condicionales/condSwitchDefault":23,"./Instrucciones/Continue":24,"./Instrucciones/Declaracion":25,"./Instrucciones/Decremento":26,"./Instrucciones/Exec":27,"./Instrucciones/Funciones":28,"./Instrucciones/Incremento":29,"./Instrucciones/LlamadaFuncMetd":30,"./Instrucciones/Metodos":31,"./Instrucciones/Return":32,"./Instrucciones/accesoLista":33,"./Instrucciones/accesoVector":34,"./Instrucciones/agregarLista":35,"./Instrucciones/asignacionLista":36,"./Instrucciones/asignacionVector":37,"./Instrucciones/casteo":38,"./Instrucciones/declaracionListas":39,"./Instrucciones/declaracionVectores":40,"./Instrucciones/funcNativa":41,"./Instrucciones/print":42,"./TS/Tipo":44,"_process":3,"fs":1,"path":2}],47:[function(require,module,exports){
+},{"./Excepciones/Errores":6,"./Excepciones/Listado_Errores":7,"./Expresiones/Aritmetica":8,"./Expresiones/Cadenas":9,"./Expresiones/Identificador":10,"./Expresiones/Logica":11,"./Expresiones/Primitivo":12,"./Expresiones/Relacional":13,"./Instrucciones/Asignacion":14,"./Instrucciones/Break":15,"./Instrucciones/Ciclicas/condDoWhile":16,"./Instrucciones/Ciclicas/condFor":17,"./Instrucciones/Ciclicas/condWhile":18,"./Instrucciones/Condicionales/condIf":19,"./Instrucciones/Condicionales/condIfTernario":20,"./Instrucciones/Condicionales/condSwitch":21,"./Instrucciones/Condicionales/condSwitchCase":22,"./Instrucciones/Condicionales/condSwitchDefault":23,"./Instrucciones/Continue":24,"./Instrucciones/Declaracion":25,"./Instrucciones/Decremento":26,"./Instrucciones/Exec":27,"./Instrucciones/Funciones":28,"./Instrucciones/Incremento":29,"./Instrucciones/LlamadaFuncMetd":30,"./Instrucciones/Metodos":31,"./Instrucciones/Return":32,"./Instrucciones/accesoLista":33,"./Instrucciones/accesoVector":34,"./Instrucciones/agregarLista":35,"./Instrucciones/asignacionLista":36,"./Instrucciones/asignacionVector":37,"./Instrucciones/casteo":38,"./Instrucciones/declaracionListas":39,"./Instrucciones/declaracionVectores":40,"./Instrucciones/funcNativa":41,"./Instrucciones/print":42,"./TS/Tipo":45,"_process":3,"fs":1,"path":2}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function obtenerValor(valor) {
@@ -6304,7 +6412,7 @@ function obtenerValor(valor) {
 }
 exports.default = obtenerValor;
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reporteTabla = void 0;
@@ -6355,11 +6463,15 @@ var reporteTabla = /** @class */ (function () {
 }());
 exports.reporteTabla = reporteTabla;
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var parser = require('./Analizador/analizador');
 var shared_1 = require("./shared");
+var Arbol_1 = __importDefault(require("./Analizador/TS/Arbol"));
 var file = document.querySelector('#file');
 var open_file = document.querySelector('#open_file');
 var clear_file = document.querySelector('#clear_file');
@@ -6413,10 +6525,10 @@ grammar_table === null || grammar_table === void 0 ? void 0 : grammar_table.addE
 show_ast === null || show_ast === void 0 ? void 0 : show_ast.addEventListener('click', function () { });
 var analize_source = function (source) {
     console.log('ANALIZANDO...');
-    return parser.parse(source);
+    return new Arbol_1.default(parser.parse(source));
 };
 
-},{"./Analizador/analizador":46,"./shared":50}],50:[function(require,module,exports){
+},{"./Analizador/TS/Arbol":43,"./Analizador/analizador":47,"./shared":51}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setConsole = exports.setResult = void 0;
@@ -6435,5 +6547,5 @@ var setConsole = function (res) {
 };
 exports.setConsole = setConsole;
 
-},{}]},{},[49])(49)
+},{}]},{},[50])(50)
 });

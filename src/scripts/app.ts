@@ -1,6 +1,7 @@
 let parser = require('./Analizador/analizador');
-import { Instruccion } from './Analizador/Abstracto/Instruccion';
+
 import { setConsole } from './shared';
+import Arbol from './Analizador/TS/Arbol';
 
 const file = document.querySelector('#file');
 const open_file = document.querySelector('#open_file');
@@ -51,7 +52,8 @@ clear_file?.addEventListener('click', () => {
 analize?.addEventListener('click', () => {
 	setConsole('Interpretando la entrada...\n\n');
 	let source = my_source.value;
-	const result = analize_source(source);
+	const result: Arbol = analize_source(source);
+
 	console.log(result);
 });
 
@@ -71,7 +73,7 @@ grammar_table?.addEventListener('click', () => {});
 
 show_ast?.addEventListener('click', () => {});
 
-const analize_source = (source: string): Instruccion[] => {
+const analize_source = (source: string): Arbol => {
 	console.log('ANALIZANDO...');
-	return parser.parse(source);
+	return new Arbol(parser.parse(source));
 };
