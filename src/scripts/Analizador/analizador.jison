@@ -42,6 +42,7 @@ const modiLista = require('./Instrucciones/asignacionLista');
 const agregarLista= require('./Instrucciones/agregarLista');
 const funcNativa= require('./Instrucciones/funcNativa');
 const casteo= require('./Instrucciones/casteo');
+const main = require('./Instrucciones/Main')
 %}
 //definicion lexica
 %lex 
@@ -70,6 +71,7 @@ const casteo= require('./Instrucciones/casteo');
 "break"         return 'RESBREAK';
 "continue"      return 'RESCONTINUE';
 "return"        return 'RESRETURN';
+"main"          return 'RESMAIN';
 "switch"        return 'RESSWITCH';
 "case"          return 'RESCASE';
 "default"       return 'RESDEFAULT';
@@ -251,6 +253,7 @@ INSTRUCCION:
     |FUNCIONES                          {$$=$1;}
     |VECTORES PTCOMA                    {$$=$1;}
     |ASIGVECTORES PTCOMA                {$$=$1;}
+    |FUNCMAIN PTCOMA                    {$$=$1;}
         |error PTCOMA                   {
                                             inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));console.log("sinta ");
                                             $$=false;
@@ -440,4 +443,8 @@ FUNCNATIVA:
 BLOQUEINSTRUCCION:
     LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=$2;}
     |LLAVEABRE LLAVECIERRA              {$$=[];}
+    ;
+
+FUNCMAIN:
+    RESVOID RESMAIN PARABRE PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=new main.default($1,@1.first_line,@1.first_column,$6);}
     ;
