@@ -4989,12 +4989,12 @@ var Print = /** @class */ (function (_super) {
             var valor = expr.interpretar(arbol, tabla);
             if (valor instanceof Errores_1.default)
                 return valor;
-            shared_1.setConsole(valor);
+            shared_1.setValueConsole(valor);
             console.log(valor);
             arbol.actualizaConsola(valor + '');
         });
         if (this.isSalto)
-            shared_1.setConsole('\n');
+            shared_1.setValueConsole('\n');
     };
     return Print;
 }(Instruccion_1.Instruccion));
@@ -5347,7 +5347,8 @@ this.$=$$[$0-1];
 break;
 case 23:
 
-                                            inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",_$[$0-1].first_line,_$[$0-1].first_column));console.log("sinta ");
+                                            // inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",_$[$0-1].first_line,_$[$0-1].first_column));
+                                            console.log(`Error sintactico, se esperaba un token en esta linea ${_$[$0-1].first_line}, ${_$[$0-1].first_column}`);
                                             this.$=false;
                                         
 break;
@@ -6483,6 +6484,35 @@ var errors_table = document.querySelector('#errors_table');
 var grammar_table = document.querySelector('#grammar_table');
 var show_ast = document.querySelector('#show_ast');
 var my_source = document.querySelector('#my_source');
+// // CODE EDITOR
+// const sourceEditor = CodeMirror.fromTextArea(
+// 	document.querySelector('#my_source'),
+// 	{
+// 		lineNumbers: true,
+// 		theme: 'paraiso-light',
+// 		mode: 'javascript',
+// 		autoCloseBrackets: true,
+// 	}
+// );
+// sourceEditor.setSize(null, 450);
+// const resultEditor = CodeMirror.fromTextArea(
+// 	document.querySelector('#my_result'),
+// 	{
+// 		lineNumbers: true,
+// 		theme: 'paraiso-dark',
+// 		mode: 'clike',
+// 		readonly: true,
+// 	}
+// );
+// resultEditor.setSize(null, 450);
+// const consoleEditor = CodeMirror.fromTextArea(
+// 	document.querySelector('#my_console'),
+// 	{
+// 		theme: 'pastel-on-dark',
+// 	}
+// );
+// consoleEditor.setSize(null, 200);
+// // END CODE EDITOR
 var hideSubmenu = function (selector, idx) {
     document.querySelectorAll(selector)[idx].classList.toggle('submenu--hide');
 };
@@ -6498,7 +6528,7 @@ open_file === null || open_file === void 0 ? void 0 : open_file.addEventListener
         var target = e.target;
         if (target !== undefined && target !== null) {
             var content = "" + target.result;
-            my_source.value = content;
+            sourceEditor.setValue(content);
         }
     };
     reader.readAsText(file);
@@ -6508,16 +6538,17 @@ clear_file === null || clear_file === void 0 ? void 0 : clear_file.addEventListe
     hideSubmenu('.submenu', 0);
 });
 analize === null || analize === void 0 ? void 0 : analize.addEventListener('click', function () {
-    shared_1.setConsole('Interpretando la entrada...\n\n');
+    shared_1.setValueConsole('Interpretando la entrada...\n\n');
+    sourceEditor.save();
     var source = my_source.value;
     var result = analize_source(source);
     console.log(result);
 });
 compile === null || compile === void 0 ? void 0 : compile.addEventListener('click', function () {
-    shared_1.setConsole('Compilando la entrada...\n\n');
+    shared_1.setValueConsole('Compilando la entrada...\n\n');
 });
 reports === null || reports === void 0 ? void 0 : reports.addEventListener('click', function () {
-    hideSubmenu('.submenu', 0);
+    hideSubmenu('.submenu', 1);
 });
 symbols_table === null || symbols_table === void 0 ? void 0 : symbols_table.addEventListener('click', function () { });
 errors_table === null || errors_table === void 0 ? void 0 : errors_table.addEventListener('click', function () { });
@@ -6531,21 +6562,23 @@ var analize_source = function (source) {
 },{"./Analizador/TS/Arbol":43,"./Analizador/analizador":47,"./shared":51}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setConsole = exports.setResult = void 0;
+exports.setValueConsole = exports.setResult = void 0;
 var setResult = function (res) {
     var textarea = document.querySelector('#my_result');
     var value = textarea.value;
     value += res;
-    textarea.value = value;
+    resultEditor.setValue(value);
+    resultEditor.save();
 };
 exports.setResult = setResult;
-var setConsole = function (res) {
+var setValueConsole = function (texto) {
     var textarea = document.querySelector('#my_console');
     var value = textarea.value;
-    value += res;
-    textarea.value = value;
+    value += texto;
+    consoleEditor.setValue(value);
+    consoleEditor.save();
 };
-exports.setConsole = setConsole;
+exports.setValueConsole = setValueConsole;
 
 },{}]},{},[50])(50)
 });

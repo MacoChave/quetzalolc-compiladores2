@@ -1,6 +1,6 @@
 let parser = require('./Analizador/analizador');
 
-import { setConsole } from './shared';
+import { setValueConsole } from './shared';
 import Arbol from './Analizador/TS/Arbol';
 
 const file = document.querySelector('#file');
@@ -15,6 +15,38 @@ const grammar_table = document.querySelector('#grammar_table');
 const show_ast = document.querySelector('#show_ast');
 
 const my_source = <HTMLInputElement>document.querySelector('#my_source');
+
+// // CODE EDITOR
+// const sourceEditor = CodeMirror.fromTextArea(
+// 	document.querySelector('#my_source'),
+// 	{
+// 		lineNumbers: true,
+// 		theme: 'paraiso-light',
+// 		mode: 'javascript',
+// 		autoCloseBrackets: true,
+// 	}
+// );
+// sourceEditor.setSize(null, 450);
+
+// const resultEditor = CodeMirror.fromTextArea(
+// 	document.querySelector('#my_result'),
+// 	{
+// 		lineNumbers: true,
+// 		theme: 'paraiso-dark',
+// 		mode: 'clike',
+// 		readonly: true,
+// 	}
+// );
+// resultEditor.setSize(null, 450);
+
+// const consoleEditor = CodeMirror.fromTextArea(
+// 	document.querySelector('#my_console'),
+// 	{
+// 		theme: 'pastel-on-dark',
+// 	}
+// );
+// consoleEditor.setSize(null, 200);
+// // END CODE EDITOR
 
 const hideSubmenu = (selector: string, idx: number) => {
 	document.querySelectorAll(selector)[idx].classList.toggle('submenu--hide');
@@ -35,7 +67,7 @@ open_file?.addEventListener(
 			let target = e.target;
 			if (target !== undefined && target !== null) {
 				var content = `${target.result}`;
-				my_source.value = content;
+				sourceEditor.setValue(content);
 			}
 		};
 		reader.readAsText(file);
@@ -50,7 +82,8 @@ clear_file?.addEventListener('click', () => {
 });
 
 analize?.addEventListener('click', () => {
-	setConsole('Interpretando la entrada...\n\n');
+	setValueConsole('Interpretando la entrada...\n\n');
+	sourceEditor.save();
 	let source = my_source.value;
 	const result: Arbol = analize_source(source);
 
@@ -58,11 +91,11 @@ analize?.addEventListener('click', () => {
 });
 
 compile?.addEventListener('click', () => {
-	setConsole('Compilando la entrada...\n\n');
+	setValueConsole('Compilando la entrada...\n\n');
 });
 
 reports?.addEventListener('click', () => {
-	hideSubmenu('.submenu', 0);
+	hideSubmenu('.submenu', 1);
 });
 
 symbols_table?.addEventListener('click', () => {});

@@ -100,7 +100,8 @@ this.$=$$[$0-1];
 break;
 case 23:
 
-                                            inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",_$[$0-1].first_line,_$[$0-1].first_column));console.log("sinta ");
+                                            // inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",_$[$0-1].first_line,_$[$0-1].first_column));
+                                            console.log(`Error sintactico, se esperaba un token en esta linea ${_$[$0-1].first_line}, ${_$[$0-1].first_column}`);
                                             this.$=false;
                                         
 break;

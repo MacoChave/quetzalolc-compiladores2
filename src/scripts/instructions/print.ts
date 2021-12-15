@@ -1,9 +1,8 @@
-import { forEach } from '@angular-devkit/schematics';
 import { AST } from '../ast/ast';
 import { Scope } from '../ast/scope';
 import { Expression } from '../interfaces/expresion';
 import { Instruction } from '../interfaces/instruction';
-import { setConsole } from '../shared';
+import { setValueConsole } from '../shared';
 
 export class Print implements Instruction {
 	line: number;
@@ -26,13 +25,13 @@ export class Print implements Instruction {
 		this.expressions.forEach((expr) => {
 			const value = expr.getValue(scope, tree);
 			if (value !== null) {
-				setConsole(value);
-			} else
-				setConsole(
-					`Error semántico (${this.line}, ${this.column}): No se pueden imprimir valores nulos`
-				);
+				// setValueEditor(value);
+			}
+			// setValueEditor(
+			// 	`Error semántico (${this.line}, ${this.column}): No se pueden imprimir valores nulos`
+			// );
 		});
-		if (this.newLine) setConsole('\n');
+		// if (this.newLine) setValueEditor('\n');
 	}
 
 	translate(scope: Scope, tree: AST) {

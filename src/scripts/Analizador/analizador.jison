@@ -132,7 +132,7 @@ const casteo= require('./Instrucciones/casteo');
 <<EOF>>                 return 'EOF';
 
 
-.   {console.log("error Lexico")}
+.                       {console.log("error Lexico")}
 /lex
 //Precedencia
 %left 'INTERROGACION' 
@@ -252,7 +252,8 @@ INSTRUCCION:
     |VECTORES PTCOMA                    {$$=$1;}
     |ASIGVECTORES PTCOMA                {$$=$1;}
         |error PTCOMA                   {
-                                            inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));console.log("sinta ");
+                                            // inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));
+                                            console.log(`Error sintactico, se esperaba un token en esta linea ${@1.first_line}, ${@1.first_column}`);
                                             $$=false;
                                         }
     ;

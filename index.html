@@ -4,13 +4,24 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- HOJA DE ESTILOS -->
 		<link rel="stylesheet" href="styles/style.css" />
+		<!-- GOOGLE FONTS -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Nunito+Sans:wght@400;600;700&family=Rubik:wght@700&display=swap"
 			rel="stylesheet"
 		/>
+		<!-- CODE EDITOR -->
+		<script src="./CodeEditor/codemirror.js"></script>
+		<script src="./CodeEditor/mode/clike.js"></script>
+		<script src="./CodeEditor/mode/javascript.js"></script>
+		<script src="./CodeEditor/addon/edit/closebrackets.js"></script>
+		<link rel="stylesheet" href="./CodeEditor/codemirror.css">
+		<link rel="stylesheet" href="./CodeEditor/theme/paraiso-dark.css">
+		<link rel="stylesheet" href="./CodeEditor/theme/paraiso-light.css">
+		<link rel="stylesheet" href="./CodeEditor/theme/pastel-on-dark.css">
 		<title>Calculadora</title>
 	</head>
 	<body>
@@ -73,6 +84,40 @@
 				<textarea name="my_console" id="my_console" readonly></textarea>
 			</div>
 		</div>
+		<script>
+			// CODE EDITOR
+			const sourceEditor = CodeMirror.fromTextArea(
+				document.querySelector('#my_source'),
+				{
+					lineNumbers: true,
+					theme: 'paraiso-light',
+					mode: 'javascript',
+					autoCloseBrackets: true,
+				}
+			);
+			sourceEditor.setSize(null, 450);
+
+			const resultEditor = CodeMirror.fromTextArea(
+				document.querySelector('#my_result'),
+				{
+					lineNumbers: true,
+					theme: 'paraiso-dark',
+					mode: 'clike',
+					readonly: true,
+				}
+			);
+			resultEditor.setSize(null, 450);
+
+			const consoleEditor = CodeMirror.fromTextArea(
+				document.querySelector('#my_console'),
+				{
+					theme: 'pastel-on-dark',
+				}
+			);
+			consoleEditor.setSize(null, 200);
+			// END CODE EDITOR
+		</script>
+		<!-- BUNDLE -->
 		<script src="bundle.js"></script>
 	</body>
 </html>

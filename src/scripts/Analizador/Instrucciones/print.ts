@@ -1,4 +1,4 @@
-import { setConsole } from '../../shared';
+import { setValueConsole } from '../../shared';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -34,11 +34,11 @@ export default class Print extends Instruccion {
 		this.expresion.forEach((expr) => {
 			let valor = expr.interpretar(arbol, tabla);
 			if (valor instanceof Errores) return valor;
-			setConsole(valor);
+			setValueConsole(valor);
 			console.log(valor);
 			arbol.actualizaConsola(valor + '');
 		});
 
-		if (this.isSalto) setConsole('\n');
+		if (this.isSalto) setValueConsole('\n');
 	}
 }
