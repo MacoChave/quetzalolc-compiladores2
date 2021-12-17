@@ -1,4 +1,4 @@
-import { Codigo3d } from '../Abstracto/Codigo3d';
+import { Codigo3d, new_temporal } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -607,7 +607,104 @@ export default class Aritmetica extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
+		let izq, der;
+		let c3d: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: 0,
+			tipo: tipoDato.NULO,
+		};
+
+		if (this.valorUnario !== null) {
+			izq = this.valorUnario?.traducir(arbol, tabla);
+			if (izq?.tipo === tipoDato.NULO || izq?.tipo === -1) return c3d;
+		} else {
+			izq = this.valor1?.traducir(arbol, tabla);
+			der = this.valor2?.traducir(arbol, tabla);
+			if (
+				izq?.tipo === tipoDato.NULO ||
+				der?.tipo === tipoDato.NULO ||
+				izq?.tipo === -1 ||
+				der?.tipo === -1
+			)
+				return c3d;
+		}
+
+		switch (this.operacion) {
+			case Operadores.SUMA:
+				this.traducirBinario(izq, der, '+');
+				break;
+			case Operadores.RESTA:
+				this.traducirBinario(izq, der, '-');
+				break;
+			case Operadores.MULTIPLICACION:
+				this.traducirBinario(izq, der, '*');
+				break;
+			case Operadores.DIVISION:
+				this.traducirBinario(izq, der, '/');
+				break;
+			case Operadores.MODULADOR:
+				this.traducirBinario(izq, der, '%');
+				break;
+			case Operadores.MENOSNUM:
+				this.traducirNegativo(izq);
+				break;
+		}
 		throw new Error('Method not implemented.');
+	}
+
+	traducirBinario(izq: Codigo3d, der: Codigo3d, op: string): Codigo3d {
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: 0,
+			tipo: -1,
+		};
+		let temp: number = new_temporal();
+		let c3d: string = `${izq.codigo3d}\n${der.codigo3d}\n`;
+		c3d += `t${temp} = t${izq.temporal} ${op} ${der.temporal};\n`;
+
+		if (izq.tipo === tipoDato.DECIMAL || der.tipo === tipoDato.DECIMAL) {
+			res.tipo = tipoDato.DECIMAL;
+		} else if (
+			izq.tipo === tipoDato.ENTERO ||
+			izq.tipo === tipoDato.CARACTER
+		) {
+			res.tipo = tipoDato.ENTERO;
+		} else return res;
+
+		res.codigo3d = c3d;
+		res.temporal = temp;
+		return res;
+	}
+
+	traducirNegativo(izq: Codigo3d): Codigo3d {
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: 0,
+			tipo: -1,
+		};
+		let temp: number = new_temporal();
+		let c3d: string = `${izq.codigo3d}\n`;
+		c3d += `t${temp} = ${izq.temporal} * -1;\n`;
+		if (izq.tipo === tipoDato.DECIMAL) res.tipo = tipoDato.DECIMAL;
+		else if (izq.tipo === tipoDato.ENTERO || izq.tipo === tipoDato.CARACTER)
+			res.tipo = tipoDato.ENTERO;
+		else return res;
+
+		res.codigo3d = c3d;
+		res.temporal = temp;
+		return res;
 	}
 }
 export enum Operadores {

@@ -41,7 +41,7 @@ export default class Primitivo extends Instruccion {
 		let res: Codigo3d = {
 			codigo3d: '',
 			temporal: 0,
-			tipo: tipoDato.NULO,
+			tipo: -1,
 			etq_falsas: [],
 			etq_verdaderas: [],
 			etq_salida: [],

@@ -187,13 +187,15 @@ export default class Cadena extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			temporal: 0,
-			tipo: tipoDato.NULO,
+			tipo: -1,
 			pos: 0,
 		};
 
 		if (
 			izq?.tipo === tipoDato.NULO ||
-			der?.tipo === tipoDato.NULO ||
+			izq?.tipo === tipoDato.NULO ||
+			der?.tipo === -1 ||
+			der?.tipo === -1 ||
 			izq === undefined ||
 			der === undefined
 		)
@@ -215,7 +217,7 @@ export default class Cadena extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			temporal: 0,
-			tipo: tipoDato.NULO,
+			tipo: tipoDato.CADENA,
 			pos: 0,
 		};
 
@@ -276,7 +278,7 @@ export default class Cadena extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			temporal: 0,
-			tipo: tipoDato.NULO,
+			tipo: tipoDato.CADENA,
 			pos: 0,
 		};
 		if (
