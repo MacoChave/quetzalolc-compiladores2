@@ -1096,7 +1096,8 @@ var Aritmetica = /** @class */ (function (_super) {
                     var da = der + '';
                     var res = da.charCodeAt(0);
                     return parseInt(izq) + res;
-                default: //OPERACION ENTRE BOOLEANOS O STRING
+                default:
+                    //OPERACION ENTRE BOOLEANOS O STRING
                     //error
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
             }
@@ -1116,14 +1117,16 @@ var Aritmetica = /** @class */ (function (_super) {
                     var da = der + '';
                     var res = da.charCodeAt(0);
                     return parseInt(izq) + res;
-                default: //OPERACION ENTRE BOOLEANOS O STRING
+                default:
+                    //OPERACION ENTRE BOOLEANOS O STRING
                     //error
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
             }
         }
         else if (numero == 3) {
             //caracter
-            switch (op2) { //2DO OPERADOR
+            switch (op2 //2DO OPERADOR
+            ) {
                 case Tipo_1.tipoDato.ENTERO: //(caracter + entero)
                     this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
                     var da = izq + '';
@@ -1141,7 +1144,8 @@ var Aritmetica = /** @class */ (function (_super) {
                     var da1 = izq + '';
                     var res1 = da1.charCodeAt(0);
                     return res1 + res;
-                default: //OPERACION ENTRE BOOLEANOS O STRING
+                default:
+                    //OPERACION ENTRE BOOLEANOS O STRING
                     //error
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
             }
@@ -1178,7 +1182,8 @@ var Aritmetica = /** @class */ (function (_super) {
                     var da = der + '';
                     var res = da.charCodeAt(0);
                     return parseInt(izq) - res;
-                default: //OPERACION ENTRE BOOLEANOS O STRING
+                default:
+                    //OPERACION ENTRE BOOLEANOS O STRING
                     //error
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA RESTA', this.fila, this.columna);
             }
@@ -1198,14 +1203,16 @@ var Aritmetica = /** @class */ (function (_super) {
                     var da = der + '';
                     var res = da.charCodeAt(0);
                     return parseInt(izq) - res;
-                default: //OPERACION ENTRE BOOLEANOS O STRING
+                default:
+                    //OPERACION ENTRE BOOLEANOS O STRING
                     //error
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
             }
         }
         else if (numero == 3) {
             //caracter
-            switch (op2) { //2DO OPERADOR
+            switch (op2 //2DO OPERADOR
+            ) {
                 case Tipo_1.tipoDato.ENTERO: //(caracter - entero)
                     this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.ENTERO);
                     var da = izq + '';
@@ -1223,7 +1230,8 @@ var Aritmetica = /** @class */ (function (_super) {
                     var da1 = izq + '';
                     var res1 = da1.charCodeAt(0);
                     return res1 - res;
-                default: //OPERACION ENTRE BOOLEANOS O STRING
+                default:
+                    //OPERACION ENTRE BOOLEANOS O STRING
                     //error
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA SUMA', this.fila, this.columna);
             }
@@ -1406,7 +1414,7 @@ var Aritmetica = /** @class */ (function (_super) {
                     var res1 = da1.charCodeAt(0);
                     return res != 0
                         ? res1 / res
-                        : "NO SE PUEDE DIVIDIR SOBRE 0";
+                        : 'NO SE PUEDE DIVIDIR SOBRE 0';
                 default:
                     //error semantico
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OPERAR EN UNA MULTIPLICACION', this.fila, this.columna);
@@ -1495,6 +1503,9 @@ var Aritmetica = /** @class */ (function (_super) {
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO NO SE PUEDE OBTENER EL MODULO', this.fila, this.columna);
             }
         }
+    };
+    Aritmetica.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Aritmetica;
 }(Instruccion_1.Instruccion));
@@ -1624,7 +1635,8 @@ var Cadena = /** @class */ (function (_super) {
                 case Tipo_1.tipoDato.CARACTER: //(Cadena & caracter)
                     this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
                     return izq + '' + der;
-                default: //OTROS TIPOS DE DATOS
+                default:
+                    //OTROS TIPOS DE DATOS
                     //error
                     return new Errores_1.default('SEMANTICO', 'ESTA OPERACION NO PUEDE EJECUTARSE CON OTRO TIPO DE DATO QUE NO SEA CADENA', this.fila, this.columna);
             }
@@ -1639,7 +1651,8 @@ var Cadena = /** @class */ (function (_super) {
                 case Tipo_1.tipoDato.CARACTER: //(Caracter & caracter)
                     this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
                     return izq + '' + der;
-                default: //OTROS TIPOS DE DATOS
+                default:
+                    //OTROS TIPOS DE DATOS
                     //error
                     return new Errores_1.default('SEMANTICO', 'ESTA OPERACION NO PUEDE EJECUTARSE CON OTRO TIPO DE DATO QUE NO SEA CADENA', this.fila, this.columna);
             }
@@ -1667,7 +1680,8 @@ var Cadena = /** @class */ (function (_super) {
                     this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
                     var palabra = izq + '';
                     return palabra.repeat(parseInt(der));
-                default: //OTROS TIPOS DE DATOS
+                default:
+                    //OTROS TIPOS DE DATOS
                     //error
                     return new Errores_1.default('SEMANTICO', 'NO SE PUEDE UTILIZAR OTRO TIPO DE DATO DIFERENTE A ENTERO', this.fila, this.columna);
             }
@@ -1680,11 +1694,15 @@ var Cadena = /** @class */ (function (_super) {
                     this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
                     var palabra = izq + '';
                     return palabra.repeat(parseInt(der));
-                default: //OTROS TIPOS DE DATOS
+                default:
+                    //OTROS TIPOS DE DATOS
                     //error
                     return new Errores_1.default('SEMANTICO', 'NO SE PUEDE UTILIZAR OTRO TIPO DE DATO DIFERENTE A ENTERO', this.fila, this.columna);
             }
         }
+    };
+    Cadena.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Cadena;
 }(Instruccion_1.Instruccion));
@@ -1761,6 +1779,9 @@ var Identificador = /** @class */ (function (_super) {
             return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' NO EXISTE', this.fila, this.columna);
         }
     };
+    Identificador.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return Identificador;
 }(Instruccion_1.Instruccion));
 exports.default = Identificador;
@@ -1806,7 +1827,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logicas = void 0;
-//relacionales
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../Excepciones/Errores"));
@@ -1867,6 +1887,9 @@ var Logica = /** @class */ (function (_super) {
                 this.tipoDato.setTipo(Tipo_1.tipoDato.BOOLEANO);
                 return !unico;
         }
+    };
+    Logica.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Logica;
 }(Instruccion_1.Instruccion));
@@ -1933,6 +1956,9 @@ var Primitivo = /** @class */ (function (_super) {
         }
         return this.valor;
     };
+    Primitivo.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return Primitivo;
 }(Instruccion_1.Instruccion));
 exports.default = Primitivo;
@@ -1978,7 +2004,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Relacionales = void 0;
-//aritmeticas
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../Excepciones/Errores"));
@@ -2051,6 +2076,9 @@ var Relacional = /** @class */ (function (_super) {
             case Tipo_1.tipoDato.CADENA:
                 return '' + valor;
         }
+    };
+    Relacional.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Relacional;
 }(Instruccion_1.Instruccion));
@@ -2131,7 +2159,9 @@ var Asignacion = /** @class */ (function (_super) {
         if (variable != null) {
             var val = this.valor.interpretar(arbol, tabla);
             if (variable.gettipo().getTipo() != this.valor.tipoDato.getTipo()) {
-                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                    this.identificador +
+                    ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
             }
             else {
                 variable.setvalor(val);
@@ -2144,6 +2174,9 @@ var Asignacion = /** @class */ (function (_super) {
             console.log(this.identificador);
             return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' NO EXISTE', this.fila, this.columna);
         }
+    };
+    Asignacion.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Asignacion;
 }(Instruccion_1.Instruccion));
@@ -2205,6 +2238,9 @@ var Break = /** @class */ (function (_super) {
     };
     Break.prototype.interpretar = function (arbol, tabla) {
         return 'ByLy23';
+    };
+    Break.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Break;
 }(Instruccion_1.Instruccion));
@@ -2302,6 +2338,9 @@ var condWhile = /** @class */ (function (_super) {
                     return;
             }
         } while (this.condicion.interpretar(arbol, tabla));
+    };
+    condWhile.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return condWhile;
 }(Instruccion_1.Instruccion));
@@ -2414,6 +2453,9 @@ var condFor = /** @class */ (function (_super) {
                 return valActualizacion;
         }
     };
+    condFor.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return condFor;
 }(Instruccion_1.Instruccion));
 exports.default = condFor;
@@ -2510,6 +2552,9 @@ var condWhile = /** @class */ (function (_super) {
                     return;
             }
         }
+    };
+    condWhile.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return condWhile;
 }(Instruccion_1.Instruccion));
@@ -2673,6 +2718,9 @@ var condIf = /** @class */ (function (_super) {
       }
     }*/
     };
+    condIf.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return condIf;
 }(Instruccion_1.Instruccion));
 exports.default = condIf;
@@ -2760,6 +2808,9 @@ var condIfTernario = /** @class */ (function (_super) {
             this.tipoDato.setTipo(this.condElse.tipoDato.getTipo());
             return elsec;
         }
+    };
+    condIfTernario.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return condIfTernario;
 }(Instruccion_1.Instruccion));
@@ -2875,6 +2926,9 @@ var condSwitch = /** @class */ (function (_super) {
                 return;
         }
     };
+    condSwitch.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return condSwitch;
 }(Instruccion_1.Instruccion));
 exports.default = condSwitch;
@@ -2972,6 +3026,9 @@ var condSwitchCase = /** @class */ (function (_super) {
             return new Errores_1.default('SEMANTICO', 'VARIABLE  TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
         }
     };
+    condSwitchCase.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return condSwitchCase;
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
@@ -3056,6 +3113,9 @@ var condSwitchCase = /** @class */ (function (_super) {
                 return a;
         }
     };
+    condSwitchCase.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return condSwitchCase;
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
@@ -3117,6 +3177,9 @@ var Continue = /** @class */ (function (_super) {
     Continue.prototype.interpretar = function (arbol, tabla) {
         return 'ByLyContinue';
     };
+    Continue.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return Continue;
 }(Instruccion_1.Instruccion));
 exports.default = Continue;
@@ -3173,9 +3236,10 @@ var Declaracion = /** @class */ (function (_super) {
         if (this.valor === undefined) {
             switch (this.tipo.getTipo()) {
                 case Tipo_1.tipoDato.ENTERO:
-                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, 0)) ==
-                        'La variable existe actualmente') {
-                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, 0)) == 'La variable existe actualmente') {
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                            this.identificador +
+                            ' EXISTE ACTUALMENTE', this.fila, this.columna);
                     }
                     else {
                         if (!arbol.actualizarTabla(this.identificador, '0', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
@@ -3186,7 +3250,9 @@ var Declaracion = /** @class */ (function (_super) {
                     break;
                 case Tipo_1.tipoDato.DECIMAL:
                     if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, 0.0)) == 'La variable existe actualmente') {
-                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                            this.identificador +
+                            ' EXISTE ACTUALMENTE', this.fila, this.columna);
                     }
                     else {
                         if (!arbol.actualizarTabla(this.identificador, '0.0', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
@@ -3197,7 +3263,9 @@ var Declaracion = /** @class */ (function (_super) {
                     break;
                 case Tipo_1.tipoDato.CARACTER:
                     if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, '\u0000')) == 'La variable existe actualmente') {
-                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                            this.identificador +
+                            ' EXISTE ACTUALMENTE', this.fila, this.columna);
                     }
                     else {
                         if (!arbol.actualizarTabla(this.identificador, '\u0000', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
@@ -3207,9 +3275,10 @@ var Declaracion = /** @class */ (function (_super) {
                     }
                     break;
                 case Tipo_1.tipoDato.CADENA:
-                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, '')) ==
-                        'La variable existe actualmente') {
-                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, '')) == 'La variable existe actualmente') {
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                            this.identificador +
+                            ' EXISTE ACTUALMENTE', this.fila, this.columna);
                     }
                     else {
                         if (!arbol.actualizarTabla(this.identificador, '', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
@@ -3220,7 +3289,9 @@ var Declaracion = /** @class */ (function (_super) {
                     break;
                 case Tipo_1.tipoDato.BOOLEANO:
                     if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, true)) == 'La variable existe actualmente') {
-                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                        return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                            this.identificador +
+                            ' EXISTE ACTUALMENTE', this.fila, this.columna);
                     }
                     else {
                         if (!arbol.actualizarTabla(this.identificador, 'true', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
@@ -3237,9 +3308,10 @@ var Declaracion = /** @class */ (function (_super) {
                 return new Errores_1.default('SEMANTICO', 'TIPO DE VALOR DIFERENTE', this.fila, this.columna);
             }
             else {
-                if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, val)) ==
-                    'La variable existe actualmente') {
-                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, val)) == 'La variable existe actualmente') {
+                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                        this.identificador +
+                        ' EXISTE ACTUALMENTE', this.fila, this.columna);
                 }
                 else {
                     if (!arbol.actualizarTabla(this.identificador, val, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
@@ -3249,6 +3321,9 @@ var Declaracion = /** @class */ (function (_super) {
                 }
             }
         }
+    };
+    Declaracion.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Declaracion;
 }(Instruccion_1.Instruccion));
@@ -3326,7 +3401,9 @@ var Incremento = /** @class */ (function (_super) {
                     variable.setvalor(uno);
                 }
                 else {
-                    return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+                    return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                        this.identificador +
+                        ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
                 }
             }
             else {
@@ -3350,9 +3427,14 @@ var Incremento = /** @class */ (function (_super) {
                 return otro;
             }
             else {
-                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                    this.identificador +
+                    ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
             }
         }
+    };
+    Incremento.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Incremento;
 }(Instruccion_1.Instruccion));
@@ -3470,6 +3552,9 @@ var Exec = /** @class */ (function (_super) {
             }
         }
     };
+    Exec.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return Exec;
 }(Instruccion_1.Instruccion));
 exports.default = Exec;
@@ -3558,6 +3643,9 @@ var Funciones = /** @class */ (function (_super) {
             }
         }
     };
+    Funciones.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return Funciones;
 }(Instruccion_1.Instruccion));
 exports.default = Funciones;
@@ -3634,7 +3722,9 @@ var Decremento = /** @class */ (function (_super) {
                     variable.setvalor(uno);
                 }
                 else {
-                    return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+                    return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                        this.identificador +
+                        ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
                 }
             }
             else {
@@ -3658,9 +3748,14 @@ var Decremento = /** @class */ (function (_super) {
                 return otro;
             }
             else {
-                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                    this.identificador +
+                    ' DEBE SER VALOR NUMERICO', this.fila, this.columna);
             }
         }
+    };
+    Decremento.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Decremento;
 }(Instruccion_1.Instruccion));
@@ -3840,6 +3935,9 @@ var LlamadaFuncMetd = /** @class */ (function (_super) {
             }
         }
     };
+    LlamadaFuncMetd.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return LlamadaFuncMetd;
 }(Instruccion_1.Instruccion));
 exports.default = LlamadaFuncMetd;
@@ -3928,6 +4026,9 @@ var Metodos = /** @class */ (function (_super) {
             }
         }
     };
+    Metodos.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return Metodos;
 }(Instruccion_1.Instruccion));
 exports.default = Metodos;
@@ -3999,6 +4100,9 @@ var Return = /** @class */ (function (_super) {
             this.tipoDato = this.expresionReturn.tipoDato;
         }
         return this;
+    };
+    Return.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Return;
 }(Instruccion_1.Instruccion));
@@ -4079,6 +4183,9 @@ var accesoLista = /** @class */ (function (_super) {
         }
         return null;
     };
+    accesoLista.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return accesoLista;
 }(Instruccion_1.Instruccion));
 exports.default = accesoLista;
@@ -4156,6 +4263,9 @@ var accesoVector = /** @class */ (function (_super) {
         }
         return null;
     };
+    accesoVector.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return accesoVector;
 }(Instruccion_1.Instruccion));
 exports.default = accesoVector;
@@ -4231,13 +4341,18 @@ var agregarLista = /** @class */ (function (_super) {
             if (exp instanceof Errores_1.default)
                 return exp;
             if (ide.gettipo().getTipo() != this.expresion.tipoDato.getTipo())
-                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                    this.identificador +
+                    ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
             arreglo.push(exp);
             ide.setvalor(arreglo);
             arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
         }
         else
             return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
+    };
+    agregarLista.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return agregarLista;
 }(Instruccion_1.Instruccion));
@@ -4324,13 +4439,18 @@ var asignacionLista = /** @class */ (function (_super) {
             if (exp instanceof Errores_1.default)
                 return exp;
             if (ide.gettipo().getTipo() != this.expresion.tipoDato.getTipo())
-                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                    this.identificador +
+                    ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
             arreglo[pos] = exp;
             ide.setvalor(arreglo);
             arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
         }
         else
             return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
+    };
+    asignacionLista.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return asignacionLista;
 }(Instruccion_1.Instruccion));
@@ -4415,13 +4535,18 @@ var asignacionVector = /** @class */ (function (_super) {
             if (exp instanceof Errores_1.default)
                 return exp;
             if (ide.gettipo().getTipo() != this.expresion.tipoDato.getTipo())
-                return new Errores_1.default('SEMANTICO', 'VARIABLE ' + this.identificador + ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
+                return new Errores_1.default('SEMANTICO', 'VARIABLE ' +
+                    this.identificador +
+                    ' TIPOS DE DATOS DIFERENTES', this.fila, this.columna);
             arreglo[pos] = exp;
             ide.setvalor(arreglo);
             arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
         }
         else
             return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
+    };
+    asignacionVector.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return asignacionVector;
 }(Instruccion_1.Instruccion));
@@ -4539,6 +4664,9 @@ var casteo = /** @class */ (function (_super) {
         else
             return new Errores_1.default('SEMANTICO', 'NO ES POSIBLE EL CASTEO POR TIPO DE DATO', this.fila, this.columna);
     };
+    casteo.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return casteo;
 }(Instruccion_1.Instruccion));
 exports.default = casteo;
@@ -4605,7 +4733,9 @@ var declaracionListas = /** @class */ (function (_super) {
             else {
                 var arreglo = new Array();
                 if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, arreglo)) == 'La variable existe actualmente')
-                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                        this.identificador +
+                        ' EXISTE ACTUALMENTE', this.fila, this.columna);
                 else {
                     if (!arbol.actualizarTabla(this.identificador, arreglo.toString(), this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
                         var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo.toString(), 'lista', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
@@ -4633,6 +4763,9 @@ var declaracionListas = /** @class */ (function (_super) {
                 }
             }
         }
+    };
+    declaracionListas.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return declaracionListas;
 }(Instruccion_1.Instruccion));
@@ -4721,7 +4854,9 @@ var declaracionVectores = /** @class */ (function (_super) {
                     arreglo[i] = [];
                 }
                 if (tabla.setVariable(new Simbolo_1.default(this.tipo, this.identificador, arreglo)) == 'La variable existe actualmente')
-                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
+                    return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' +
+                        this.identificador +
+                        ' EXISTE ACTUALMENTE', this.fila, this.columna);
                 else {
                     if (!arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
                         var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo, 'vector', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
@@ -4738,7 +4873,8 @@ var declaracionVectores = /** @class */ (function (_super) {
                 var valor = this.listaValores[i].interpretar(arbol, tabla);
                 if (valor instanceof Errores_1.default)
                     return valor;
-                if (this.tipo.getTipo() != this.listaValores[i].tipoDato.getTipo())
+                if (this.tipo.getTipo() !=
+                    this.listaValores[i].tipoDato.getTipo())
                     return new Errores_1.default('SEMANTICO', 'TIPO DE DATO DIFERENTE', this.fila, this.columna);
                 arreglo[i] = valor;
             }
@@ -4752,6 +4888,9 @@ var declaracionVectores = /** @class */ (function (_super) {
             }
             //declaracion tipo 2
         }
+    };
+    declaracionVectores.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return declaracionVectores;
 }(Instruccion_1.Instruccion));
@@ -4918,6 +5057,9 @@ var funcNativa = /** @class */ (function (_super) {
                 return new Errores_1.default('SEMANTICO', 'TIPO DE DATO INCOMPATIBLE CON FUNCION NATIVA', this.fila, this.columna);
         }
     };
+    funcNativa.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
+    };
     return funcNativa;
 }(Instruccion_1.Instruccion));
 exports.default = funcNativa;
@@ -4995,6 +5137,9 @@ var Print = /** @class */ (function (_super) {
         });
         if (this.isSalto)
             shared_1.setValueConsole('\n');
+    };
+    Print.prototype.traducir = function (arbol, tabla) {
+        throw new Error('Method not implemented.');
     };
     return Print;
 }(Instruccion_1.Instruccion));
@@ -6484,35 +6629,6 @@ var errors_table = document.querySelector('#errors_table');
 var grammar_table = document.querySelector('#grammar_table');
 var show_ast = document.querySelector('#show_ast');
 var my_source = document.querySelector('#my_source');
-// // CODE EDITOR
-// const sourceEditor = CodeMirror.fromTextArea(
-// 	document.querySelector('#my_source'),
-// 	{
-// 		lineNumbers: true,
-// 		theme: 'paraiso-light',
-// 		mode: 'javascript',
-// 		autoCloseBrackets: true,
-// 	}
-// );
-// sourceEditor.setSize(null, 450);
-// const resultEditor = CodeMirror.fromTextArea(
-// 	document.querySelector('#my_result'),
-// 	{
-// 		lineNumbers: true,
-// 		theme: 'paraiso-dark',
-// 		mode: 'clike',
-// 		readonly: true,
-// 	}
-// );
-// resultEditor.setSize(null, 450);
-// const consoleEditor = CodeMirror.fromTextArea(
-// 	document.querySelector('#my_console'),
-// 	{
-// 		theme: 'pastel-on-dark',
-// 	}
-// );
-// consoleEditor.setSize(null, 200);
-// // END CODE EDITOR
 var hideSubmenu = function (selector, idx) {
     document.querySelectorAll(selector)[idx].classList.toggle('submenu--hide');
 };
@@ -6546,6 +6662,10 @@ analize === null || analize === void 0 ? void 0 : analize.addEventListener('clic
 });
 compile === null || compile === void 0 ? void 0 : compile.addEventListener('click', function () {
     shared_1.setValueConsole('Compilando la entrada...\n\n');
+    shared_1.setValueResult("#include <stdio.h>\n#include <math.h>\n\ndouble heap[30101999];\ndouble stack[30101999];\ndouble P;\ndouble H;");
+    sourceEditor.save();
+    var source = my_source.value;
+    var result = analize_source(source);
 });
 reports === null || reports === void 0 ? void 0 : reports.addEventListener('click', function () {
     hideSubmenu('.submenu', 1);
@@ -6562,15 +6682,15 @@ var analize_source = function (source) {
 },{"./Analizador/TS/Arbol":43,"./Analizador/analizador":47,"./shared":51}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setValueConsole = exports.setResult = void 0;
-var setResult = function (res) {
+exports.setValueConsole = exports.setValueResult = void 0;
+var setValueResult = function (res) {
     var textarea = document.querySelector('#my_result');
     var value = textarea.value;
     value += res;
     resultEditor.setValue(value);
     resultEditor.save();
 };
-exports.setResult = setResult;
+exports.setValueResult = setValueResult;
 var setValueConsole = function (texto) {
     var textarea = document.querySelector('#my_console');
     var value = textarea.value;

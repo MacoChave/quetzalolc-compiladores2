@@ -1,6 +1,6 @@
 let parser = require('./Analizador/analizador');
 
-import { setValueConsole } from './shared';
+import { setValueConsole, setValueResult } from './shared';
 import Arbol from './Analizador/TS/Arbol';
 
 const file = document.querySelector('#file');
@@ -15,38 +15,6 @@ const grammar_table = document.querySelector('#grammar_table');
 const show_ast = document.querySelector('#show_ast');
 
 const my_source = <HTMLInputElement>document.querySelector('#my_source');
-
-// // CODE EDITOR
-// const sourceEditor = CodeMirror.fromTextArea(
-// 	document.querySelector('#my_source'),
-// 	{
-// 		lineNumbers: true,
-// 		theme: 'paraiso-light',
-// 		mode: 'javascript',
-// 		autoCloseBrackets: true,
-// 	}
-// );
-// sourceEditor.setSize(null, 450);
-
-// const resultEditor = CodeMirror.fromTextArea(
-// 	document.querySelector('#my_result'),
-// 	{
-// 		lineNumbers: true,
-// 		theme: 'paraiso-dark',
-// 		mode: 'clike',
-// 		readonly: true,
-// 	}
-// );
-// resultEditor.setSize(null, 450);
-
-// const consoleEditor = CodeMirror.fromTextArea(
-// 	document.querySelector('#my_console'),
-// 	{
-// 		theme: 'pastel-on-dark',
-// 	}
-// );
-// consoleEditor.setSize(null, 200);
-// // END CODE EDITOR
 
 const hideSubmenu = (selector: string, idx: number) => {
 	document.querySelectorAll(selector)[idx].classList.toggle('submenu--hide');
@@ -92,6 +60,16 @@ analize?.addEventListener('click', () => {
 
 compile?.addEventListener('click', () => {
 	setValueConsole('Compilando la entrada...\n\n');
+	setValueResult(`#include <stdio.h>
+#include <math.h>
+
+double heap[30101999];
+double stack[30101999];
+double P;
+double H;`);
+	sourceEditor.save();
+	let source = my_source.value;
+	const result: Arbol = analize_source(source);
 });
 
 reports?.addEventListener('click', () => {

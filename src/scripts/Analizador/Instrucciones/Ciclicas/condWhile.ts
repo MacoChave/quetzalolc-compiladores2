@@ -1,3 +1,4 @@
+import { Codigo3d } from '../../Abstracto/Codigo3d';
 import { Instruccion } from '../../Abstracto/Instruccion';
 import nodoAST from '../../Abstracto/nodoAST';
 import Errores from '../../Excepciones/Errores';
@@ -58,5 +59,9 @@ export default class condWhile extends Instruccion {
 				if (a == 'ByLy23') return;
 			}
 		}
+	}
+
+	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
+		throw new Error('Method not implemented.');
 	}
 }

@@ -1,4 +1,4 @@
-export const setResult = (res: string) => {
+export const setValueResult = (res: string) => {
 	let textarea = <HTMLInputElement>document.querySelector('#my_result');
 	let value = textarea.value;
 	value += res;

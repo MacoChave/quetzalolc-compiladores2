@@ -1,3 +1,4 @@
+import { Codigo3d } from '../../Abstracto/Codigo3d';
 import { Instruccion } from '../../Abstracto/Instruccion';
 import nodoAST from '../../Abstracto/nodoAST';
 import Errores from '../../Excepciones/Errores';
@@ -63,5 +64,9 @@ export default class condSwitchCase extends Instruccion {
 				this.columna
 			);
 		}
+	}
+
+	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
+		throw new Error('Method not implemented.');
 	}
 }

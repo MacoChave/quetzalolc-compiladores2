@@ -6,6 +6,7 @@ import Arbol from '../../TS/Arbol';
 import tablaSimbolos from '../../TS/tablaSimbolos';
 import Tipo, { tipoDato } from '../../TS/Tipo';
 import Return from '../Return';
+import { Codigo3d } from '../../Abstracto/Codigo3d';
 
 export default class condWhile extends Instruccion {
 	private condicion: Instruccion;
@@ -59,5 +60,9 @@ export default class condWhile extends Instruccion {
 				if (a == 'ByLy23') return;
 			}
 		} while (this.condicion.interpretar(arbol, tabla));
+	}
+
+	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
+		throw new Error('Method not implemented.');
 	}
 }

@@ -1,4 +1,5 @@
 //aritmeticas
+import { Codigo3d } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -92,6 +93,10 @@ export default class Relacional extends Instruccion {
 			case tipoDato.CADENA:
 				return '' + valor;
 		}
+	}
+
+	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
+		throw new Error('Method not implemented.');
 	}
 }
 
