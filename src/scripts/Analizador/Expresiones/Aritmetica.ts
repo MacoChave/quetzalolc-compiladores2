@@ -615,7 +615,7 @@ export default class Aritmetica extends Instruccion {
 			etq_verdaderas: [],
 			pos: 0,
 			temporal: 0,
-			tipo: tipoDato.NULO,
+			tipo: -1,
 		};
 
 		if (this.valorUnario !== null) {

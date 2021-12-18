@@ -67,7 +67,66 @@ export default class Logica extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
-		throw new Error('Method not implemented.');
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: 0,
+			tipo: -1,
+		};
+		let izq = this.cond1?.traducir(arbol, tabla);
+		let der = this.cond2?.traducir(arbol, tabla);
+
+		if (izq.tipo === -1 || der.tipo === -1) return res;
+
+		let c3d: string = `${izq.codigo3d}\n`;
+		switch (this.loogica) {
+			case Logicas.AND:
+				izq.etq_verdaderas.forEach((etiqueta, index) => {
+					c3d += `L${etiqueta}:\n`;
+				});
+				res.etq_verdaderas = der?.etq_verdaderas;
+
+				izq?.etq_falsas.forEach((falsa) => res.etq_falsas.push(falsa));
+				der?.etq_falsas.forEach((falsa) => res.etq_falsas.push(falsa));
+
+				break;
+			case Logicas.OR:
+				izq.etq_falsas.forEach((etiqueta, index) => {
+					c3d += `L${etiqueta}:\n`;
+				});
+				izq?.etq_verdaderas.forEach((verdadera) =>
+					res.etq_verdaderas.push(verdadera)
+				);
+				der?.etq_verdaderas.forEach((verdadera) =>
+					res.etq_verdaderas.push(verdadera)
+				);
+
+				res.etq_falsas = der?.etq_falsas;
+				break;
+			case Logicas.NOT:
+				izq?.etq_falsas.forEach((verdadera) =>
+					res.etq_verdaderas.push(verdadera)
+				);
+				der?.etq_falsas.forEach((verdadera) =>
+					res.etq_verdaderas.push(verdadera)
+				);
+
+				izq?.etq_verdaderas.forEach((falsa) =>
+					res.etq_falsas.push(falsa)
+				);
+				der?.etq_verdaderas.forEach((falsa) =>
+					res.etq_falsas.push(falsa)
+				);
+				break;
+		}
+		c3d += `${der.codigo3d}\n`;
+		res.codigo3d = c3d;
+		res.tipo = tipoDato.BOOLEANO;
+
+		return res;
 	}
 }
 
