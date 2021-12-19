@@ -1,7 +1,13 @@
 let parser = require('./Analizador/analizador');
 
-import { setValueConsole, setValueResult } from './shared';
+import {
+	addHeaderResult,
+	clearValueResult,
+	setValueConsole,
+	setValueResult,
+} from './shared';
 import Arbol from './Analizador/TS/Arbol';
+import tablaSimbolos from './Analizador/TS/tablaSimbolos';
 
 const file = document.querySelector('#file');
 const open_file = document.querySelector('#open_file');
@@ -59,17 +65,16 @@ analize?.addEventListener('click', () => {
 });
 
 compile?.addEventListener('click', () => {
+	clearValueResult();
 	setValueConsole('Compilando la entrada...\n\n');
-	setValueResult(`#include <stdio.h>
-#include <math.h>
-
-double heap[30101999];
-double stack[30101999];
-double P;
-double H;`);
 	sourceEditor.save();
 	let source = my_source.value;
 	const result: Arbol = analize_source(source);
+	var tabla = new tablaSimbolos();
+	result.getinstrucciones().forEach((instruccion, index) => {
+		let res = instruccion.traducir(result, tabla);
+	});
+	addHeaderResult();
 });
 
 reports?.addEventListener('click', () => {

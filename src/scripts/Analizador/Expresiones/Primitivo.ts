@@ -40,7 +40,7 @@ export default class Primitivo extends Instruccion {
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
 		let res: Codigo3d = {
 			codigo3d: '',
-			temporal: 0,
+			temporal: '',
 			tipo: -1,
 			etq_falsas: [],
 			etq_verdaderas: [],
@@ -49,24 +49,24 @@ export default class Primitivo extends Instruccion {
 		};
 		res.tipo = this.tipoDato.getTipo();
 		if (this.tipoDato.getTipo() === tipoDato.BOOLEANO) {
-			res.temporal = this.valor === 'true' ? 1 : 0;
+			res.temporal = this.valor === 'true' ? '1' : '0';
 		} else if (
 			this.tipoDato.getTipo() === tipoDato.ENTERO ||
 			this.tipoDato.getTipo() === tipoDato.DECIMAL
 		) {
-			res.temporal = Number(this.valor);
+			res.temporal = `${this.valor}`;
 		} else if (this.tipoDato.getTipo() === tipoDato.CARACTER) {
-			res.temporal = Number(this.valor);
+			res.temporal = `${this.valor}`;
 		} else if (this.tipoDato.getTipo() === tipoDato.CADENA) {
-			let temp: number = new_temporal();
-			let c3d: string = `t${temp} = H;\n`;
+			let temp: string = new_temporal();
+			let c3d: string = `\t${temp} = H;\n`;
 			for (let index = 0; index < this.valor.length; index++) {
 				const caracter: string = this.valor.charCodeAt(index);
-				c3d += `heap[(int) H] = ${caracter};\n`;
-				c3d += 'H = H + 1;\n';
+				c3d += `\theap[(int) H] = ${caracter};\n`;
+				c3d += '\tH = H + 1;\n';
 			}
-			c3d += 'heap[(int) H] = -1;\n';
-			c3d += 'H = H + 1;\n';
+			c3d += '\theap[(int) H] = -1;\n';
+			c3d += '\tH = H + 1;\n';
 
 			res.temporal = temp;
 			res.codigo3d = c3d;

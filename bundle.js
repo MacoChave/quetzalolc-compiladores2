@@ -722,6 +722,50 @@ process.umask = function() { return 0; };
 },{}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.crearImprimirStr = exports.crearCompararStr = exports.crearDuplicarStr = exports.crearConcatenarStr = exports.agregarCabecera = exports.new_etiqueta = exports.new_temporal = void 0;
+var cont_temporales = 0;
+var temporales = [];
+var cont_etiquetas = 0;
+var c3d_nativa = '';
+var new_temporal = function () {
+    var temp_number = cont_temporales;
+    cont_temporales++;
+    var temp = "t" + temp_number;
+    temporales.push(temp);
+    return temp;
+};
+exports.new_temporal = new_temporal;
+var new_etiqueta = function () {
+    var etiqueta = cont_etiquetas;
+    cont_etiquetas++;
+    return "L" + etiqueta;
+};
+exports.new_etiqueta = new_etiqueta;
+var agregarCabecera = function () {
+    var header = '#include <stdio.h>\n';
+    header += '#include <math.h>\n';
+    header += 'double heap[30101999];\n';
+    header += 'double stack[30101999];\n';
+    header += 'double P;\n';
+    header += 'double H;\n';
+    temporales.forEach(function (temp) {
+        header += "float " + temp + ";\n";
+    });
+    return header;
+};
+exports.agregarCabecera = agregarCabecera;
+var crearConcatenarStr = function () { };
+exports.crearConcatenarStr = crearConcatenarStr;
+var crearDuplicarStr = function () { };
+exports.crearDuplicarStr = crearDuplicarStr;
+var crearCompararStr = function () { };
+exports.crearCompararStr = crearCompararStr;
+var crearImprimirStr = function () { };
+exports.crearImprimirStr = crearImprimirStr;
+
+},{}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Instruccion = void 0;
 var Instruccion = /** @class */ (function () {
     function Instruccion(tipo, fila, columna) {
@@ -733,7 +777,7 @@ var Instruccion = /** @class */ (function () {
 }());
 exports.Instruccion = Instruccion;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var nodoAST = /** @class */ (function () {
@@ -821,7 +865,7 @@ var nodoAST = /** @class */ (function () {
 }());
 exports.default = nodoAST;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Errores = /** @class */ (function () {
@@ -851,7 +895,7 @@ var Errores = /** @class */ (function () {
 }());
 exports.default = Errores;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listaErrores = void 0;
@@ -946,7 +990,7 @@ var cuerpo;
 // }
 // export const listado_Errores = new Listado_Errores();
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -987,6 +1031,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Operadores = void 0;
+var Codigo3d_1 = require("../Abstracto/Codigo3d");
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../Excepciones/Errores"));
@@ -1505,7 +1550,94 @@ var Aritmetica = /** @class */ (function (_super) {
         }
     };
     Aritmetica.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var _a, _b, _c;
+        var izq, der;
+        var c3d = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        if (this.valorUnario != null) {
+            izq = (_a = this.valorUnario) === null || _a === void 0 ? void 0 : _a.traducir(arbol, tabla);
+            if ((izq === null || izq === void 0 ? void 0 : izq.tipo) === Tipo_1.tipoDato.NULO || (izq === null || izq === void 0 ? void 0 : izq.tipo) === -1)
+                return c3d;
+        }
+        else {
+            izq = (_b = this.valor1) === null || _b === void 0 ? void 0 : _b.traducir(arbol, tabla);
+            der = (_c = this.valor2) === null || _c === void 0 ? void 0 : _c.traducir(arbol, tabla);
+            if ((izq === null || izq === void 0 ? void 0 : izq.tipo) === Tipo_1.tipoDato.NULO ||
+                (der === null || der === void 0 ? void 0 : der.tipo) === Tipo_1.tipoDato.NULO ||
+                (izq === null || izq === void 0 ? void 0 : izq.tipo) === -1 ||
+                (der === null || der === void 0 ? void 0 : der.tipo) === -1)
+                return c3d;
+        }
+        switch (this.operacion) {
+            case Operadores.SUMA:
+                return this.traducirBinario(izq, der, '+');
+            case Operadores.RESTA:
+                return this.traducirBinario(izq, der, '-');
+            case Operadores.MULTIPLICACION:
+                return this.traducirBinario(izq, der, '*');
+            case Operadores.DIVISION:
+                return this.traducirBinario(izq, der, '/');
+            case Operadores.MODULADOR:
+                return this.traducirBinario(izq, der, '%');
+            case Operadores.MENOSNUM:
+                return this.traducirNegativo(izq);
+        }
+    };
+    Aritmetica.prototype.traducirBinario = function (izq, der, op) {
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var temp = Codigo3d_1.new_temporal();
+        var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
+        c3d += "\t" + temp + " = " + izq.temporal + " " + op + " " + der.temporal + ";\n";
+        if (izq.tipo === Tipo_1.tipoDato.DECIMAL || der.tipo === Tipo_1.tipoDato.DECIMAL) {
+            res.tipo = Tipo_1.tipoDato.DECIMAL;
+        }
+        else if (izq.tipo === Tipo_1.tipoDato.ENTERO ||
+            izq.tipo === Tipo_1.tipoDato.CARACTER) {
+            res.tipo = Tipo_1.tipoDato.ENTERO;
+        }
+        else
+            return res;
+        res.codigo3d = c3d;
+        res.temporal = temp;
+        return res;
+    };
+    Aritmetica.prototype.traducirNegativo = function (izq) {
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var temp = Codigo3d_1.new_temporal();
+        var c3d = izq.codigo3d + "\n";
+        c3d += "\t" + temp + " = " + izq.temporal + " * -1;\n";
+        if (izq.tipo === Tipo_1.tipoDato.DECIMAL)
+            res.tipo = Tipo_1.tipoDato.DECIMAL;
+        else if (izq.tipo === Tipo_1.tipoDato.ENTERO || izq.tipo === Tipo_1.tipoDato.CARACTER)
+            res.tipo = Tipo_1.tipoDato.ENTERO;
+        else
+            return res;
+        res.codigo3d = c3d;
+        res.temporal = temp;
+        return res;
     };
     return Aritmetica;
 }(Instruccion_1.Instruccion));
@@ -1520,7 +1652,7 @@ var Operadores;
     Operadores[Operadores["MENOSNUM"] = 5] = "MENOSNUM";
 })(Operadores = exports.Operadores || (exports.Operadores = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],9:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],10:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1561,6 +1693,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Operadores = void 0;
+var Codigo3d_1 = require("../Abstracto/Codigo3d");
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../Excepciones/Errores"));
@@ -1702,7 +1835,150 @@ var Cadena = /** @class */ (function (_super) {
         }
     };
     Cadena.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var _a, _b;
+        var izq = (_a = this.valor1) === null || _a === void 0 ? void 0 : _a.traducir(arbol, tabla);
+        var der = (_b = this.valor2) === null || _b === void 0 ? void 0 : _b.traducir(arbol, tabla);
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            temporal: '',
+            tipo: -1,
+            pos: 0,
+        };
+        if ((izq === null || izq === void 0 ? void 0 : izq.tipo) === Tipo_1.tipoDato.NULO ||
+            (izq === null || izq === void 0 ? void 0 : izq.tipo) === Tipo_1.tipoDato.NULO ||
+            (der === null || der === void 0 ? void 0 : der.tipo) === -1 ||
+            (der === null || der === void 0 ? void 0 : der.tipo) === -1 ||
+            izq === undefined ||
+            der === undefined)
+            return res;
+        else {
+            switch (this.operacion) {
+                case Operadores.CONCATENACION:
+                    return this.traducirConcatenacion(izq, der);
+                case Operadores.DUPLICIDAD:
+                    return this.traducirDuplicado(izq, der);
+            }
+        }
+    };
+    Cadena.prototype.traducirConcatenacion = function (izq, der) {
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            temporal: '',
+            tipo: Tipo_1.tipoDato.CADENA,
+            pos: 0,
+        };
+        if (((izq.tipo === Tipo_1.tipoDato.CADENA || izq.tipo === Tipo_1.tipoDato.CARACTER) &&
+            der.tipo === Tipo_1.tipoDato.CADENA) ||
+            der.tipo === Tipo_1.tipoDato.CARACTER) {
+            var temp = Codigo3d_1.new_temporal();
+            var temp_valor = Codigo3d_1.new_temporal();
+            var label1 = Codigo3d_1.new_etiqueta();
+            var label2 = Codigo3d_1.new_etiqueta();
+            var label3 = Codigo3d_1.new_etiqueta();
+            var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
+            c3d += temp + " = H;\n";
+            if (izq.tipo === Tipo_1.tipoDato.CADENA) {
+                c3d += label1 + ":\n";
+                c3d += "\t" + temp_valor + " = heap[(int) " + izq.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += '\tH = H + 1;\n';
+                c3d += "\t" + izq.temporal + " = " + izq.temporal + " + 1;\n";
+                c3d += "\t" + temp_valor + " = heap[(int) " + izq.temporal + "];\n";
+                c3d += "\tif (" + temp_valor + " != -1) goto " + label1 + ";\n";
+                c3d += "\tgoto " + label2 + ";\n";
+            }
+            else {
+                c3d += "\theap[(int) H] = " + izq.temporal + ";\n";
+                c3d += '\tH = H + 1;\n';
+            }
+            if (der.tipo === Tipo_1.tipoDato.CADENA) {
+                c3d += label2 + ":\n";
+                c3d += "\t" + temp_valor + " = heap[(int) " + der.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += '\tH = H + 1;\n';
+                c3d += "\t" + der.temporal + " = " + der.temporal + " + 1;\n";
+                c3d += "\t" + temp_valor + " = heap[(int) " + der.temporal + "];\n";
+                c3d += "\tif (" + temp_valor + " != -1) goto " + label2 + ";\n";
+                c3d += "\tgoto " + label3 + ";\n";
+            }
+            else {
+                c3d += label2 + ":\n";
+                c3d += "\theap[(int) H] = " + der.temporal + ";\n";
+                c3d += '\tH = H + 1;\n';
+                c3d += "\tgoto " + label3 + ";\n";
+            }
+            c3d += label3 + ":\n";
+            c3d += "\theap[(int) H] = -1;\n";
+            c3d += '\tH = H + 1;\n';
+            res.codigo3d = c3d;
+            res.temporal = temp;
+            return res;
+        }
+        else
+            return res;
+    };
+    Cadena.prototype.traducirDuplicado = function (izq, der) {
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            temporal: '',
+            tipo: Tipo_1.tipoDato.CADENA,
+            pos: 0,
+        };
+        if ((izq.tipo === Tipo_1.tipoDato.CADENA || izq.tipo === Tipo_1.tipoDato.CARACTER) &&
+            der.tipo === Tipo_1.tipoDato.ENTERO) {
+            var temp = Codigo3d_1.new_temporal();
+            var temp_izq = Codigo3d_1.new_temporal();
+            var temp_valor = Codigo3d_1.new_temporal();
+            var label1 = Codigo3d_1.new_etiqueta();
+            var label2 = Codigo3d_1.new_etiqueta();
+            var label3 = Codigo3d_1.new_etiqueta();
+            var label4 = Codigo3d_1.new_etiqueta();
+            var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
+            c3d += "\t" + temp + " = H;\n";
+            c3d += "\t" + temp_izq + " = " + izq.temporal + ";\n";
+            c3d += label1 + ":\n";
+            if (izq.tipo === Tipo_1.tipoDato.CADENA) {
+                c3d += label3 + ":\n";
+                c3d += "\t" + temp_valor + " = heap[(int) " + temp_izq + "];\n";
+                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += '\tH = H + 1;\n';
+                c3d += "\t" + temp_izq + " = " + temp_izq + " + 1;\n";
+                c3d += "\t" + temp_valor + " = heap[(int) " + temp_izq + "];\n";
+                c3d += "\tif (" + temp_valor + " != -1) goto " + label3 + ";\n";
+                c3d += "\tgoto " + label4 + ";\n";
+                c3d += label4 + ":\n";
+                c3d += "\t" + temp_izq + " = " + izq.temporal + ";\n";
+                c3d += "\t" + der.temporal + " = " + der.temporal + " - 1;\n";
+                c3d += "\tif (" + der.temporal + " > 0) goto " + label1 + ";\n";
+                c3d += "\tgoto " + label2 + ";\n";
+                c3d += label2 + ":\n";
+            }
+            else {
+                c3d += "\t" + temp_valor + " = stack[(int) " + izq.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += '\tH = H + 1;\n';
+                c3d += "\t" + der.temporal + " = " + der.temporal + " - 1;\n";
+                c3d += "\tif (" + der.temporal + " > 0) goto " + label1 + ";\n";
+                c3d += "\tgoto " + label2 + ";\n";
+                c3d += "\t" + label2 + ":\n";
+            }
+            c3d += "\theap[(int) H] = -1;\n";
+            c3d += '\tH = H + 1;\n';
+            res.codigo3d += c3d;
+            res.temporal = temp;
+            return res;
+        }
+        else
+            return res;
     };
     return Cadena;
 }(Instruccion_1.Instruccion));
@@ -1713,7 +1989,7 @@ var Operadores;
     Operadores[Operadores["DUPLICIDAD"] = 1] = "DUPLICIDAD";
 })(Operadores = exports.Operadores || (exports.Operadores = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],10:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1753,6 +2029,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var Codigo3d_1 = require("../Abstracto/Codigo3d");
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../Excepciones/Errores"));
@@ -1780,13 +2057,29 @@ var Identificador = /** @class */ (function (_super) {
         }
     };
     Identificador.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            temporal: 0,
+            tipo: 0,
+            etq_falsas: [],
+            etq_verdaderas: [],
+            etq_salida: [],
+            pos: 0,
+        };
+        var variable = tabla.getVariable(this.identificador);
+        if (variable !== null) {
+            var temp = Codigo3d_1.new_temporal();
+            var stack_pos = variable.stackPos;
+            res.codigo3d = "\t" + temp + " = stack[(int) " + stack_pos + "]";
+            res.temporal = temp;
+        }
+        return res;
     };
     return Identificador;
 }(Instruccion_1.Instruccion));
 exports.default = Identificador;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],11:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],12:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1889,7 +2182,61 @@ var Logica = /** @class */ (function (_super) {
         }
     };
     Logica.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var _a, _b;
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var izq = (_a = this.cond1) === null || _a === void 0 ? void 0 : _a.traducir(arbol, tabla);
+        var der = (_b = this.cond2) === null || _b === void 0 ? void 0 : _b.traducir(arbol, tabla);
+        if (izq.tipo === -1 || der.tipo === -1)
+            return res;
+        var c3d = izq.codigo3d + "\n";
+        switch (this.loogica) {
+            case Logicas.AND:
+                izq.etq_verdaderas.forEach(function (etiqueta, index) {
+                    c3d += etiqueta + ":\n";
+                });
+                res.etq_verdaderas = der === null || der === void 0 ? void 0 : der.etq_verdaderas;
+                izq === null || izq === void 0 ? void 0 : izq.etq_falsas.forEach(function (falsa) { return res.etq_falsas.push(falsa); });
+                der === null || der === void 0 ? void 0 : der.etq_falsas.forEach(function (falsa) { return res.etq_falsas.push(falsa); });
+                break;
+            case Logicas.OR:
+                izq.etq_falsas.forEach(function (etiqueta) {
+                    c3d += etiqueta + ":\n";
+                });
+                izq === null || izq === void 0 ? void 0 : izq.etq_verdaderas.forEach(function (verdadera) {
+                    return res.etq_verdaderas.push(verdadera);
+                });
+                der === null || der === void 0 ? void 0 : der.etq_verdaderas.forEach(function (verdadera) {
+                    return res.etq_verdaderas.push(verdadera);
+                });
+                res.etq_falsas = der === null || der === void 0 ? void 0 : der.etq_falsas;
+                break;
+            case Logicas.NOT:
+                izq === null || izq === void 0 ? void 0 : izq.etq_falsas.forEach(function (verdadera) {
+                    return res.etq_verdaderas.push(verdadera);
+                });
+                der === null || der === void 0 ? void 0 : der.etq_falsas.forEach(function (verdadera) {
+                    return res.etq_verdaderas.push(verdadera);
+                });
+                izq === null || izq === void 0 ? void 0 : izq.etq_verdaderas.forEach(function (falsa) {
+                    return res.etq_falsas.push(falsa);
+                });
+                der === null || der === void 0 ? void 0 : der.etq_verdaderas.forEach(function (falsa) {
+                    return res.etq_falsas.push(falsa);
+                });
+                break;
+        }
+        c3d += der.codigo3d + "\n";
+        res.codigo3d = c3d;
+        res.tipo = Tipo_1.tipoDato.BOOLEANO;
+        return res;
     };
     return Logica;
 }(Instruccion_1.Instruccion));
@@ -1901,7 +2248,7 @@ var Logicas;
     Logicas[Logicas["NOT"] = 2] = "NOT";
 })(Logicas = exports.Logicas || (exports.Logicas = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],12:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],13:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1922,6 +2269,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var Codigo3d_1 = require("../Abstracto/Codigo3d");
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Tipo_1 = require("../TS/Tipo");
@@ -1957,13 +2305,46 @@ var Primitivo = /** @class */ (function (_super) {
         return this.valor;
     };
     Primitivo.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            temporal: '',
+            tipo: -1,
+            etq_falsas: [],
+            etq_verdaderas: [],
+            etq_salida: [],
+            pos: 0,
+        };
+        res.tipo = this.tipoDato.getTipo();
+        if (this.tipoDato.getTipo() === Tipo_1.tipoDato.BOOLEANO) {
+            res.temporal = this.valor === 'true' ? '1' : '0';
+        }
+        else if (this.tipoDato.getTipo() === Tipo_1.tipoDato.ENTERO ||
+            this.tipoDato.getTipo() === Tipo_1.tipoDato.DECIMAL) {
+            res.temporal = "" + this.valor;
+        }
+        else if (this.tipoDato.getTipo() === Tipo_1.tipoDato.CARACTER) {
+            res.temporal = "" + this.valor;
+        }
+        else if (this.tipoDato.getTipo() === Tipo_1.tipoDato.CADENA) {
+            var temp = Codigo3d_1.new_temporal();
+            var c3d = temp + " = H;\n";
+            for (var index = 0; index < this.valor.length; index++) {
+                var caracter = this.valor.charCodeAt(index);
+                c3d += "\theap[(int) H] = " + caracter + ";\n";
+                c3d += '\tH = H + 1;\n';
+            }
+            c3d += '\theap[(int) H] = -1;\n';
+            c3d += '\tH = H + 1;\n';
+            res.temporal = temp;
+            res.codigo3d = c3d;
+        }
+        return res;
     };
     return Primitivo;
 }(Instruccion_1.Instruccion));
 exports.default = Primitivo;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],13:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":46}],14:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2004,6 +2385,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Relacionales = void 0;
+//aritmeticas
+var Codigo3d_1 = require("../Abstracto/Codigo3d");
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../Excepciones/Errores"));
@@ -2078,7 +2461,106 @@ var Relacional = /** @class */ (function (_super) {
         }
     };
     Relacional.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var label_true = Codigo3d_1.new_etiqueta();
+        var label_false = Codigo3d_1.new_etiqueta();
+        var izq = this.cond1.traducir(arbol, tabla);
+        var der = this.cond2.traducir(arbol, tabla);
+        var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
+        if (izq.tipo === Tipo_1.tipoDato.CADENA && der.tipo === Tipo_1.tipoDato.CADENA) {
+            var label1 = Codigo3d_1.new_etiqueta();
+            var label2 = Codigo3d_1.new_etiqueta();
+            var label3 = Codigo3d_1.new_etiqueta();
+            var label4 = Codigo3d_1.new_etiqueta();
+            var t_cond = Codigo3d_1.new_temporal();
+            var t_valorIzq = Codigo3d_1.new_temporal();
+            var t_valorDer = Codigo3d_1.new_temporal();
+            c3d += label1 + ":\n";
+            c3d += "\t" + t_valorIzq + " = heap[(int) " + izq.temporal + "];\n";
+            c3d += "\t" + t_valorDer + " = heap[(int) " + der.temporal + "];\n";
+            c3d += "\tif (" + t_valorIzq + " " + this.notOperacionToChar() + " " + t_valorDer + ") goto " + label2 + ";\n";
+            c3d += "\tif (" + t_valorIzq + " != -1) goto " + label3 + ";\n";
+            c3d += "\t" + izq.temporal + " = " + izq.temporal + " + 1;\n";
+            c3d += "\t" + der.temporal + " = " + der.temporal + " + 1;\n";
+            c3d += "\tgoto " + label1 + ";\n";
+            c3d += label2 + ":\n";
+            c3d += "\t" + t_cond + " = 1;\n";
+            c3d += "\tgoto " + label4 + ";\n";
+            c3d += label3 + ":\n";
+            c3d += "\t" + t_cond + " = 0;\n";
+            c3d += label4 + ":\n";
+            c3d += "\tif (" + t_cond + ") goto " + label_true + ";\n";
+            c3d += "\tgoto " + label_false + ";\n";
+        }
+        else if (izq.tipo === Tipo_1.tipoDato.CADENA || der.tipo === Tipo_1.tipoDato.CADENA)
+            return res;
+        else if (izq.tipo === -1 || der.tipo === -1)
+            return res;
+        else {
+            c3d += "\tif (" + izq.temporal + " " + this.operacionToChar() + " " + der.temporal + ") goto " + label_true + ";\n";
+            c3d += "\tgoto " + label_false + ";\n";
+        }
+        res.codigo3d = c3d;
+        res.etq_verdaderas.push(label_true);
+        res.etq_falsas.push(label_false);
+        res.tipo = Tipo_1.tipoDato.BOOLEANO;
+        return res;
+    };
+    Relacional.prototype.operacionToChar = function () {
+        var op = '';
+        switch (this.relacion) {
+            case Relacionales.DIFERENTE:
+                op = '!=';
+                break;
+            case Relacionales.IGUAL:
+                op = '==';
+                break;
+            case Relacionales.MAYOR:
+                op = '>';
+                break;
+            case Relacionales.MAYORIGUAL:
+                op = '>=';
+                break;
+            case Relacionales.MENOR:
+                op = '<';
+                break;
+            case Relacionales.MENORIGUAL:
+                op = '<=';
+                break;
+        }
+        return op;
+    };
+    Relacional.prototype.notOperacionToChar = function () {
+        var op = '';
+        switch (this.relacion) {
+            case Relacionales.DIFERENTE:
+                op = '==';
+                break;
+            case Relacionales.IGUAL:
+                op = '!=';
+                break;
+            case Relacionales.MAYOR:
+                op = '<=';
+                break;
+            case Relacionales.MAYORIGUAL:
+                op = '<';
+                break;
+            case Relacionales.MENOR:
+                op = '>=';
+                break;
+            case Relacionales.MENORIGUAL:
+                op = '>';
+                break;
+        }
+        return op;
     };
     return Relacional;
 }(Instruccion_1.Instruccion));
@@ -2093,7 +2575,7 @@ var Relacionales;
     Relacionales[Relacionales["MENORIGUAL"] = 5] = "MENORIGUAL";
 })(Relacionales = exports.Relacionales || (exports.Relacionales = {}));
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],14:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],15:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2182,7 +2664,7 @@ var Asignacion = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Asignacion;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],15:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],16:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2246,7 +2728,7 @@ var Break = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Break;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],16:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":46}],17:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2346,7 +2828,7 @@ var condWhile = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condWhile;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],17:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":46,"../../TS/tablaSimbolos":47,"../Return":33}],18:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2460,7 +2942,7 @@ var condFor = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condFor;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],18:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":46,"../../TS/tablaSimbolos":47,"../Return":33}],19:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2560,7 +3042,7 @@ var condWhile = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condWhile;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],19:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":46,"../../TS/tablaSimbolos":47,"../Return":33}],20:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2725,7 +3207,7 @@ var condIf = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condIf;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],20:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":46,"../../TS/tablaSimbolos":47,"../Return":33}],21:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2816,7 +3298,7 @@ var condIfTernario = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condIfTernario;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../TS/Tipo":45}],21:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../TS/Tipo":46}],22:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2933,7 +3415,7 @@ var condSwitch = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitch;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../Return":32}],22:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":46,"../Return":33}],23:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3033,7 +3515,7 @@ var condSwitchCase = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],23:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":46,"../../TS/tablaSimbolos":47,"../Return":33}],24:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3120,7 +3602,7 @@ var condSwitchCase = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
 
-},{"../../Abstracto/Instruccion":4,"../../Abstracto/nodoAST":5,"../../Excepciones/Errores":6,"../../Excepciones/Listado_Errores":7,"../../TS/Tipo":45,"../../TS/tablaSimbolos":46,"../Return":32}],24:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":46,"../../TS/tablaSimbolos":47,"../Return":33}],25:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3184,7 +3666,7 @@ var Continue = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Continue;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],25:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":46}],26:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3329,7 +3811,7 @@ var Declaracion = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Declaracion;
 
-},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":44,"../TS/Tipo":45}],26:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../../Reportes/reporteTabla":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":45,"../TS/Tipo":46}],27:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3440,7 +3922,7 @@ var Incremento = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Incremento;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":45}],27:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Expresiones/Identificador":11,"../TS/Tipo":46}],28:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3559,7 +4041,7 @@ var Exec = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Exec;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45,"../TS/tablaSimbolos":46,"./Declaracion":25,"./Metodos":31}],28:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46,"../TS/tablaSimbolos":47,"./Declaracion":26,"./Metodos":32}],29:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3650,7 +4132,7 @@ var Funciones = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Funciones;
 
-},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],29:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"./Return":33}],30:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3761,7 +4243,7 @@ var Decremento = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Decremento;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":45}],30:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Expresiones/Identificador":11,"../TS/Tipo":46}],31:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3942,7 +4424,7 @@ var LlamadaFuncMetd = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = LlamadaFuncMetd;
 
-},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45,"../TS/tablaSimbolos":46,"./Declaracion":25,"./Funciones":28,"./Metodos":31,"./declaracionListas":39,"./declaracionVectores":40}],31:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../../Reportes/reporteTabla":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46,"../TS/tablaSimbolos":47,"./Declaracion":26,"./Funciones":29,"./Metodos":32,"./declaracionListas":40,"./declaracionVectores":41}],32:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4033,7 +4515,7 @@ var Metodos = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Metodos;
 
-},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"./Return":32}],32:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"./Return":33}],33:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4108,7 +4590,7 @@ var Return = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Return;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../TS/Tipo":45}],33:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":46}],34:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4190,7 +4672,7 @@ var accesoLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = accesoLista;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],34:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],35:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4270,7 +4752,7 @@ var accesoVector = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = accesoVector;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],35:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],36:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4358,7 +4840,7 @@ var agregarLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = agregarLista;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],36:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],37:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4456,7 +4938,7 @@ var asignacionLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = asignacionLista;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],37:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],38:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4552,7 +5034,7 @@ var asignacionVector = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = asignacionVector;
 
-},{"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],38:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],39:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4671,7 +5153,7 @@ var casteo = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = casteo;
 
-},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],39:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],40:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4771,7 +5253,7 @@ var declaracionListas = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = declaracionListas;
 
-},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":44}],40:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../../Reportes/reporteTabla":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":45}],41:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4896,7 +5378,7 @@ var declaracionVectores = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = declaracionVectores;
 
-},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Simbolo":44,"../TS/Tipo":45}],41:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../../Reportes/reporteTabla":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":45,"../TS/Tipo":46}],42:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5064,7 +5546,7 @@ var funcNativa = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = funcNativa;
 
-},{"../../Reportes/cambiarTipo":48,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../Expresiones/Identificador":10,"../TS/Tipo":45}],42:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Expresiones/Identificador":11,"../TS/Tipo":46}],43:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5105,6 +5587,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var shared_1 = require("../../shared");
+var Codigo3d_1 = require("../Abstracto/Codigo3d");
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../Excepciones/Errores"));
@@ -5139,13 +5622,64 @@ var Print = /** @class */ (function (_super) {
             shared_1.setValueConsole('\n');
     };
     Print.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var _this = this;
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\n// ==========> PRINTN\n';
+        this.expresion.forEach(function (expr) {
+            var valor = expr.traducir(arbol, tabla);
+            if (valor.tipo === -1)
+                return;
+            c3d += valor.codigo3d;
+            c3d += _this.getTexto(valor);
+        });
+        if (this.isSalto)
+            c3d += "\tprintf(\"%c\", (char) 10);\n";
+        c3d += '\n// ==========> END PRINTN\n';
+        shared_1.setValueResult(c3d);
+        return res;
+    };
+    Print.prototype.getTexto = function (valor) {
+        var c3d = '';
+        if (valor.tipo === Tipo_1.tipoDato.BOOLEANO) {
+            c3d += "\tprintf(\"%i\", (int) stack[(int) " + valor.temporal + "]);\n";
+        }
+        else if (valor.tipo === Tipo_1.tipoDato.CARACTER) {
+            c3d += "\tprintf(\"%c\", (char) stack[(int) " + valor.temporal + "]);\n";
+        }
+        else if (valor.tipo === Tipo_1.tipoDato.CADENA) {
+            var temp = Codigo3d_1.new_temporal();
+            var label_inicio = Codigo3d_1.new_etiqueta();
+            var label_exit = Codigo3d_1.new_etiqueta();
+            c3d += label_inicio + ":\n";
+            c3d += "\t" + temp + " = heap[(int) " + valor.temporal + "];\n";
+            c3d += "\tprintf(\"%c\", (char) " + temp + ");\n";
+            c3d += "\t" + valor.temporal + " = " + valor.temporal + " + 1;\n";
+            c3d += "\t" + temp + " = heap[(int) " + valor.temporal + "];\n";
+            c3d += "\tif (" + temp + " != -1) goto " + label_inicio + ";\n";
+            c3d += "\tgoto " + label_exit + ";\n";
+            c3d += label_exit + ":\n";
+        }
+        else if (valor.tipo === Tipo_1.tipoDato.DECIMAL) {
+            c3d += "\tprintf(\"%f\", (float) stack[(int) " + valor.temporal + "]);\n";
+        }
+        else if (valor.tipo === Tipo_1.tipoDato.ENTERO) {
+            c3d += "\tprintf(\"%i\", (int) stack[(int) " + valor.temporal + "]);\n";
+        }
+        return c3d;
     };
     return Print;
 }(Instruccion_1.Instruccion));
 exports.default = Print;
 
-},{"../../shared":51,"../Abstracto/Instruccion":4,"../Abstracto/nodoAST":5,"../Excepciones/Errores":6,"../TS/Tipo":45}],43:[function(require,module,exports){
+},{"../../shared":52,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":46}],44:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -5253,7 +5787,7 @@ var Arbol = /** @class */ (function () {
 }());
 exports.default = Arbol;
 
-},{"../../Reportes/cambiarTipo":48,"../../Reportes/reporteTabla":49,"../Instrucciones/Funciones":28,"../Instrucciones/Metodos":31,"./tablaSimbolos":46}],44:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":49,"../../Reportes/reporteTabla":50,"../Instrucciones/Funciones":29,"../Instrucciones/Metodos":32,"./tablaSimbolos":47}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Simbolo = /** @class */ (function () {
@@ -5261,6 +5795,7 @@ var Simbolo = /** @class */ (function () {
         this.tipo = tipo;
         this.identificador = identificador.toLowerCase();
         this.valor = valor;
+        this._stackPos = 0;
     }
     //getters y setters
     Simbolo.prototype.gettipo = function () {
@@ -5281,11 +5816,21 @@ var Simbolo = /** @class */ (function () {
     Simbolo.prototype.setvalor = function (value) {
         this.valor = value;
     };
+    Object.defineProperty(Simbolo.prototype, "stackPos", {
+        get: function () {
+            return this._stackPos;
+        },
+        set: function (value) {
+            this._stackPos = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
     return Simbolo;
 }());
 exports.default = Simbolo;
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tipoDato = void 0;
@@ -5316,7 +5861,7 @@ var tipoDato;
     tipoDato[tipoDato["NULO"] = 6] = "NULO";
 })(tipoDato = exports.tipoDato || (exports.tipoDato = {}));
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -5388,7 +5933,7 @@ var tablaSimbolos = /** @class */ (function () {
 }());
 exports.default = tablaSimbolos;
 
-},{"./Tipo":45}],47:[function(require,module,exports){
+},{"./Tipo":46}],48:[function(require,module,exports){
 (function (process){(function (){
 /* parser generated by jison 0.4.18 */
 /*
@@ -6533,7 +7078,7 @@ if (typeof module !== 'undefined' && require.main === module) {
 }
 }
 }).call(this)}).call(this,require('_process'))
-},{"./Excepciones/Errores":6,"./Excepciones/Listado_Errores":7,"./Expresiones/Aritmetica":8,"./Expresiones/Cadenas":9,"./Expresiones/Identificador":10,"./Expresiones/Logica":11,"./Expresiones/Primitivo":12,"./Expresiones/Relacional":13,"./Instrucciones/Asignacion":14,"./Instrucciones/Break":15,"./Instrucciones/Ciclicas/condDoWhile":16,"./Instrucciones/Ciclicas/condFor":17,"./Instrucciones/Ciclicas/condWhile":18,"./Instrucciones/Condicionales/condIf":19,"./Instrucciones/Condicionales/condIfTernario":20,"./Instrucciones/Condicionales/condSwitch":21,"./Instrucciones/Condicionales/condSwitchCase":22,"./Instrucciones/Condicionales/condSwitchDefault":23,"./Instrucciones/Continue":24,"./Instrucciones/Declaracion":25,"./Instrucciones/Decremento":26,"./Instrucciones/Exec":27,"./Instrucciones/Funciones":28,"./Instrucciones/Incremento":29,"./Instrucciones/LlamadaFuncMetd":30,"./Instrucciones/Metodos":31,"./Instrucciones/Return":32,"./Instrucciones/accesoLista":33,"./Instrucciones/accesoVector":34,"./Instrucciones/agregarLista":35,"./Instrucciones/asignacionLista":36,"./Instrucciones/asignacionVector":37,"./Instrucciones/casteo":38,"./Instrucciones/declaracionListas":39,"./Instrucciones/declaracionVectores":40,"./Instrucciones/funcNativa":41,"./Instrucciones/print":42,"./TS/Tipo":45,"_process":3,"fs":1,"path":2}],48:[function(require,module,exports){
+},{"./Excepciones/Errores":7,"./Excepciones/Listado_Errores":8,"./Expresiones/Aritmetica":9,"./Expresiones/Cadenas":10,"./Expresiones/Identificador":11,"./Expresiones/Logica":12,"./Expresiones/Primitivo":13,"./Expresiones/Relacional":14,"./Instrucciones/Asignacion":15,"./Instrucciones/Break":16,"./Instrucciones/Ciclicas/condDoWhile":17,"./Instrucciones/Ciclicas/condFor":18,"./Instrucciones/Ciclicas/condWhile":19,"./Instrucciones/Condicionales/condIf":20,"./Instrucciones/Condicionales/condIfTernario":21,"./Instrucciones/Condicionales/condSwitch":22,"./Instrucciones/Condicionales/condSwitchCase":23,"./Instrucciones/Condicionales/condSwitchDefault":24,"./Instrucciones/Continue":25,"./Instrucciones/Declaracion":26,"./Instrucciones/Decremento":27,"./Instrucciones/Exec":28,"./Instrucciones/Funciones":29,"./Instrucciones/Incremento":30,"./Instrucciones/LlamadaFuncMetd":31,"./Instrucciones/Metodos":32,"./Instrucciones/Return":33,"./Instrucciones/accesoLista":34,"./Instrucciones/accesoVector":35,"./Instrucciones/agregarLista":36,"./Instrucciones/asignacionLista":37,"./Instrucciones/asignacionVector":38,"./Instrucciones/casteo":39,"./Instrucciones/declaracionListas":40,"./Instrucciones/declaracionVectores":41,"./Instrucciones/funcNativa":42,"./Instrucciones/print":43,"./TS/Tipo":46,"_process":3,"fs":1,"path":2}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function obtenerValor(valor) {
@@ -6558,7 +7103,7 @@ function obtenerValor(valor) {
 }
 exports.default = obtenerValor;
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reporteTabla = void 0;
@@ -6609,7 +7154,7 @@ var reporteTabla = /** @class */ (function () {
 }());
 exports.reporteTabla = reporteTabla;
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -6618,6 +7163,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var parser = require('./Analizador/analizador');
 var shared_1 = require("./shared");
 var Arbol_1 = __importDefault(require("./Analizador/TS/Arbol"));
+var tablaSimbolos_1 = __importDefault(require("./Analizador/TS/tablaSimbolos"));
 var file = document.querySelector('#file');
 var open_file = document.querySelector('#open_file');
 var clear_file = document.querySelector('#clear_file');
@@ -6661,11 +7207,16 @@ analize === null || analize === void 0 ? void 0 : analize.addEventListener('clic
     console.log(result);
 });
 compile === null || compile === void 0 ? void 0 : compile.addEventListener('click', function () {
+    shared_1.clearValueResult();
     shared_1.setValueConsole('Compilando la entrada...\n\n');
-    shared_1.setValueResult("#include <stdio.h>\n#include <math.h>\n\ndouble heap[30101999];\ndouble stack[30101999];\ndouble P;\ndouble H;");
     sourceEditor.save();
     var source = my_source.value;
     var result = analize_source(source);
+    var tabla = new tablaSimbolos_1.default();
+    result.getinstrucciones().forEach(function (instruccion, index) {
+        var res = instruccion.traducir(result, tabla);
+    });
+    shared_1.addHeaderResult();
 });
 reports === null || reports === void 0 ? void 0 : reports.addEventListener('click', function () {
     hideSubmenu('.submenu', 1);
@@ -6679,10 +7230,11 @@ var analize_source = function (source) {
     return new Arbol_1.default(parser.parse(source));
 };
 
-},{"./Analizador/TS/Arbol":43,"./Analizador/analizador":47,"./shared":51}],51:[function(require,module,exports){
+},{"./Analizador/TS/Arbol":44,"./Analizador/TS/tablaSimbolos":47,"./Analizador/analizador":48,"./shared":52}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setValueConsole = exports.setValueResult = void 0;
+exports.setValueConsole = exports.addHeaderResult = exports.clearValueResult = exports.setValueResult = void 0;
+var Codigo3d_1 = require("./Analizador/Abstracto/Codigo3d");
 var setValueResult = function (res) {
     var textarea = document.querySelector('#my_result');
     var value = textarea.value;
@@ -6691,6 +7243,20 @@ var setValueResult = function (res) {
     resultEditor.save();
 };
 exports.setValueResult = setValueResult;
+var clearValueResult = function () {
+    resultEditor.setValue('');
+    resultEditor.save();
+};
+exports.clearValueResult = clearValueResult;
+var addHeaderResult = function () {
+    var res = Codigo3d_1.agregarCabecera();
+    var textarea = document.querySelector('#my_result');
+    var value = res;
+    value += textarea.value;
+    resultEditor.setValue(value);
+    resultEditor.save();
+};
+exports.addHeaderResult = addHeaderResult;
 var setValueConsole = function (texto) {
     var textarea = document.querySelector('#my_console');
     var value = textarea.value;
@@ -6700,5 +7266,5 @@ var setValueConsole = function (texto) {
 };
 exports.setValueConsole = setValueConsole;
 
-},{}]},{},[50])(50)
+},{"./Analizador/Abstracto/Codigo3d":4}]},{},[51])(51)
 });

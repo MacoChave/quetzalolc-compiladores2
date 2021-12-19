@@ -614,11 +614,11 @@ export default class Aritmetica extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			pos: 0,
-			temporal: 0,
+			temporal: '',
 			tipo: -1,
 		};
 
-		if (this.valorUnario !== null) {
+		if (this.valorUnario != null) {
 			izq = this.valorUnario?.traducir(arbol, tabla);
 			if (izq?.tipo === tipoDato.NULO || izq?.tipo === -1) return c3d;
 		} else {
@@ -635,25 +635,18 @@ export default class Aritmetica extends Instruccion {
 
 		switch (this.operacion) {
 			case Operadores.SUMA:
-				this.traducirBinario(izq, der, '+');
-				break;
+				return this.traducirBinario(izq, der, '+');
 			case Operadores.RESTA:
-				this.traducirBinario(izq, der, '-');
-				break;
+				return this.traducirBinario(izq, der, '-');
 			case Operadores.MULTIPLICACION:
-				this.traducirBinario(izq, der, '*');
-				break;
+				return this.traducirBinario(izq, der, '*');
 			case Operadores.DIVISION:
-				this.traducirBinario(izq, der, '/');
-				break;
+				return this.traducirBinario(izq, der, '/');
 			case Operadores.MODULADOR:
-				this.traducirBinario(izq, der, '%');
-				break;
+				return this.traducirBinario(izq, der, '%');
 			case Operadores.MENOSNUM:
-				this.traducirNegativo(izq);
-				break;
+				return this.traducirNegativo(izq);
 		}
-		throw new Error('Method not implemented.');
 	}
 
 	traducirBinario(izq: Codigo3d, der: Codigo3d, op: string): Codigo3d {
@@ -663,12 +656,12 @@ export default class Aritmetica extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			pos: 0,
-			temporal: 0,
+			temporal: '',
 			tipo: -1,
 		};
-		let temp: number = new_temporal();
+		let temp: string = new_temporal();
 		let c3d: string = `${izq.codigo3d}\n${der.codigo3d}\n`;
-		c3d += `t${temp} = t${izq.temporal} ${op} ${der.temporal};\n`;
+		c3d += `\t${temp} = ${izq.temporal} ${op} ${der.temporal};\n`;
 
 		if (izq.tipo === tipoDato.DECIMAL || der.tipo === tipoDato.DECIMAL) {
 			res.tipo = tipoDato.DECIMAL;
@@ -691,12 +684,12 @@ export default class Aritmetica extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			pos: 0,
-			temporal: 0,
+			temporal: '',
 			tipo: -1,
 		};
-		let temp: number = new_temporal();
+		let temp: string = new_temporal();
 		let c3d: string = `${izq.codigo3d}\n`;
-		c3d += `t${temp} = ${izq.temporal} * -1;\n`;
+		c3d += `\t${temp} = ${izq.temporal} * -1;\n`;
 		if (izq.tipo === tipoDato.DECIMAL) res.tipo = tipoDato.DECIMAL;
 		else if (izq.tipo === tipoDato.ENTERO || izq.tipo === tipoDato.CARACTER)
 			res.tipo = tipoDato.ENTERO;

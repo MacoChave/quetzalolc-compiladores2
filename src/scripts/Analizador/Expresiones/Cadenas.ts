@@ -186,7 +186,7 @@ export default class Cadena extends Instruccion {
 			etq_falsas: [],
 			etq_salida: [],
 			etq_verdaderas: [],
-			temporal: 0,
+			temporal: '',
 			tipo: -1,
 			pos: 0,
 		};
@@ -216,7 +216,7 @@ export default class Cadena extends Instruccion {
 			etq_falsas: [],
 			etq_salida: [],
 			etq_verdaderas: [],
-			temporal: 0,
+			temporal: '',
 			tipo: tipoDato.CADENA,
 			pos: 0,
 		};
@@ -232,38 +232,38 @@ export default class Cadena extends Instruccion {
 			let label2 = new_etiqueta();
 			let label3 = new_etiqueta();
 			let c3d = `${izq.codigo3d}\n${der.codigo3d}\n`;
-			c3d += `t${temp} = H;\n`;
+			c3d += `${temp} = H;\n`;
 			if (izq.tipo === tipoDato.CADENA) {
-				c3d += `L${label1}:\n`;
-				c3d += `t${temp_valor} = heap[(int) ${izq.temporal}];\n`;
-				c3d += `heap[(int) H] = t${temp_valor};\n`;
-				c3d += 'H = H + 1;\n';
-				c3d += `${izq.temporal} = ${izq.temporal} + 1;\n`;
-				c3d += `t${temp_valor} = heap[(int) t${izq.temporal}];\n`;
-				c3d += `if (t${temp_valor} != -1) goto L${label1};\n`;
-				c3d += `goto L${label2};\n`;
+				c3d += `${label1}:\n`;
+				c3d += `\t${temp_valor} = heap[(int) ${izq.temporal}];\n`;
+				c3d += `\theap[(int) H] = ${temp_valor};\n`;
+				c3d += '\tH = H + 1;\n';
+				c3d += `\t${izq.temporal} = ${izq.temporal} + 1;\n`;
+				c3d += `\t${temp_valor} = heap[(int) ${izq.temporal}];\n`;
+				c3d += `\tif (${temp_valor} != -1) goto ${label1};\n`;
+				c3d += `\tgoto ${label2};\n`;
 			} else {
-				c3d += `heap[(int) H] = t${izq.temporal};\n`;
-				c3d += 'H = H + 1;\n';
+				c3d += `\theap[(int) H] = ${izq.temporal};\n`;
+				c3d += '\tH = H + 1;\n';
 			}
 			if (der.tipo === tipoDato.CADENA) {
-				c3d += `L${label2}:\n`;
-				c3d += `t${temp_valor} = heap[(int) ${der.temporal}];\n`;
-				c3d += `heap[(int) H] = t${temp_valor};\n`;
-				c3d += 'H = H + 1;\n';
-				c3d += `${der.temporal} = ${der.temporal} + 1;\n`;
-				c3d += `t${temp_valor} = heap[(int) t${der.temporal}];\n`;
-				c3d += `if (t${temp_valor} != -1) goto L${label2};\n`;
-				c3d += `goto L${label3};\n`;
+				c3d += `${label2}:\n`;
+				c3d += `\t${temp_valor} = heap[(int) ${der.temporal}];\n`;
+				c3d += `\theap[(int) H] = ${temp_valor};\n`;
+				c3d += '\tH = H + 1;\n';
+				c3d += `\t${der.temporal} = ${der.temporal} + 1;\n`;
+				c3d += `\t${temp_valor} = heap[(int) ${der.temporal}];\n`;
+				c3d += `\tif (${temp_valor} != -1) goto ${label2};\n`;
+				c3d += `\tgoto ${label3};\n`;
 			} else {
-				c3d += `L${label2}:\n`;
-				c3d += `heap[(int) H] = t${der.temporal};\n`;
-				c3d += 'H = H + 1;\n';
-				c3d += `goto L${label3};\n`;
+				c3d += `${label2}:\n`;
+				c3d += `\theap[(int) H] = ${der.temporal};\n`;
+				c3d += '\tH = H + 1;\n';
+				c3d += `\tgoto ${label3};\n`;
 			}
-			c3d += `L${label3}:\n`;
-			c3d += `heap[(int) H] = -1;\n`;
-			c3d += 'H = H + 1;\n';
+			c3d += `${label3}:\n`;
+			c3d += `\theap[(int) H] = -1;\n`;
+			c3d += '\tH = H + 1;\n';
 
 			res.codigo3d = c3d;
 			res.temporal = temp;
@@ -277,7 +277,7 @@ export default class Cadena extends Instruccion {
 			etq_falsas: [],
 			etq_salida: [],
 			etq_verdaderas: [],
-			temporal: 0,
+			temporal: '',
 			tipo: tipoDato.CADENA,
 			pos: 0,
 		};
@@ -293,35 +293,35 @@ export default class Cadena extends Instruccion {
 			let label3 = new_etiqueta();
 			let label4 = new_etiqueta();
 			let c3d = `${izq.codigo3d}\n${der.codigo3d}\n`;
-			c3d += `t${temp} = H;\n`;
-			c3d += `t${temp_izq} = t${izq.temporal};\n`;
-			c3d += `L${label1}:\n`;
+			c3d += `\t${temp} = H;\n`;
+			c3d += `\t${temp_izq} = ${izq.temporal};\n`;
+			c3d += `${label1}:\n`;
 			if (izq.tipo === tipoDato.CADENA) {
-				c3d += `L${label3}:\n`;
-				c3d += `t${temp_valor} = heap[(int) t${temp_izq}];\n`;
-				c3d += `heap[(int) H] = t${temp_valor};\n`;
-				c3d += 'H = H + 1;\n';
-				c3d += `t${temp_izq} = t${temp_izq} + 1;\n`;
-				c3d += `t${temp_valor} = heap[(int) t${temp_izq}];\n`;
-				c3d += `if (t${temp_valor} != -1) goto L${label3};\n`;
-				c3d += `goto L${label4};\n`;
-				c3d += `L${label4}:\n`;
-				c3d += `t${temp_izq} = t${izq.temporal};\n`;
-				c3d += `t${der.temporal} = t${der.temporal} - 1;\n`;
-				c3d += `if (t${der.temporal} > 0) goto L${label1};\n`;
-				c3d += `goto L${label2};\n`;
-				c3d += `L${label2}:\n`;
+				c3d += `${label3}:\n`;
+				c3d += `\t${temp_valor} = heap[(int) ${temp_izq}];\n`;
+				c3d += `\theap[(int) H] = ${temp_valor};\n`;
+				c3d += '\tH = H + 1;\n';
+				c3d += `\t${temp_izq} = ${temp_izq} + 1;\n`;
+				c3d += `\t${temp_valor} = heap[(int) ${temp_izq}];\n`;
+				c3d += `\tif (${temp_valor} != -1) goto ${label3};\n`;
+				c3d += `\tgoto ${label4};\n`;
+				c3d += `${label4}:\n`;
+				c3d += `\t${temp_izq} = ${izq.temporal};\n`;
+				c3d += `\t${der.temporal} = ${der.temporal} - 1;\n`;
+				c3d += `\tif (${der.temporal} > 0) goto ${label1};\n`;
+				c3d += `\tgoto ${label2};\n`;
+				c3d += `${label2}:\n`;
 			} else {
-				c3d += `t${temp_valor} = stack[(int) t${izq.temporal}];\n`;
-				c3d += `heap[(int) H] = t${temp_valor};\n`;
-				c3d += 'H = H + 1;\n';
-				c3d += `t${der.temporal} = t${der.temporal} - 1;\n`;
-				c3d += `if (t${der.temporal} > 0) goto L${label1};\n`;
-				c3d += `goto L${label2};\n`;
-				c3d += `L${label2}:\n`;
+				c3d += `\t${temp_valor} = stack[(int) ${izq.temporal}];\n`;
+				c3d += `\theap[(int) H] = ${temp_valor};\n`;
+				c3d += '\tH = H + 1;\n';
+				c3d += `\t${der.temporal} = ${der.temporal} - 1;\n`;
+				c3d += `\tif (${der.temporal} > 0) goto ${label1};\n`;
+				c3d += `\tgoto ${label2};\n`;
+				c3d += `\t${label2}:\n`;
 			}
-			c3d += `heap[(int) H] = -1;\n`;
-			c3d += 'H = H + 1;\n';
+			c3d += `\theap[(int) H] = -1;\n`;
+			c3d += '\tH = H + 1;\n';
 			res.codigo3d += c3d;
 			res.temporal = temp;
 			return res;

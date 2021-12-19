@@ -73,7 +73,7 @@ export default class Logica extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			pos: 0,
-			temporal: 0,
+			temporal: '',
 			tipo: -1,
 		};
 		let izq = this.cond1?.traducir(arbol, tabla);
@@ -85,7 +85,7 @@ export default class Logica extends Instruccion {
 		switch (this.loogica) {
 			case Logicas.AND:
 				izq.etq_verdaderas.forEach((etiqueta, index) => {
-					c3d += `L${etiqueta}:\n`;
+					c3d += `${etiqueta}:\n`;
 				});
 				res.etq_verdaderas = der?.etq_verdaderas;
 
@@ -94,8 +94,8 @@ export default class Logica extends Instruccion {
 
 				break;
 			case Logicas.OR:
-				izq.etq_falsas.forEach((etiqueta, index) => {
-					c3d += `L${etiqueta}:\n`;
+				izq.etq_falsas.forEach((etiqueta) => {
+					c3d += `${etiqueta}:\n`;
 				});
 				izq?.etq_verdaderas.forEach((verdadera) =>
 					res.etq_verdaderas.push(verdadera)

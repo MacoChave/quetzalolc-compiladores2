@@ -47,7 +47,7 @@ export default class Identificador extends Instruccion {
 		if (variable !== null) {
 			let temp = new_temporal();
 			let stack_pos = variable.stackPos;
-			res.codigo3d = `t${temp} = stack[(int) ${stack_pos}]`;
+			res.codigo3d = `\t${temp} = stack[(int) ${stack_pos}]`;
 			res.temporal = temp;
 		}
 

@@ -102,11 +102,11 @@ export default class Relacional extends Instruccion {
 			etq_salida: [],
 			etq_verdaderas: [],
 			pos: 0,
-			temporal: 0,
+			temporal: '',
 			tipo: -1,
 		};
-		let label_true: number = new_etiqueta();
-		let label_false: number = new_etiqueta();
+		let label_true: string = new_etiqueta();
+		let label_false: string = new_etiqueta();
 
 		let izq: Codigo3d = this.cond1.traducir(arbol, tabla);
 		let der: Codigo3d = this.cond2.traducir(arbol, tabla);
@@ -114,37 +114,37 @@ export default class Relacional extends Instruccion {
 		let c3d: string = `${izq.codigo3d}\n${der.codigo3d}\n`;
 
 		if (izq.tipo === tipoDato.CADENA && der.tipo === tipoDato.CADENA) {
-			let label1: number = new_etiqueta();
-			let label2: number = new_etiqueta();
-			let label3: number = new_etiqueta();
-			let label4: number = new_etiqueta();
-			let t_cond: number = new_temporal();
-			let t_valorIzq: number = new_temporal();
-			let t_valorDer: number = new_temporal();
-			c3d += `L${label1}:\n`;
-			c3d += `t${t_valorIzq} = heap[(int) t${izq.temporal}];\n`;
-			c3d += `t${t_valorDer} = heap[(int) t${der.temporal}];\n`;
-			c3d += `if (t${t_valorIzq} ${this.notOperacionToChar()} t${t_valorDer}) goto L${label2};\n`;
-			c3d += `if (t${t_valorIzq} != -1) goto L${label3};\n`;
-			c3d += `t${izq.temporal} = t${izq.temporal} + 1;\n`;
-			c3d += `t${der.temporal} = t${der.temporal} + 1;\n`;
-			c3d += `goto L${label1};\n`;
-			c3d += `L${label2}:\n`;
-			c3d += `t${t_cond} = 1;\n`;
-			c3d += `goto L${label4};\n`;
-			c3d += `L${label3}:\n`;
-			c3d += `t${t_cond} = 0;\n`;
-			c3d += `L${label4}:\n`;
-			c3d += `if (t${t_cond}) goto L${label_true};\n`;
-			c3d += `goto L${label_false};\n`;
+			let label1: string = new_etiqueta();
+			let label2: string = new_etiqueta();
+			let label3: string = new_etiqueta();
+			let label4: string = new_etiqueta();
+			let t_cond: string = new_temporal();
+			let t_valorIzq: string = new_temporal();
+			let t_valorDer: string = new_temporal();
+			c3d += `${label1}:\n`;
+			c3d += `\t${t_valorIzq} = heap[(int) ${izq.temporal}];\n`;
+			c3d += `\t${t_valorDer} = heap[(int) ${der.temporal}];\n`;
+			c3d += `\tif (${t_valorIzq} ${this.notOperacionToChar()} ${t_valorDer}) goto ${label2};\n`;
+			c3d += `\tif (${t_valorIzq} != -1) goto ${label3};\n`;
+			c3d += `\t${izq.temporal} = ${izq.temporal} + 1;\n`;
+			c3d += `\t${der.temporal} = ${der.temporal} + 1;\n`;
+			c3d += `\tgoto ${label1};\n`;
+			c3d += `${label2}:\n`;
+			c3d += `\t${t_cond} = 1;\n`;
+			c3d += `\tgoto ${label4};\n`;
+			c3d += `${label3}:\n`;
+			c3d += `\t${t_cond} = 0;\n`;
+			c3d += `${label4}:\n`;
+			c3d += `\tif (${t_cond}) goto ${label_true};\n`;
+			c3d += `\tgoto ${label_false};\n`;
 		} else if (izq.tipo === tipoDato.CADENA || der.tipo === tipoDato.CADENA)
 			return res;
 		else if (izq.tipo === -1 || der.tipo === -1) return res;
 		else {
-			c3d += `if (${izq.temporal} ${this.operacionToChar()} ${
+			c3d += `\tif (${izq.temporal} ${this.operacionToChar()} ${
 				der.temporal
-			}) goto L${label_true};\n`;
-			c3d += `goto L${label_false};\n`;
+			}) goto ${label_true};\n`;
+			c3d += `\tgoto ${label_false};\n`;
 		}
 
 		res.codigo3d = c3d;
