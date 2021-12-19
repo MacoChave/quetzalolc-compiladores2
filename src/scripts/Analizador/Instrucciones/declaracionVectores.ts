@@ -1,6 +1,6 @@
 import obtenerValor from '../../Reportes/cambiarTipo';
 import { reporteTabla } from '../../Reportes/reporteTabla';
-import { Codigo3d } from '../Abstracto/Codigo3d';
+import { Codigo3d, new_etiqueta, new_temporal } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -180,6 +180,119 @@ export default class declaracionVectores extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
-		throw new Error('Method not implemented.');
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: '',
+			tipo: -1,
+		};
+		let c3d = '\t// ==========> DECLARACION VECTOR\n';
+
+		if (this.tipoDeclaracion) return res;
+		else {
+			let valores: Codigo3d[] = [];
+			this.listaValores?.forEach((valor) => {
+				let resValor = valor.traducir(arbol, tabla);
+				if (resValor.tipo !== -1) valores.push(resValor);
+			});
+
+			let posRelativa = tabla.setVariable3d(
+				new Simbolo(this.tipo, this.identificador)
+			);
+			if (posRelativa < 0) return res;
+
+			let contador = this.listaValores?.length;
+			contador = contador === 0 ? 20 : contador;
+			let size = getSizeByDataType(this.tipo.getTipo());
+			let defaultValue = getValueByDataType(this.tipo.getTipo());
+
+			valores.forEach((valor) => {
+				c3d += `${valor.codigo3d}\n`;
+			});
+			if (valores.length > 0) {
+				if (this.tipo.getTipo() === tipoDato.CADENA) {
+					// c3d += `\t${valores[0].temporal} = H;\n`;
+					c3d += `\tstack[(int) ${posRelativa}] = ${valores[0].temporal};\n`;
+				} else {
+					let temp = new_temporal();
+					c3d += `\t${temp} = H;\n`;
+					valores.forEach((valor) => {
+						c3d += `\theap[(int) H] = ${valor.temporal};\n`;
+						c3d += `\tH = H + 1;\n`;
+					});
+					c3d += `\tstack[(int) ${posRelativa}] = ${temp};\n`;
+				}
+			} else {
+				let temp = new_temporal();
+				let t_cont = new_temporal();
+				let t_size = new_temporal();
+				let t_sizeaux = new_temporal();
+				let label1 = new_etiqueta();
+				let label2 = new_etiqueta();
+				let label3 = new_etiqueta();
+				let label4 = new_etiqueta();
+
+				c3d += `\t${temp} = H;\n`;
+				c3d += `\t${t_cont} = ${contador};\n`;
+				c3d += `\t${t_size} = ${size};\n`;
+				c3d += `${label1}:\n`;
+				c3d += `\t${t_sizeaux} = ${t_size};\n`;
+				c3d += `${label2}:\n`;
+				c3d += `\theap[(int) H] = ${defaultValue};\n`;
+				c3d += `\tH = H + 1;\n`;
+				c3d += `\t${t_sizeaux} = ${t_sizeaux} - 1;\n`;
+				c3d += `\tif (${t_sizeaux} >= 0) goto ${label2};\n`;
+				c3d += `\tgoto ${label3};\n`;
+				c3d += `${label3}:\n`;
+				c3d += `\t${t_cont} = ${t_cont} - 1;\n`;
+				c3d += `\tif (${t_cont} >= 0) goto ${label1};\n`;
+				c3d += `\tgoto ${label4};\n`;
+				c3d += `${label4}:\n`;
+				c3d += `\tstack[(int) ${posRelativa}] = ${temp};\n`;
+			}
+		}
+
+		c3d += '\t// ==========> END DECLARACION VECTOR\n';
+		res.codigo3d = c3d;
+		return res;
 	}
 }
+
+const getSizeByDataType = (tipo: tipoDato): number => {
+	switch (tipo) {
+		case tipoDato.BOOLEANO:
+			return 1;
+		case tipoDato.CADENA:
+			return 1;
+		case tipoDato.CARACTER:
+			return 20;
+		case tipoDato.CARACTER:
+			return 1;
+		case tipoDato.DECIMAL:
+			return 1;
+		case tipoDato.ENTERO:
+			return 1;
+		default:
+			return 1;
+	}
+};
+
+const getValueByDataType = (tipo: tipoDato): string => {
+	switch (tipo) {
+		case tipoDato.BOOLEANO:
+			return '0';
+		case tipoDato.CADENA:
+			return '-1';
+		case tipoDato.CARACTER:
+			return '';
+		case tipoDato.DECIMAL:
+			return '0.0';
+		case tipoDato.ENTERO:
+			return '0';
+		default:
+			return '0';
+	}
+};

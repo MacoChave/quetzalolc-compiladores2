@@ -142,6 +142,27 @@ export default class declaracionListas extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
-		throw new Error('Method not implemented.');
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: '',
+			tipo: -1,
+		};
+		return res;
+		let c3d = '\t// ==========> DECLARACION LISTAS';
+
+		if (this.tipoVector != null) {
+			return res;
+		} else {
+			let valor = this.expresion?.traducir(arbol, tabla);
+			if (valor?.tipo === -1) return res;
+		}
+
+		c3d += '\t// ==========> END DECLARACION LISTAS';
+		res.codigo3d = c3d;
+		return res;
 	}
 }

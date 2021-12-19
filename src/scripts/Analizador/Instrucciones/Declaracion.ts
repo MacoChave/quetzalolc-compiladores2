@@ -283,7 +283,7 @@ export default class Declaracion extends Instruccion {
 			temporal: '',
 			tipo: -1,
 		};
-		let c3d: string = '';
+		let c3d: string = '\t// ==========> DECLARACION\n';
 		if (this.valor === undefined) {
 			// SIN INICIALIZAR
 			if (this.tipo.getTipo() === tipoDato.ENTERO) {
@@ -332,13 +332,11 @@ export default class Declaracion extends Instruccion {
 
 				c3d = `\tstack[(int) ${posRelativa}] = 0;\n`;
 			}
-			res.codigo3d = c3d;
 		} else {
 			// INICIALIZADO
 			let valor: Codigo3d = this.valor.traducir(arbol, tabla);
 			if (valor.tipo === -1) return res;
 
-			c3d += '\n// DECLARACION\n';
 			c3d += `${valor.codigo3d}\n`;
 			let simbolo = new Simbolo(
 				new Tipo(valor.tipo),
@@ -350,9 +348,9 @@ export default class Declaracion extends Instruccion {
 			if (posRelativa < 0) return res;
 
 			c3d += `\tstack[(int) ${posRelativa}] = ${valor.temporal};\n`;
-			c3d += '\n// END DECLARACION\n';
-			res.codigo3d = c3d;
 		}
+		c3d += '\t// ==========> END DECLARACION\n';
+		res.codigo3d = c3d;
 		return res;
 	}
 }

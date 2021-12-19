@@ -53,7 +53,7 @@ export default class Print extends Instruccion {
 			temporal: '',
 			tipo: -1,
 		};
-		let c3d: string = '\n// ==========> PRINTN\n';
+		let c3d: string = '\t// ==========> PRINTN\n';
 		this.expresion.forEach((expr) => {
 			let valor = expr.traducir(arbol, tabla);
 			if (valor.tipo === -1) return;
@@ -62,7 +62,7 @@ export default class Print extends Instruccion {
 		});
 
 		if (this.isSalto) c3d += `\tprintf("%c", (char) 10);\n`;
-		c3d += '\n// ==========> END PRINTN\n';
+		c3d += '\t// ==========> END PRINTN\n';
 		setValueResult(c3d);
 
 		return res;

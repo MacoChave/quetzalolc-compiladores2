@@ -92,9 +92,6 @@ compile?.addEventListener('click', () => {
 	setValueResult('\nint main () {\n');
 	let ast: Arbol = analize_source(source);
 	traducir(ast);
-	// ast.getinstrucciones().forEach((instruccion, index) => {
-	// 	let res = instruccion.traducir(ast, tabla);
-	// });
 });
 
 reports?.addEventListener('click', () => {
@@ -117,38 +114,39 @@ const analize_source = (source: string): Arbol => {
 const traducir = (ast: Arbol): void => {
 	var tabla = new tablaSimbolos();
 	ast.settablaGlobal(tabla);
-	console.log(ast.getinstrucciones());
-	let funciones = ast.getinstrucciones().filter((value) => {
+	let instrucciones = ast.getinstrucciones();
+
+	let funciones = instrucciones.filter((value, index, arr) => {
 		return value instanceof Funciones;
 	});
-	let metodos = ast.getinstrucciones().filter((value) => {
+	let metodos = instrucciones.filter((value, index, arr) => {
 		return value instanceof Metodos;
 	});
-	let ejecutar = ast.getinstrucciones().filter((value) => {
+	let ejecutar = instrucciones.filter((value, index, arr) => {
 		return value instanceof Exec;
 	});
-	let declara = ast.getinstrucciones().filter((value) => {
+	let declara = instrucciones.filter((value, index, arr) => {
 		return value instanceof Declaracion;
 	});
-	let declaraVector = ast.getinstrucciones().filter((value) => {
+	let declaraVector = instrucciones.filter((value, index, arr) => {
 		return value instanceof declaracionVectores;
 	});
-	let declaraLista = ast.getinstrucciones().filter((value) => {
+	let declaraLista = instrucciones.filter((value, index, arr) => {
 		return value instanceof declaracionListas;
 	});
-	let asignaVector = ast.getinstrucciones().filter((value) => {
+	let asignaVector = instrucciones.filter((value, index, arr) => {
 		return value instanceof asignacionVector;
 	});
-	let asignaLista = ast.getinstrucciones().filter((value) => {
+	let asignaLista = instrucciones.filter((value, index, arr) => {
 		return value instanceof asignacionLista;
 	});
-	let agregaLista = ast.getinstrucciones().filter((value) => {
+	let agregaLista = instrucciones.filter((value, index, arr) => {
 		return value instanceof agregarLista;
 	});
-	let metodoMain = ast.getinstrucciones().filter((value) => {
+	let metodoMain = instrucciones.filter((value, index, arr) => {
 		return value instanceof Main;
 	});
-	let imprimir = ast.getinstrucciones().filter((value) => {
+	let imprimir = instrucciones.filter((value, index, arr) => {
 		return value instanceof Print;
 	});
 
@@ -170,11 +168,11 @@ const traducir = (ast: Arbol): void => {
 	escribirDeclaraLista(declaraLista, ast, tabla);
 	escribirAsignaVector(asignaVector, ast, tabla);
 	escribirAsignaLista(asignaLista, ast, tabla);
+	escribirImprimir(imprimir, ast, tabla);
 	escribirMain(metodoMain, ast, tabla);
 	setValueResult('}\n\n');
 	escribirFunciones(funciones, ast, tabla);
 	escribirMetodos(metodos, ast, tabla);
-	escribirImprimir(imprimir, ast, tabla);
 
 	addHeaderResult();
 };
@@ -196,7 +194,11 @@ const escribirDeclaraVector = (
 	ast: Arbol,
 	tabla: tablaSimbolos
 ): void => {
-	declaracion.forEach((instruccion) => {});
+	let c3d = '';
+	declaracion.forEach((instruccion) => {
+		c3d += instruccion.traducir(ast, tabla).codigo3d;
+	});
+	setValueResult(c3d);
 };
 
 const escribirDeclaraLista = (
@@ -205,9 +207,7 @@ const escribirDeclaraLista = (
 	tabla: tablaSimbolos
 ): void => {
 	let c3d = '';
-	declaracion.forEach((instruccion) => {
-		c3d += instruccion.traducir(ast, tabla).codigo3d;
-	});
+	declaracion.forEach((instruccion) => {});
 	setValueResult(c3d);
 };
 
@@ -216,7 +216,11 @@ const escribirAsignaVector = (
 	ast: Arbol,
 	tabla: tablaSimbolos
 ): void => {
-	asignacion.forEach((instruccion) => {});
+	let c3d = '';
+	asignacion.forEach((instruccion) => {
+		// c3d += instruccion.traducir(ast, tabla).codigo3d
+	});
+	setValueResult(c3d);
 };
 
 const escribirAsignaLista = (
@@ -232,7 +236,11 @@ const escribirMain = (
 	ast: Arbol,
 	tabla: tablaSimbolos
 ) => {
-	metodoMain.forEach((instruccion) => {});
+	let c3d = '';
+	metodoMain.forEach((instruccion) => {
+		// c3d += instruccion.traducir(ast, tabla).codigo3d
+	});
+	setValueResult(c3d);
 };
 
 const escribirFunciones = (
@@ -240,7 +248,11 @@ const escribirFunciones = (
 	ast: Arbol,
 	tabla: tablaSimbolos
 ) => {
-	funciones.forEach((instruccion) => {});
+	let c3d = '';
+	funciones.forEach((instruccion) => {
+		// c3d += instruccion.traducir(ast, tabla).codigo3d
+	});
+	setValueResult(c3d);
 };
 
 const escribirMetodos = (
@@ -248,16 +260,20 @@ const escribirMetodos = (
 	ast: Arbol,
 	tabla: tablaSimbolos
 ) => {
-	metodos.forEach((instruccion) => {});
+	let c3d = '';
+	metodos.forEach((instruccion) => {
+		// c3d += instruccion.traducir(ast, tabla).codigo3d
+	});
+	setValueResult(c3d);
 };
-function escribirImprimir(
+const escribirImprimir = (
 	imprimir: Instruccion[],
 	ast: Arbol,
 	tabla: tablaSimbolos
-) {
+) => {
 	let c3d = '';
 	imprimir.forEach((instruccion) => {
-		c3d += instruccion.traducir(ast, tabla);
+		c3d += instruccion.traducir(ast, tabla).codigo3d;
 	});
 	setValueResult(c3d);
-}
+};
