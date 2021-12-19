@@ -7,7 +7,7 @@ import Simbolo from '../TS/Simbolo';
 import tablaSimbolos from '../TS/tablaSimbolos';
 import Tipo, { tipoDato } from '../TS/Tipo';
 import obtenerValor from '../../Reportes/cambiarTipo';
-import { Codigo3d } from '../Abstracto/Codigo3d';
+import { Codigo3d, new_stackPos } from '../Abstracto/Codigo3d';
 export default class Declaracion extends Instruccion {
 	private tipo: Tipo;
 	private identificador: string;
@@ -274,6 +274,85 @@ export default class Declaracion extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
-		throw new Error('Method not implemented.');
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: '',
+			tipo: -1,
+		};
+		let c3d: string = '';
+		if (this.valor === undefined) {
+			// SIN INICIALIZAR
+			if (this.tipo.getTipo() === tipoDato.ENTERO) {
+				let simbolo = new Simbolo(
+					new Tipo(tipoDato.ENTERO),
+					this.identificador
+				);
+				let posRelativa = tabla.setVariable3d(simbolo);
+				if (posRelativa < 0) return res;
+
+				c3d = `\tstack[(int) ${posRelativa}] = 0;\n`;
+			} else if (this.tipo.getTipo() === tipoDato.DECIMAL) {
+				let simbolo = new Simbolo(
+					new Tipo(tipoDato.DECIMAL),
+					this.identificador
+				);
+				let posRelativa = tabla.setVariable3d(simbolo);
+				if (posRelativa < 0) return res;
+
+				c3d = `\tstack[(int) ${posRelativa}] = 0.0;\n`;
+			} else if (this.tipo.getTipo() === tipoDato.CARACTER) {
+				let simbolo = new Simbolo(
+					new Tipo(tipoDato.CARACTER),
+					this.identificador
+				);
+				let posRelativa = tabla.setVariable3d(simbolo);
+				if (posRelativa < 0) return res;
+
+				c3d = `\tstack[(int) ${posRelativa}] = '';\n`;
+			} else if (this.tipo.getTipo() === tipoDato.CADENA) {
+				let simbolo = new Simbolo(
+					new Tipo(tipoDato.CADENA),
+					this.identificador
+				);
+				let posRelativa = tabla.setVariable3d(simbolo);
+				if (posRelativa < 0) return res;
+
+				c3d = `\tstack[(int) ${posRelativa}] = -1;\n`;
+			} else if (this.tipo.getTipo() === tipoDato.BOOLEANO) {
+				let simbolo = new Simbolo(
+					new Tipo(tipoDato.BOOLEANO),
+					this.identificador
+				);
+				let posRelativa = tabla.setVariable3d(simbolo);
+				if (posRelativa < 0) return res;
+
+				c3d = `\tstack[(int) ${posRelativa}] = 0;\n`;
+			}
+			res.codigo3d = c3d;
+		} else {
+			// INICIALIZADO
+			let valor: Codigo3d = this.valor.traducir(arbol, tabla);
+			if (valor.tipo === -1) return res;
+
+			c3d += '\n// DECLARACION\n';
+			c3d += `${valor.codigo3d}\n`;
+			let simbolo = new Simbolo(
+				new Tipo(valor.tipo),
+				this.identificador,
+				''
+			);
+			let posRelativa = tabla.setVariable3d(simbolo);
+
+			if (posRelativa < 0) return res;
+
+			c3d += `\tstack[(int) ${posRelativa}] = ${valor.temporal};\n`;
+			c3d += '\n// END DECLARACION\n';
+			res.codigo3d = c3d;
+		}
+		return res;
 	}
 }

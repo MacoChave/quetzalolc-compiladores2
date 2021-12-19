@@ -36,20 +36,21 @@ export default class Identificador extends Instruccion {
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
 		let res: Codigo3d = {
 			codigo3d: '',
-			temporal: 0,
-			tipo: 0,
+			temporal: '0',
+			tipo: -1,
 			etq_falsas: [],
 			etq_verdaderas: [],
 			etq_salida: [],
 			pos: 0,
 		};
 		let variable = tabla.getVariable(this.identificador);
-		if (variable !== null) {
-			let temp = new_temporal();
-			let stack_pos = variable.stackPos;
-			res.codigo3d = `\t${temp} = stack[(int) ${stack_pos}]`;
-			res.temporal = temp;
-		}
+		if (variable == null) return res;
+
+		let temp = new_temporal();
+		let stack_pos = variable.posAbsoluta;
+		res.codigo3d = `\t${temp} = stack[(int) ${stack_pos}];`;
+		res.tipo = variable.gettipo().getTipo();
+		res.temporal = temp;
 
 		return res;
 	}

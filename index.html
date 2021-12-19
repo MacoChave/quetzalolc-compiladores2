@@ -1,123 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<!-- HOJA DE ESTILOS -->
-		<link rel="stylesheet" href="styles/style.css" />
-		<!-- GOOGLE FONTS -->
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Nunito+Sans:wght@400;600;700&family=Rubik:wght@700&display=swap"
-			rel="stylesheet"
-		/>
-		<!-- CODE EDITOR -->
-		<script src="./CodeEditor/codemirror.js"></script>
-		<script src="./CodeEditor/mode/clike.js"></script>
-		<script src="./CodeEditor/mode/javascript.js"></script>
-		<script src="./CodeEditor/addon/edit/closebrackets.js"></script>
-		<link rel="stylesheet" href="./CodeEditor/codemirror.css">
-		<link rel="stylesheet" href="./CodeEditor/theme/paraiso-dark.css">
-		<link rel="stylesheet" href="./CodeEditor/theme/paraiso-light.css">
-		<link rel="stylesheet" href="./CodeEditor/theme/pastel-on-dark.css">
-		<title>Calculadora</title>
-	</head>
-	<body>
-		<nav class="container__menu">
-			<ul class="menu">
-				<li class="menu__item">
-					<a id="file" class="menu__link">Archivo</a>
-					<ul class="submenu submenu--hide">
-						<li class="submenu__item">
-							<label for="open_file" class="submenu__link">Abrir</lab>
-								<input type="file" name="open_file" id="open_file" hidden>
-						</li>
-						<li class="submenu__item">
-							<a id="clear_file" class="submenu__link">Limpiar</a>
-						</li>
-					</ul>
-				</li>
-				<li class="menu__item">
-					<a id="analize" class="menu__link">Interpretar</a>
-				</li>
-				<li class="menu__item">
-					<a id="compile" class="menu__link">Traducir</a>
-				</li>
-				<li class="menu__item">
-					<a id="reports" class="menu__link">Reportes</a>
-					<ul class="submenu submenu--hide">
-						<li class="submenu__item">
-							<a id="symbols_table" class="submenu__link"
-								>Tabla de simbolos</a
-							>
-						</li>
-						<li class="submenu__item">
-							<a id="errors_table" class="submenu__link"
-								>Tabla de errores</a
-							>
-						</li>
-						<li class="submenu__item">
-							<a id="grammar_table" class="submenu__link"
-								>Tabla gramatical</a
-							>
-						</li>
-						<li class="submenu__item">
-							<a id="show_ast" class="submenu__link">AST</a>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
-		<div class="container">
-			<div class="item">
-				<h2 class="title">Código fuente</h2>
-				<textarea name="my_source" id="my_source"></textarea>
-			</div>
-			<div class="item">
-				<h2 class="title">Codigo destino</h2>
-				<textarea name="my_result" id="my_result" readonly></textarea>
-			</div>
-			<div class="item">
-				<h2 class="title">Consola</h2>
-				<textarea name="my_console" id="my_console" readonly></textarea>
-			</div>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<!-- HOJA DE ESTILOS -->
+	<link rel="stylesheet" href="styles/style.css" />
+	<!-- GOOGLE FONTS -->
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Nunito+Sans:wght@400;600;700&family=Rubik:wght@700&display=swap"
+		rel="stylesheet" />
+	<!-- CODE EDITOR -->
+	<script src="./CodeEditor/codemirror.js"></script>
+	<script src="./CodeEditor/mode/clike.js"></script>
+	<script src="./CodeEditor/mode/javascript.js"></script>
+	<script src="./CodeEditor/keymap/sublime.js"></script>
+	<script src="./CodeEditor/addon/edit/closebrackets.js"></script>
+	<link rel="stylesheet" href="./CodeEditor/codemirror.css">
+	<link rel="stylesheet" href="./CodeEditor/theme/paraiso-dark.css">
+	<link rel="stylesheet" href="./CodeEditor/theme/paraiso-light.css">
+	<link rel="stylesheet" href="./CodeEditor/theme/pastel-on-dark.css">
+	<title>Calculadora</title>
+</head>
+
+<body>
+	<nav class="container__menu">
+		<ul class="menu">
+			<li class="menu__item">
+				<a id="file" class="menu__link">Archivo</a>
+				<ul class="submenu submenu--hide">
+					<li class="submenu__item">
+						<label for="open_file" class="submenu__link">Abrir</lab>
+							<input type="file" name="open_file" id="open_file" hidden>
+					</li>
+					<li class="submenu__item">
+						<a id="clear_file" class="submenu__link">Limpiar</a>
+					</li>
+				</ul>
+			</li>
+			<li class="menu__item">
+				<a id="analize" class="menu__link">Interpretar</a>
+			</li>
+			<li class="menu__item">
+				<a id="compile" class="menu__link">Traducir</a>
+			</li>
+			<li class="menu__item">
+				<a id="reports" class="menu__link">Reportes</a>
+				<ul class="submenu submenu--hide">
+					<li class="submenu__item">
+						<a id="symbols_table" class="submenu__link">Tabla de simbolos</a>
+					</li>
+					<li class="submenu__item">
+						<a id="errors_table" class="submenu__link">Tabla de errores</a>
+					</li>
+					<li class="submenu__item">
+						<a id="grammar_table" class="submenu__link">Tabla gramatical</a>
+					</li>
+					<li class="submenu__item">
+						<a id="show_ast" class="submenu__link">AST</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</nav>
+	<div class="container">
+		<div class="item">
+			<h2 class="title">Código fuente</h2>
+			<textarea name="my_source" id="my_source"></textarea>
 		</div>
-		<script>
-			// CODE EDITOR
-			const sourceEditor = CodeMirror.fromTextArea(
-				document.querySelector('#my_source'),
-				{
-					lineNumbers: true,
-					theme: 'paraiso-light',
-					mode: 'javascript',
-					autoCloseBrackets: true,
-				}
-			);
-			sourceEditor.setSize(null, 450);
+		<div class="item">
+			<h2 class="title">Codigo destino</h2>
+			<textarea name="my_result" id="my_result" readonly></textarea>
+		</div>
+		<div class="item">
+			<h2 class="title">Consola</h2>
+			<textarea name="my_console" id="my_console" readonly></textarea>
+		</div>
+	</div>
+	<script>
+		// CODE EDITOR
+		const sourceEditor = CodeMirror.fromTextArea(
+			document.querySelector('#my_source'),
+			{
+				lineNumbers: true,
+				theme: 'paraiso-light',
+				mode: 'javascript',
+				keyMap: 'sublime',
+				lineWrapping: true,
+				autoCloseBrackets: true,
+			}
+		);
+		sourceEditor.setSize(null, 450);
 
-			const resultEditor = CodeMirror.fromTextArea(
-				document.querySelector('#my_result'),
-				{
-					lineNumbers: true,
-					theme: 'paraiso-dark',
-					mode: 'clike',
-					readonly: true,
-				}
-			);
-			resultEditor.setSize(null, 450);
+		const resultEditor = CodeMirror.fromTextArea(
+			document.querySelector('#my_result'),
+			{
+				lineNumbers: true,
+				theme: 'paraiso-dark',
+				mode: 'clike',
+				keyMap: 'sublime',
+				lineWrapping: true,
+				readonly: true,
+			}
+		);
+		resultEditor.setSize(null, 450);
 
-			const consoleEditor = CodeMirror.fromTextArea(
-				document.querySelector('#my_console'),
-				{
-					theme: 'pastel-on-dark',
-				}
-			);
-			consoleEditor.setSize(null, 200);
+		const consoleEditor = CodeMirror.fromTextArea(
+			document.querySelector('#my_console'),
+			{
+				lineWrapping: true,
+				theme: 'pastel-on-dark',
+			}
+		);
+		consoleEditor.setSize(null, 200);
 			// END CODE EDITOR
-		</script>
-		<!-- BUNDLE -->
-		<script src="bundle.js"></script>
-	</body>
+	</script>
+	<!-- BUNDLE -->
+	<script src="bundle.js"></script>
+</body>
+
 </html>

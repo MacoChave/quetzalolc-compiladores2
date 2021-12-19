@@ -62,9 +62,7 @@
 
 .container {
 	display: grid;
-	grid-template-areas:
-		'source result'
-		'console console';
+	grid-template-columns: repeat(2, 1fr);
 	grid-gap: 30px;
 	margin: 2em;
 	margin-top: 4em;
@@ -75,15 +73,16 @@
 }
 
 .item:nth-child(1) {
-	grid-area: source;
+	/* grid-area: source; */
 }
 
 .item:nth-child(2) {
-	grid-area: result;
+	/* grid-area: result; */
 }
 
 .item:nth-child(3) {
-	grid-area: console;
+	/* grid-area: console; */
+	grid-column: span 2;
 }
 
 .item textarea {

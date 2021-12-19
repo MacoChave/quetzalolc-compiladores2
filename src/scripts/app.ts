@@ -8,6 +8,19 @@ import {
 } from './shared';
 import Arbol from './Analizador/TS/Arbol';
 import tablaSimbolos from './Analizador/TS/tablaSimbolos';
+import Funciones from './Analizador/Instrucciones/Funciones';
+import Metodos from './Analizador/Instrucciones/Metodos';
+import Exec from './Analizador/Instrucciones/Exec';
+import Declaracion from './Analizador/Instrucciones/Declaracion';
+import declaracionVectores from './Analizador/Instrucciones/declaracionVectores';
+import declaracionListas from './Analizador/Instrucciones/declaracionListas';
+import asignacionVector from './Analizador/Instrucciones/asignacionVector';
+import asignacionLista from './Analizador/Instrucciones/asignacionLista';
+import agregarLista from './Analizador/Instrucciones/agregarLista';
+import Main from './Analizador/Instrucciones/Main';
+import { Instruccion } from './Analizador/Abstracto/Instruccion';
+import { clear_data } from './Analizador/Abstracto/Codigo3d';
+import Print from './Analizador/Instrucciones/print';
 
 const file = document.querySelector('#file');
 const open_file = document.querySelector('#open_file');
@@ -59,22 +72,29 @@ analize?.addEventListener('click', () => {
 	setValueConsole('Interpretando la entrada...\n\n');
 	sourceEditor.save();
 	let source = my_source.value;
-	const result: Arbol = analize_source(source);
+	let ast: Arbol = analize_source(source);
+	ast.geterrores().forEach((error) => {
+		let str_error = `${error.getTipoError} en [${error.getFila},${error.getcolumna}]: ${error.getDesc}`;
+		console.error(str_error);
+		setValueConsole(str_error);
+	});
 
-	console.log(result);
+	console.log(ast);
 });
 
 compile?.addEventListener('click', () => {
 	clearValueResult();
+	clear_data();
 	setValueConsole('Compilando la entrada...\n\n');
 	sourceEditor.save();
 	let source = my_source.value;
-	const result: Arbol = analize_source(source);
-	var tabla = new tablaSimbolos();
-	result.getinstrucciones().forEach((instruccion, index) => {
-		let res = instruccion.traducir(result, tabla);
-	});
-	addHeaderResult();
+	// TODO: Pasar traductor a clase
+	setValueResult('\nint main () {\n');
+	let ast: Arbol = analize_source(source);
+	traducir(ast);
+	// ast.getinstrucciones().forEach((instruccion, index) => {
+	// 	let res = instruccion.traducir(ast, tabla);
+	// });
 });
 
 reports?.addEventListener('click', () => {
@@ -93,3 +113,151 @@ const analize_source = (source: string): Arbol => {
 	console.log('ANALIZANDO...');
 	return new Arbol(parser.parse(source));
 };
+
+const traducir = (ast: Arbol): void => {
+	var tabla = new tablaSimbolos();
+	ast.settablaGlobal(tabla);
+	console.log(ast.getinstrucciones());
+	let funciones = ast.getinstrucciones().filter((value) => {
+		return value instanceof Funciones;
+	});
+	let metodos = ast.getinstrucciones().filter((value) => {
+		return value instanceof Metodos;
+	});
+	let ejecutar = ast.getinstrucciones().filter((value) => {
+		return value instanceof Exec;
+	});
+	let declara = ast.getinstrucciones().filter((value) => {
+		return value instanceof Declaracion;
+	});
+	let declaraVector = ast.getinstrucciones().filter((value) => {
+		return value instanceof declaracionVectores;
+	});
+	let declaraLista = ast.getinstrucciones().filter((value) => {
+		return value instanceof declaracionListas;
+	});
+	let asignaVector = ast.getinstrucciones().filter((value) => {
+		return value instanceof asignacionVector;
+	});
+	let asignaLista = ast.getinstrucciones().filter((value) => {
+		return value instanceof asignacionLista;
+	});
+	let agregaLista = ast.getinstrucciones().filter((value) => {
+		return value instanceof agregarLista;
+	});
+	let metodoMain = ast.getinstrucciones().filter((value) => {
+		return value instanceof Main;
+	});
+	let imprimir = ast.getinstrucciones().filter((value) => {
+		return value instanceof Print;
+	});
+
+	console.log({
+		funciones,
+		metodos,
+		ejecutar,
+		declara,
+		declaraVector,
+		declaraLista,
+		asignaVector,
+		asignaLista,
+		agregaLista,
+		metodoMain,
+		imprimir,
+	});
+	escribirDeclara(declara, ast, tabla);
+	escribirDeclaraVector(declaraVector, ast, tabla);
+	escribirDeclaraLista(declaraLista, ast, tabla);
+	escribirAsignaVector(asignaVector, ast, tabla);
+	escribirAsignaLista(asignaLista, ast, tabla);
+	escribirMain(metodoMain, ast, tabla);
+	setValueResult('}\n\n');
+	escribirFunciones(funciones, ast, tabla);
+	escribirMetodos(metodos, ast, tabla);
+	escribirImprimir(imprimir, ast, tabla);
+
+	addHeaderResult();
+};
+
+const escribirDeclara = (
+	declaracion: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+): void => {
+	let c3d = '';
+	declaracion.forEach((instruccion) => {
+		c3d += instruccion.traducir(ast, tabla).codigo3d;
+	});
+	setValueResult(c3d);
+};
+
+const escribirDeclaraVector = (
+	declaracion: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+): void => {
+	declaracion.forEach((instruccion) => {});
+};
+
+const escribirDeclaraLista = (
+	declaracion: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+): void => {
+	let c3d = '';
+	declaracion.forEach((instruccion) => {
+		c3d += instruccion.traducir(ast, tabla).codigo3d;
+	});
+	setValueResult(c3d);
+};
+
+const escribirAsignaVector = (
+	asignacion: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+): void => {
+	asignacion.forEach((instruccion) => {});
+};
+
+const escribirAsignaLista = (
+	asignacion: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+): void => {
+	asignacion.forEach((instruccion) => {});
+};
+
+const escribirMain = (
+	metodoMain: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+) => {
+	metodoMain.forEach((instruccion) => {});
+};
+
+const escribirFunciones = (
+	funciones: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+) => {
+	funciones.forEach((instruccion) => {});
+};
+
+const escribirMetodos = (
+	metodos: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+) => {
+	metodos.forEach((instruccion) => {});
+};
+function escribirImprimir(
+	imprimir: Instruccion[],
+	ast: Arbol,
+	tabla: tablaSimbolos
+) {
+	let c3d = '';
+	imprimir.forEach((instruccion) => {
+		c3d += instruccion.traducir(ast, tabla);
+	});
+	setValueResult(c3d);
+}

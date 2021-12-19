@@ -4,13 +4,15 @@ export default class Simbolo {
 	private tipo: Tipo;
 	private identificador: String;
 	private valor: any; //este es el valor que va a recibir
-	private _stackPos: number;
+	private _posRelativa: number;
+	private _posAbsoluta: number;
 
 	constructor(tipo: Tipo, identificador: String, valor?: any) {
 		this.tipo = tipo;
 		this.identificador = identificador.toLowerCase();
 		this.valor = valor;
-		this._stackPos = 0;
+		this._posRelativa = 0;
+		this._posAbsoluta = 0;
 	}
 	//getters y setters
 	public gettipo(): Tipo {
@@ -31,10 +33,16 @@ export default class Simbolo {
 	public setvalor(value: any) {
 		this.valor = value;
 	}
-	public get stackPos(): number {
-		return this._stackPos;
+	public get posRelativa(): number {
+		return this._posRelativa;
 	}
-	public set stackPos(value: number) {
-		this._stackPos = value;
+	public set posRelativa(value: number) {
+		this._posRelativa = value;
+	}
+	public get posAbsoluta(): number {
+		return this._posAbsoluta;
+	}
+	public set posAbsoluta(value: number) {
+		this._posAbsoluta = value;
 	}
 }

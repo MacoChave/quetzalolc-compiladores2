@@ -672,6 +672,8 @@ export default class Aritmetica extends Instruccion {
 			res.tipo = tipoDato.ENTERO;
 		} else return res;
 
+		if (op === '/') res.tipo = tipoDato.DECIMAL;
+
 		res.codigo3d = c3d;
 		res.temporal = temp;
 		return res;

@@ -57,7 +57,7 @@ export default class Print extends Instruccion {
 		this.expresion.forEach((expr) => {
 			let valor = expr.traducir(arbol, tabla);
 			if (valor.tipo === -1) return;
-			c3d += valor.codigo3d;
+			c3d += `${valor.codigo3d}\n`;
 			c3d += this.getTexto(valor);
 		});
 

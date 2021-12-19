@@ -12,6 +12,14 @@ let cont_temporales: number = 0;
 let temporales: string[] = [];
 let cont_etiquetas: number = 0;
 let c3d_nativa: string = '';
+let cont_stack: number = 0;
+
+export const clear_data = (): void => {
+	cont_etiquetas = 0;
+	cont_temporales = 0;
+	temporales = [];
+	cont_stack = 0;
+};
 
 export const new_temporal = (): string => {
 	let temp_number: number = cont_temporales;
@@ -25,6 +33,12 @@ export const new_etiqueta = (): string => {
 	let etiqueta: number = cont_etiquetas;
 	cont_etiquetas++;
 	return `L${etiqueta}`;
+};
+
+export const new_stackPos = (): number => {
+	let pos_absoluta = cont_stack;
+	cont_stack++;
+	return pos_absoluta;
 };
 
 export const agregarCabecera = (): string => {
