@@ -1,4 +1,4 @@
-import { Codigo3d, new_temporal } from '../Abstracto/Codigo3d';
+import { Codigo3d, new_etiqueta, new_temporal } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Arbol from '../TS/Arbol';
@@ -89,13 +89,13 @@ export default class Primitivo extends Instruccion {
 			temporal: '',
 			tipo: -1,
 		};
-		let temp = new_temporal();
-		let c3d = `\t${temp} = H;\n`;
-		let concat = this.valor.split('$');
-		// TODO: Concatenar string
-		let str = concat[0];
-		for (let index = 1; index < concat.length; index++) {
-			const element = concat[index];
+		let resList = [];
+		let valorSplitted = this.valor.split('$');
+		let c3dAux: string = '';
+		let str = valorSplitted[0];
+		// TODO: Push str a resList
+		for (let index = 1; index < valorSplitted.length; index++) {
+			const element = valorSplitted[index];
 			if (element.includes(' ')) {
 				let i = element.indexOf(' ');
 				let id = new Identificador(
@@ -106,23 +106,75 @@ export default class Primitivo extends Instruccion {
 				let result = id.traducir(arbol, tabla);
 
 				if (result.tipo === tipoDato.BOOLEANO) {
-					c3d += result.codigo3d;
-					c3d += `\theap[(int) H] = ${result.temporal};\n`;
+					let c3dAux: string = '';
+					let t_inicio = new_temporal();
+					let t_data = new_temporal();
+					let l_true = new_etiqueta();
+					let l_false = new_etiqueta();
+					let l_exit = new_etiqueta();
+					c3dAux += result.codigo3d;
+					c3dAux += `\t${t_inicio} = H;\n`;
+					c3dAux += `\t${t_data} = ${result.temporal};\n`;
+					c3dAux += `\tif (${t_data}) goto ${l_true};\n`;
+					c3dAux += `\tgoto ${l_false};\n`;
+					c3dAux += `${l_true}:\n`;
+					c3dAux += `\theap[(int) H] = 116;\n`; // t
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\theap[(int) H] = 114;\n`; // r
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\theap[(int) H] = 117;\n`; // u
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\theap[(int) H] = 101;\n`; // e
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\tgoto ${l_exit};\n`;
+					c3dAux += `${l_false}:\n`;
+					c3dAux += `\theap[(int) H] = 102;\n`; // f
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\theap[(int) H] = 97;\n`; // a
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\theap[(int) H] = 108;\n`; // l
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\theap[(int) H] = 115;\n`; // s
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `\theap[(int) H] = 101;\n`; // e
+					c3dAux += `\tH = H + 1;\n`;
+					c3dAux += `${l_exit}:\n`;
+
+					resList.push({ c3d: c3dAux, temp: t_inicio });
 				} else if (result.tipo === tipoDato.CADENA) {
+					let c3dAux: string = '';
+					let t_inicio = new_temporal();
+
+					resList.push({ c3d: c3dAux, temp: t_inicio });
 				} else if (result.tipo === tipoDato.CARACTER) {
+					let c3dAux: string = '';
+					let t_inicio = new_temporal();
+					let t_data = new_temporal();
+
+					c3dAux += `${t_data} = ${result.temporal};\n`;
+
+					resList.push({ c3d: c3dAux, temp: t_data });
 				} else if (result.tipo === tipoDato.DECIMAL) {
+					let c3dAux: string = '';
+					let t_inicio = new_temporal();
+
+					resList.push({ c3d: c3dAux, temp: t_inicio });
 				} else if (result.tipo === tipoDato.ENTERO) {
+					let c3dAux: string = '';
+					let t_inicio = new_temporal();
+
+					resList.push({ c3d: c3dAux, temp: t_inicio });
 				}
 
 				let str = element.slice(i, element.length);
-				// TODO: Concatenar string
+				// TODO: Push str a resList
 			} else {
 				let id = new Identificador(element, this.fila, this.columna);
 				let result = id.traducir(arbol, tabla);
 
 				if (result.tipo === tipoDato.BOOLEANO) {
-					c3d += result.codigo3d;
-					c3d += `\theap[(int) H] = ${result.temporal};\n`;
+					c3dAux += result.codigo3d;
+					c3dAux += `\theap[(int) H] = ${result.temporal};\n`;
 				} else if (result.tipo === tipoDato.CADENA) {
 				} else if (result.tipo === tipoDato.CARACTER) {
 				} else if (result.tipo === tipoDato.DECIMAL) {
@@ -130,5 +182,9 @@ export default class Primitivo extends Instruccion {
 				}
 			}
 		}
+		let c3d: string = '';
+		// CONCATENAR STRING
+		// let temp = new_temporal();
+		// c3d += `\t${temp} = H;\n`;
 	}
 }
