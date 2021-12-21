@@ -54,17 +54,19 @@ export default class Print extends Instruccion {
 			tipo: -1,
 		};
 		let c3d: string = '\t// ==========> PRINTN\n';
+		let c3d_aux: string = '';
 		this.expresion.forEach((expr) => {
 			let valor = expr.traducir(arbol, tabla);
 			if (valor.tipo === -1) return;
 			c3d += `${valor.codigo3d}\n`;
-			c3d += this.getTexto(valor);
+			c3d_aux += this.getTexto(valor);
 		});
+		c3d += c3d_aux;
 
 		if (this.isSalto) c3d += `\tprintf("%c", (char) 10);\n`;
 		c3d += '\t// ==========> END PRINTN\n';
-		setValueResult(c3d);
 
+		res.codigo3d = c3d;
 		return res;
 	}
 

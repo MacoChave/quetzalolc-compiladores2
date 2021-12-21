@@ -47,7 +47,7 @@ export const agregarCabecera = (): string => {
 	header += 'double heap[30101999];\n';
 	header += 'double stack[30101999];\n';
 	header += 'double P;\n';
-	header += 'double H;\n';
+	header += 'double H;\n\n';
 
 	temporales.forEach((temp) => {
 		header += `float ${temp};\n`;

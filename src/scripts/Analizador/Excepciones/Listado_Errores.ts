@@ -120,14 +120,10 @@ export class Listado_Errores {
 	}
 
 	public traducir() {
-		console.log('Traduciendo...');
+		let globales: string = this.traducirGlobales();
 		this.traducirFunciones();
 		this.traducirMetodos();
-		setValueResult('int main {\n');
-		setValueResult('\tH = 0; P = 0\n');
-		this.traducirGlobales();
-		this.traducirPrincipal();
-		setValueResult('}');
+		this.traducirPrincipal(globales);
 		addHeaderResult();
 	}
 
@@ -136,7 +132,10 @@ export class Listado_Errores {
 			.getinstrucciones()
 			.filter((instruccion) => instruccion instanceof Funciones);
 		instrucciones.forEach((instruccion) => {
-			instruccion.traducir(this._ast, this.tabla);
+			setValueResult(`\nvoid ${instruccion.identificador} {\n`);
+			let result = instruccion.traducir(this._ast, this.tabla).codigo3d;
+			setValueResult(result);
+			setValueResult('}\n');
 		});
 	}
 	traducirMetodos() {
@@ -148,10 +147,14 @@ export class Listado_Errores {
 					instruccion.identificador !== 'main'
 			);
 		instrucciones.forEach((instruccion) => {
-			instruccion.traducir(this._ast, this.tabla);
+			setValueResult(`\nvoid ${instruccion.identificador} {\n`);
+			let result = instruccion.traducir(this._ast, this.tabla).codigo3d;
+			setValueResult(result);
+			setValueResult('}\n');
 		});
 	}
-	traducirGlobales() {
+	traducirGlobales(): string {
+		let result: string = '';
 		let instrucciones = this._ast
 			.getinstrucciones()
 			.filter(
@@ -163,33 +166,21 @@ export class Listado_Errores {
 			);
 		instrucciones.forEach((instruccion) => {
 			if (instruccion instanceof Declaracion) {
-				let result = instruccion.traducir(
-					this.ast,
-					this.tabla
-				).codigo3d;
-				setValueResult(result);
+				result += instruccion.traducir(this.ast, this.tabla).codigo3d;
 			} else if (instruccion instanceof Asignacion) {
-				let result = instruccion.traducir(
-					this.ast,
-					this.tabla
-				).codigo3d;
-				setValueResult(result);
+				result += instruccion.traducir(this.ast, this.tabla).codigo3d;
 			} else if (instruccion instanceof declaracionVectores) {
-				let result = instruccion.traducir(
-					this.ast,
-					this.tabla
-				).codigo3d;
-				setValueResult(result);
+				result += instruccion.traducir(this.ast, this.tabla).codigo3d;
 			} else if (instruccion instanceof declaracionListas) {
-				let result = instruccion.traducir(
-					this.ast,
-					this.tabla
-				).codigo3d;
-				setValueResult(result);
+				result += instruccion.traducir(this.ast, this.tabla).codigo3d;
 			}
 		});
+		return result;
 	}
-	traducirPrincipal() {
+	traducirPrincipal(globales: string) {
+		let result: string = 'void main () {\n';
+		result += '\tH = 0; P = 0;\n\n';
+		result += globales;
 		let instrucciones = this._ast
 			.getinstrucciones()
 			.filter(
@@ -198,12 +189,16 @@ export class Listado_Errores {
 					instruccion.identificador === 'main'
 			);
 		if (instrucciones.length !== 1) {
-			setValueConsole('Se encontró más de un método principal\n');
-			clearValueResult();
-		} else if (instrucciones.length === 0) {
-			setValueConsole('No se encontró un método principal\n');
+			if (instrucciones.length === 0) {
+				setValueConsole('No se encontró un método principal\n');
+			} else {
+				setValueConsole('Se encontró más de un método principal\n');
+				clearValueResult();
+			}
+			return;
 		}
-		let result = instrucciones[0].traducir(this._ast, this.tabla).codigo3d;
+		result += instrucciones[0].traducir(this._ast, this.tabla).codigo3d;
+		result += '}';
 		setValueResult(result);
 	}
 

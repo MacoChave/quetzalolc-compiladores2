@@ -761,7 +761,7 @@ var agregarCabecera = function () {
     header += 'double heap[30101999];\n';
     header += 'double stack[30101999];\n';
     header += 'double P;\n';
-    header += 'double H;\n';
+    header += 'double H;\n\n';
     temporales.forEach(function (temp) {
         header += "float " + temp + ";\n";
     });
@@ -1016,14 +1016,10 @@ var Listado_Errores = /** @class */ (function () {
         }
     };
     Listado_Errores.prototype.traducir = function () {
-        console.log('Traduciendo...');
+        var globales = this.traducirGlobales();
         this.traducirFunciones();
         this.traducirMetodos();
-        shared_1.setValueResult('int main {\n');
-        shared_1.setValueResult('\tH = 0; P = 0\n');
-        this.traducirGlobales();
-        this.traducirPrincipal();
-        shared_1.setValueResult('}');
+        this.traducirPrincipal(globales);
         shared_1.addHeaderResult();
     };
     Listado_Errores.prototype.traducirFunciones = function () {
@@ -1031,9 +1027,11 @@ var Listado_Errores = /** @class */ (function () {
         var instrucciones = this._ast
             .getinstrucciones()
             .filter(function (instruccion) { return instruccion instanceof Funciones_1.default; });
-        console.log(instrucciones);
         instrucciones.forEach(function (instruccion) {
-            instruccion.traducir(_this._ast, _this.tabla);
+            shared_1.setValueResult("\nvoid " + instruccion.identificador + " {\n");
+            var result = instruccion.traducir(_this._ast, _this.tabla).codigo3d;
+            shared_1.setValueResult(result);
+            shared_1.setValueResult('}\n');
         });
     };
     Listado_Errores.prototype.traducirMetodos = function () {
@@ -1044,13 +1042,16 @@ var Listado_Errores = /** @class */ (function () {
             return instruccion instanceof Metodos_1.default &&
                 instruccion.identificador !== 'main';
         });
-        console.log(instrucciones);
         instrucciones.forEach(function (instruccion) {
-            instruccion.traducir(_this._ast, _this.tabla);
+            shared_1.setValueResult("\nvoid " + instruccion.identificador + " {\n");
+            var result = instruccion.traducir(_this._ast, _this.tabla).codigo3d;
+            shared_1.setValueResult(result);
+            shared_1.setValueResult('}\n');
         });
     };
     Listado_Errores.prototype.traducirGlobales = function () {
         var _this = this;
+        var result = '';
         var instrucciones = this._ast
             .getinstrucciones()
             .filter(function (instruccion) {
@@ -1061,24 +1062,24 @@ var Listado_Errores = /** @class */ (function () {
         });
         instrucciones.forEach(function (instruccion) {
             if (instruccion instanceof Declaracion_1.default) {
-                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
-                shared_1.setValueResult(result);
+                result += instruccion.traducir(_this.ast, _this.tabla).codigo3d;
             }
             else if (instruccion instanceof Asignacion_1.default) {
-                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
-                shared_1.setValueResult(result);
+                result += instruccion.traducir(_this.ast, _this.tabla).codigo3d;
             }
             else if (instruccion instanceof declaracionVectores_1.default) {
-                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
-                shared_1.setValueResult(result);
+                result += instruccion.traducir(_this.ast, _this.tabla).codigo3d;
             }
             else if (instruccion instanceof declaracionListas_1.default) {
-                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
-                shared_1.setValueResult(result);
+                result += instruccion.traducir(_this.ast, _this.tabla).codigo3d;
             }
         });
+        return result;
     };
-    Listado_Errores.prototype.traducirPrincipal = function () {
+    Listado_Errores.prototype.traducirPrincipal = function (globales) {
+        var result = 'void main () {\n';
+        result += '\tH = 0; P = 0;\n\n';
+        result += globales;
         var instrucciones = this._ast
             .getinstrucciones()
             .filter(function (instruccion) {
@@ -1086,14 +1087,17 @@ var Listado_Errores = /** @class */ (function () {
                 instruccion.identificador === 'main';
         });
         if (instrucciones.length !== 1) {
-            shared_1.setValueConsole('Se encontró más de un método principal\n');
-            shared_1.clearValueResult();
+            if (instrucciones.length === 0) {
+                shared_1.setValueConsole('No se encontró un método principal\n');
+            }
+            else {
+                shared_1.setValueConsole('Se encontró más de un método principal\n');
+                shared_1.clearValueResult();
+            }
+            return;
         }
-        else if (instrucciones.length === 0) {
-            shared_1.clearValueResult();
-            shared_1.setValueConsole('No se encontró un método principal\n');
-        }
-        var result = instrucciones[0].traducir(this._ast, this.tabla).codigo3d;
+        result += instrucciones[0].traducir(this._ast, this.tabla).codigo3d;
+        result += '}';
         shared_1.setValueResult(result);
     };
     Listado_Errores.prototype.graficar = function () {
@@ -2401,6 +2405,7 @@ var Codigo3d_1 = require("../Abstracto/Codigo3d");
 var Instruccion_1 = require("../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
 var Tipo_1 = require("../TS/Tipo");
+var Identificador_1 = __importDefault(require("./Identificador"));
 var Primitivo = /** @class */ (function (_super) {
     __extends(Primitivo, _super);
     function Primitivo(tipo, valor, fila, columna) {
@@ -2454,6 +2459,13 @@ var Primitivo = /** @class */ (function (_super) {
             res.temporal = "" + this.valor;
         }
         else if (this.tipoDato.getTipo() === Tipo_1.tipoDato.CADENA) {
+            console.log({
+                cadena: this.valor,
+                hasId: this.valor.includes('$'),
+            });
+            if (this.valor.includes('$')) {
+                this.concatStringWithId(arbol, tabla);
+            }
             var temp = Codigo3d_1.new_temporal();
             var c3d = "\t" + temp + " = H;\n";
             for (var index = 0; index < this.valor.length; index++) {
@@ -2468,11 +2480,31 @@ var Primitivo = /** @class */ (function (_super) {
         }
         return res;
     };
+    Primitivo.prototype.concatStringWithId = function (arbol, tabla) {
+        var concat = this.valor.split('$');
+        console.log(concat);
+        console.info("concat(" + concat[0] + ")");
+        for (var index = 1; index < concat.length; index++) {
+            var element = concat[index];
+            if (element.includes(' ')) {
+                var i = element.indexOf(' ');
+                // console.info(`getId(${element.slice(0, i)})`);
+                var id = new Identificador_1.default(element.slice(0, i), this.fila, this.columna);
+                console.log(id.traducir(arbol, tabla));
+                console.info("concat(" + element.slice(i, element.length) + ")");
+            }
+            else {
+                // console.info(`getId(${element})`);
+                var id = new Identificador_1.default(element, this.fila, this.columna);
+                console.log(id.traducir(arbol, tabla));
+            }
+        }
+    };
     return Primitivo;
 }(Instruccion_1.Instruccion));
 exports.default = Primitivo;
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":47}],14:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":47,"./Identificador":11}],14:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4481,6 +4513,7 @@ var Funciones = /** @class */ (function (_super) {
         }
     };
     Funciones.prototype.traducir = function (arbol, tabla) {
+        var _this = this;
         var res = {
             codigo3d: '',
             etq_falsas: [],
@@ -4490,12 +4523,10 @@ var Funciones = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
-        var c3d = '';
         this.instrucciones.forEach(function (instruccion) {
-            var instValue = instruccion.traducir(arbol, tabla);
-            c3d += instValue.codigo3d;
+            console.log("Funci\u00F3n " + _this.identificador, instruccion);
+            // res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d
         });
-        res.codigo3d = c3d;
         return res;
     };
     return Funciones;
@@ -4983,12 +5014,9 @@ var Metodos = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
-        var c3d = '';
         this.instrucciones.forEach(function (instruccion) {
-            var instValue = instruccion.traducir(arbol, tabla);
-            c3d += instValue.codigo3d;
+            res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d;
         });
-        res.codigo3d = c3d;
         return res;
     };
     return Metodos;
@@ -6255,17 +6283,19 @@ var Print = /** @class */ (function (_super) {
             tipo: -1,
         };
         var c3d = '\t// ==========> PRINTN\n';
+        var c3d_aux = '';
         this.expresion.forEach(function (expr) {
             var valor = expr.traducir(arbol, tabla);
             if (valor.tipo === -1)
                 return;
             c3d += valor.codigo3d + "\n";
-            c3d += _this.getTexto(valor);
+            c3d_aux += _this.getTexto(valor);
         });
+        c3d += c3d_aux;
         if (this.isSalto)
             c3d += "\tprintf(\"%c\", (char) 10);\n";
         c3d += '\t// ==========> END PRINTN\n';
-        shared_1.setValueResult(c3d);
+        res.codigo3d = c3d;
         return res;
     };
     Print.prototype.getTexto = function (valor) {
