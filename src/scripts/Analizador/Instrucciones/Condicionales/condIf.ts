@@ -1,4 +1,4 @@
-import { Codigo3d } from '../../Abstracto/Codigo3d';
+import { Codigo3d, new_etiqueta, new_temporal } from '../../Abstracto/Codigo3d';
 import { Instruccion } from '../../Abstracto/Instruccion';
 import nodoAST from '../../Abstracto/nodoAST';
 import Errores from '../../Excepciones/Errores';
@@ -124,6 +124,58 @@ export default class condIf extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
-		throw new Error('Method not implemented.');
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: '',
+			tipo: -1,
+		};
+		let c3d = '\t// ==========> IF\n';
+		let l_exit = new_etiqueta();
+
+		let resCondicion = this.cond1.traducir(arbol, tabla);
+		// console.log(resCondicion);
+		if (resCondicion.tipo === -1) return res;
+
+		c3d += resCondicion.codigo3d;
+		resCondicion.etq_verdaderas.forEach((etiqueta) => {
+			c3d += `${etiqueta}:\n`;
+		});
+
+		let nuevaTabla = new tablaSimbolos(tabla);
+		nuevaTabla.setNombre('If');
+
+		this.condIf.forEach((cif) => {
+			c3d += cif.traducir(arbol, nuevaTabla).codigo3d;
+			// TODO: Evaluar return y continue
+			c3d += `\tgoto ${l_exit};\n`;
+		});
+
+		resCondicion.etq_falsas.forEach((etiqueta) => {
+			c3d += `${etiqueta}:\n`;
+		});
+
+		if (this.condElse !== undefined) {
+			let nuevaTabla = new tablaSimbolos(tabla);
+			nuevaTabla.setNombre('else');
+			this.condElse.forEach((celse) => {
+				c3d += celse.traducir(arbol, nuevaTabla).codigo3d;
+				// TODO: Evaluar return y continue
+				c3d += `\tgoto ${l_exit};\n`;
+			});
+		} else if (this.condElseIf !== undefined) {
+			c3d += this.condElseIf.traducir(arbol, tabla).codigo3d;
+			// TODO: Evaluar return y continue
+			c3d += `\tgoto ${l_exit};\n`;
+		}
+
+		c3d += `${l_exit}:\n`;
+		c3d += '\t// ==========> END IF\n';
+		res.codigo3d = c3d;
+		res.tipo = 0;
+		return res;
 	}
 }

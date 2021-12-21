@@ -21,6 +21,7 @@ import Main from './Analizador/Instrucciones/Main';
 import { Instruccion } from './Analizador/Abstracto/Instruccion';
 import { clear_data } from './Analizador/Abstracto/Codigo3d';
 import Print from './Analizador/Instrucciones/print';
+import LlamadaFuncMetd from './Analizador/Instrucciones/LlamadaFuncMetd';
 
 const file = document.querySelector('#file');
 const open_file = document.querySelector('#open_file');
@@ -89,7 +90,6 @@ compile?.addEventListener('click', () => {
 	sourceEditor.save();
 	let source = my_source.value;
 	// TODO: Pasar traductor a clase
-	setValueResult('\nint main () {\n');
 	let ast: Arbol = analize_source(source);
 	traducir(ast);
 });
@@ -149,20 +149,26 @@ const traducir = (ast: Arbol): void => {
 	let imprimir = instrucciones.filter((value, index, arr) => {
 		return value instanceof Print;
 	});
+	metodoMain = metodos.filter((value) => {
+		return value.identificador === 'main';
+	});
+	if (metodoMain.length !== 1) {
+		if (metodoMain.length > 1)
+			setValueConsole('Hay más de 1 método principal');
+		else setValueConsole('No se encontró un método principal');
+		return;
+	}
 
 	console.log({
 		funciones,
 		metodos,
-		ejecutar,
-		declara,
-		declaraVector,
-		declaraLista,
-		asignaVector,
-		asignaLista,
-		agregaLista,
 		metodoMain,
-		imprimir,
 	});
+
+	setValueResult(`int main() {
+	H = 0;
+	P = 0;
+`);
 	escribirDeclara(declara, ast, tabla);
 	escribirDeclaraVector(declaraVector, ast, tabla);
 	escribirDeclaraLista(declaraLista, ast, tabla);
@@ -238,7 +244,7 @@ const escribirMain = (
 ) => {
 	let c3d = '';
 	metodoMain.forEach((instruccion) => {
-		// c3d += instruccion.traducir(ast, tabla).codigo3d
+		c3d += instruccion.traducir(ast, tabla).codigo3d;
 	});
 	setValueResult(c3d);
 };
@@ -250,7 +256,7 @@ const escribirFunciones = (
 ) => {
 	let c3d = '';
 	funciones.forEach((instruccion) => {
-		// c3d += instruccion.traducir(ast, tabla).codigo3d
+		c3d += instruccion.traducir(ast, tabla).codigo3d;
 	});
 	setValueResult(c3d);
 };
@@ -262,7 +268,8 @@ const escribirMetodos = (
 ) => {
 	let c3d = '';
 	metodos.forEach((instruccion) => {
-		// c3d += instruccion.traducir(ast, tabla).codigo3d
+		if (instruccion.identificador !== 'main')
+			c3d += instruccion.traducir(ast, tabla).codigo3d;
 	});
 	setValueResult(c3d);
 };

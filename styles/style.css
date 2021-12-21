@@ -94,6 +94,10 @@
 	width: 100%;
 }
 
+.CodeMirror {
+	font-family: 'Fira Code', monospace !important;
+}
+
 .item:nth-child(3) textarea {
 	height: 20vh;
 }

@@ -2675,7 +2675,28 @@ var Asignacion = /** @class */ (function (_super) {
         }
     };
     Asignacion.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var variable = tabla.getVariable(this.identificador);
+        if (variable === null)
+            return res;
+        var valor = this.valor.traducir(arbol, tabla);
+        if (variable.gettipo().getTipo() !== valor.tipo)
+            return res;
+        // let temp = new_temporal()
+        var c3d = '\t// ==========> ASIGNACION\n';
+        c3d += valor.codigo3d + "\n";
+        c3d += "\tstack[(int) " + variable.posAbsoluta + "] = " + valor.temporal + ";\n";
+        c3d += '\t// ==========> END ASIGNACION\n';
+        res.codigo3d = c3d;
+        return res;
     };
     return Asignacion;
 }(Instruccion_1.Instruccion));
@@ -2839,7 +2860,18 @@ var condWhile = /** @class */ (function (_super) {
         } while (this.condicion.interpretar(arbol, tabla));
     };
     condWhile.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t/// ==========> \n';
+        c3d = '\t/// ==========> END\n';
+        return res;
     };
     return condWhile;
 }(Instruccion_1.Instruccion));
@@ -2953,7 +2985,18 @@ var condFor = /** @class */ (function (_super) {
         }
     };
     condFor.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t/// ==========> \n';
+        c3d = '\t/// ==========> END\n';
+        return res;
     };
     return condFor;
 }(Instruccion_1.Instruccion));
@@ -3053,7 +3096,18 @@ var condWhile = /** @class */ (function (_super) {
         }
     };
     condWhile.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t/// ==========> \n';
+        c3d = '\t/// ==========> END\n';
+        return res;
     };
     return condWhile;
 }(Instruccion_1.Instruccion));
@@ -3099,6 +3153,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var Codigo3d_1 = require("../../Abstracto/Codigo3d");
 var Instruccion_1 = require("../../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
@@ -3218,13 +3273,60 @@ var condIf = /** @class */ (function (_super) {
     }*/
     };
     condIf.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t// ==========> IF\n';
+        var l_exit = Codigo3d_1.new_etiqueta();
+        var resCondicion = this.cond1.traducir(arbol, tabla);
+        // console.log(resCondicion);
+        if (resCondicion.tipo === -1)
+            return res;
+        c3d += resCondicion.codigo3d;
+        resCondicion.etq_verdaderas.forEach(function (etiqueta) {
+            c3d += etiqueta + ":\n";
+        });
+        var nuevaTabla = new tablaSimbolos_1.default(tabla);
+        nuevaTabla.setNombre('If');
+        this.condIf.forEach(function (cif) {
+            c3d += cif.traducir(arbol, nuevaTabla).codigo3d;
+            // TODO: Evaluar return y continue
+            c3d += "\tgoto " + l_exit + ":\n";
+        });
+        resCondicion.etq_falsas.forEach(function (etiqueta) {
+            c3d += etiqueta + ":\n";
+        });
+        if (this.condElse !== undefined) {
+            var nuevaTabla_1 = new tablaSimbolos_1.default(tabla);
+            nuevaTabla_1.setNombre('else');
+            this.condElse.forEach(function (celse) {
+                c3d += celse.traducir(arbol, nuevaTabla_1).codigo3d;
+                // TODO: Evaluar return y continue
+                c3d += "\tgoto " + l_exit + ":\n";
+            });
+        }
+        else if (this.condElseIf !== undefined) {
+            c3d += this.condElseIf.traducir(arbol, tabla).codigo3d;
+            // TODO: Evaluar return y continue
+            c3d += "\tgoto " + l_exit + ":\n";
+        }
+        c3d += "\t" + l_exit + ":\n";
+        c3d += '\t// ==========> END IF\n';
+        res.codigo3d = c3d;
+        res.tipo = 0;
+        return res;
     };
     return condIf;
 }(Instruccion_1.Instruccion));
 exports.default = condIf;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],21:[function(require,module,exports){
+},{"../../Abstracto/Codigo3d":4,"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],21:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3309,7 +3411,18 @@ var condIfTernario = /** @class */ (function (_super) {
         }
     };
     condIfTernario.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t/// ==========> \n';
+        c3d = '\t/// ==========> END\n';
+        return res;
     };
     return condIfTernario;
 }(Instruccion_1.Instruccion));
@@ -3426,7 +3539,18 @@ var condSwitch = /** @class */ (function (_super) {
         }
     };
     condSwitch.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t/// ==========> \n';
+        c3d = '\t/// ==========> END\n';
+        return res;
     };
     return condSwitch;
 }(Instruccion_1.Instruccion));
@@ -3526,7 +3650,18 @@ var condSwitchCase = /** @class */ (function (_super) {
         }
     };
     condSwitchCase.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t/// ==========> \n';
+        c3d = '\t/// ==========> END\n';
+        return res;
     };
     return condSwitchCase;
 }(Instruccion_1.Instruccion));
@@ -3613,7 +3748,18 @@ var condSwitchCase = /** @class */ (function (_super) {
         }
     };
     condSwitchCase.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t/// ==========> \n';
+        c3d = '\t/// ==========> END\n';
+        return res;
     };
     return condSwitchCase;
 }(Instruccion_1.Instruccion));
@@ -4224,7 +4370,22 @@ var Funciones = /** @class */ (function (_super) {
         }
     };
     Funciones.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '';
+        this.instrucciones.forEach(function (instruccion) {
+            var instValue = instruccion.traducir(arbol, tabla);
+            c3d += instValue.codigo3d;
+        });
+        res.codigo3d = c3d;
+        return res;
     };
     return Funciones;
 }(Instruccion_1.Instruccion));
@@ -4516,7 +4677,17 @@ var LlamadaFuncMetd = /** @class */ (function (_super) {
         }
     };
     LlamadaFuncMetd.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '';
+        return res;
     };
     return LlamadaFuncMetd;
 }(Instruccion_1.Instruccion));
@@ -4586,7 +4757,22 @@ var Main = /** @class */ (function (_super) {
         }
     };
     Main.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '';
+        this.instrucciones.forEach(function (instruccion) {
+            var instValue = instruccion.traducir(arbol, tabla);
+            c3d += instValue.codigo3d;
+        });
+        res.codigo3d = c3d;
+        return res;
     };
     return Main;
 }(Instruccion_1.Instruccion));
@@ -4677,7 +4863,22 @@ var Metodos = /** @class */ (function (_super) {
         }
     };
     Metodos.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '';
+        this.instrucciones.forEach(function (instruccion) {
+            var instValue = instruccion.traducir(arbol, tabla);
+            c3d += instValue.codigo3d;
+        });
+        res.codigo3d = c3d;
+        return res;
     };
     return Metodos;
 }(Instruccion_1.Instruccion));
@@ -4752,7 +4953,17 @@ var Return = /** @class */ (function (_super) {
         return this;
     };
     Return.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '';
+        return res;
     };
     return Return;
 }(Instruccion_1.Instruccion));
@@ -7556,7 +7767,6 @@ compile === null || compile === void 0 ? void 0 : compile.addEventListener('clic
     sourceEditor.save();
     var source = my_source.value;
     // TODO: Pasar traductor a clase
-    shared_1.setValueResult('\nint main () {\n');
     var ast = analize_source(source);
     traducir(ast);
 });
@@ -7608,19 +7818,22 @@ var traducir = function (ast) {
     var imprimir = instrucciones.filter(function (value, index, arr) {
         return value instanceof print_1.default;
     });
+    metodoMain = metodos.filter(function (value) {
+        return value.identificador === 'main';
+    });
+    if (metodoMain.length !== 1) {
+        if (metodoMain.length > 1)
+            shared_1.setValueConsole('Hay más de 1 método principal');
+        else
+            shared_1.setValueConsole('No se encontró un método principal');
+        return;
+    }
     console.log({
         funciones: funciones,
         metodos: metodos,
-        ejecutar: ejecutar,
-        declara: declara,
-        declaraVector: declaraVector,
-        declaraLista: declaraLista,
-        asignaVector: asignaVector,
-        asignaLista: asignaLista,
-        agregaLista: agregaLista,
         metodoMain: metodoMain,
-        imprimir: imprimir,
     });
+    shared_1.setValueResult("int main() {\n\tH = 0;\n\tP = 0;\n");
     escribirDeclara(declara, ast, tabla);
     escribirDeclaraVector(declaraVector, ast, tabla);
     escribirDeclaraLista(declaraLista, ast, tabla);
@@ -7665,21 +7878,22 @@ var escribirAsignaLista = function (asignacion, ast, tabla) {
 var escribirMain = function (metodoMain, ast, tabla) {
     var c3d = '';
     metodoMain.forEach(function (instruccion) {
-        // c3d += instruccion.traducir(ast, tabla).codigo3d
+        c3d += instruccion.traducir(ast, tabla).codigo3d;
     });
     shared_1.setValueResult(c3d);
 };
 var escribirFunciones = function (funciones, ast, tabla) {
     var c3d = '';
     funciones.forEach(function (instruccion) {
-        // c3d += instruccion.traducir(ast, tabla).codigo3d
+        c3d += instruccion.traducir(ast, tabla).codigo3d;
     });
     shared_1.setValueResult(c3d);
 };
 var escribirMetodos = function (metodos, ast, tabla) {
     var c3d = '';
     metodos.forEach(function (instruccion) {
-        // c3d += instruccion.traducir(ast, tabla).codigo3d
+        if (instruccion.identificador !== 'main')
+            c3d += instruccion.traducir(ast, tabla).codigo3d;
     });
     shared_1.setValueResult(c3d);
 };
