@@ -1,7 +1,3 @@
-
-
-
-
 %{
 //codigo js
 const print=require('./Instrucciones/print');
@@ -48,7 +44,7 @@ const main = require('./Instrucciones/Main')
 %lex 
 
 
-%options case-insensitive
+%options case-sensitive
 //inicio analisis lexico
 %%
 [ \r\t]+ {}
@@ -65,13 +61,13 @@ const main = require('./Instrucciones/Main')
 "char"          return 'RESCHAR';
 "double"        return 'RESDOUBLE';
 "boolean"       return 'RESBOOL';
-"string"        return 'RESSTRING';
+"String"        return 'RESSTRING';
 "while"         return 'RESWHILE';
 "do"            return 'RESDO';
 "break"         return 'RESBREAK';
 "continue"      return 'RESCONTINUE';
 "return"        return 'RESRETURN';
-"main"          return 'RESMAIN';
+// "main"          return 'RESMAIN';
 "switch"        return 'RESSWITCH';
 "case"          return 'RESCASE';
 "default"       return 'RESDEFAULT';
@@ -253,7 +249,7 @@ INSTRUCCION:
     |FUNCIONES                          {$$=$1;}
     |VECTORES PTCOMA                    {$$=$1;}
     |ASIGVECTORES PTCOMA                {$$=$1;}
-    |FUNCMAIN PTCOMA                    {$$=$1;}
+    // |FUNCMAIN PTCOMA                    {$$=$1;}
         |error PTCOMA                   {
                                             // inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));
                                             console.log(`Error sintactico, se esperaba un token en esta linea ${@1.first_line}, ${@1.first_column}`);
@@ -446,6 +442,6 @@ BLOQUEINSTRUCCION:
     |LLAVEABRE LLAVECIERRA              {$$=[];}
     ;
 
-FUNCMAIN:
-    RESVOID RESMAIN PARABRE PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=new main.default($1,@1.first_line,@1.first_column,$6);}
-    ;
+// FUNCMAIN:
+//     RESVOID RESMAIN PARABRE PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=new main.default($1,@1.first_line,@1.first_column,$6);}
+//     ;

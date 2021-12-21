@@ -22,6 +22,9 @@ import { Instruccion } from './Analizador/Abstracto/Instruccion';
 import { clear_data } from './Analizador/Abstracto/Codigo3d';
 import Print from './Analizador/Instrucciones/print';
 import LlamadaFuncMetd from './Analizador/Instrucciones/LlamadaFuncMetd';
+import { Listado_Errores } from './Analizador/Excepciones/Listado_Errores';
+
+let listaErrores = new Listado_Errores();
 
 const file = document.querySelector('#file');
 const open_file = document.querySelector('#open_file');
@@ -74,13 +77,8 @@ analize?.addEventListener('click', () => {
 	sourceEditor.save();
 	let source = my_source.value;
 	let ast: Arbol = analize_source(source);
-	ast.geterrores().forEach((error) => {
-		let str_error = `${error.getTipoError} en [${error.getFila},${error.getcolumna}]: ${error.getDesc}`;
-		console.error(str_error);
-		setValueConsole(str_error);
-	});
-
-	console.log(ast);
+	listaErrores.ast = ast;
+	listaErrores.interpretar();
 });
 
 compile?.addEventListener('click', () => {
@@ -91,7 +89,9 @@ compile?.addEventListener('click', () => {
 	let source = my_source.value;
 	// TODO: Pasar traductor a clase
 	let ast: Arbol = analize_source(source);
-	traducir(ast);
+	listaErrores.ast = ast;
+	listaErrores.traducir();
+	// traducir(ast);
 });
 
 reports?.addEventListener('click', () => {

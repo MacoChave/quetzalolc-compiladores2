@@ -911,100 +911,209 @@ exports.default = Errores;
 
 },{}],8:[function(require,module,exports){
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listaErrores = void 0;
+exports.Listado_Errores = exports.listaErrores = void 0;
+var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
+var Errores_1 = __importDefault(require("../Excepciones/Errores"));
+var Asignacion_1 = __importDefault(require("../Instrucciones/Asignacion"));
+var Declaracion_1 = __importDefault(require("../Instrucciones/Declaracion"));
+var declaracionVectores_1 = __importDefault(require("../Instrucciones/declaracionVectores"));
+var declaracionListas_1 = __importDefault(require("../Instrucciones/declaracionListas"));
+var Exec_1 = __importDefault(require("../Instrucciones/Exec"));
+var Funciones_1 = __importDefault(require("../Instrucciones/Funciones"));
+var Metodos_1 = __importDefault(require("../Instrucciones/Metodos"));
+var Arbol_1 = __importDefault(require("../TS/Arbol"));
+var tablaSimbolos_1 = __importDefault(require("../TS/tablaSimbolos"));
+var graficar_1 = __importDefault(require("../../Reportes/graficar"));
+var asignacionVector_1 = __importDefault(require("../Instrucciones/asignacionVector"));
+var asignacionLista_1 = __importDefault(require("../Instrucciones/asignacionLista"));
+var agregarLista_1 = __importDefault(require("../Instrucciones/agregarLista"));
+var shared_1 = require("../../shared");
 var arbolNuevo;
 var contador;
 var cuerpo;
 //tablas arboles y excepcciones
-// class Listado_Errores {
-// 	public interpretar(entrada: string) {
-// 		listaErrores = new Array<Errores>();
-// 		let parser = require('../analizador');
-// 		try {
-// 			let ast = new Arbol(parser.parse(entrada));
-// 			var tabla = new tablaSimbolos();
-// 			ast.settablaGlobal(tabla);
-// 			for (let i of ast.getinstrucciones()) {
-// 				if (i instanceof Metodos || i instanceof Funciones) {
-// 					ast.getfunciones().push(i);
-// 				}
-// 			}
-// 			for (let i of ast.getinstrucciones()) {
-// 				if (i instanceof Errores) {
-// 					listaErrores.push(i);
-// 					ast.actualizaConsola((<Errores>i).returnError());
-// 				}
-// 				if (
-// 					i instanceof Metodos ||
-// 					i instanceof Funciones ||
-// 					i instanceof Exec
-// 				)
-// 					continue;
-// 				if (
-// 					i instanceof Declaracion ||
-// 					i instanceof Asignacion ||
-// 					i instanceof declaracionVectores ||
-// 					i instanceof declaracionListas ||
-// 					i instanceof asignacionVector ||
-// 					i instanceof asignacionLista ||
-// 					i instanceof agregarLista
-// 				) {
-// 					var resultador = i.interpretar(ast, tabla);
-// 					if (resultador instanceof Errores) {
-// 						listaErrores.push(resultador);
-// 						ast.actualizaConsola(
-// 							(<Errores>resultador).returnError()
-// 						);
-// 					}
-// 				} else {
-// 					let error = new Errores(
-// 						'SEMANTICO',
-// 						'SENTENCIA FUERA DE METODO',
-// 						i.fila,
-// 						i.columna
-// 					);
-// 					listaErrores.push(error);
-// 					ast.actualizaConsola((<Errores>error).returnError());
-// 				}
-// 			}
-// 			for (let i of ast.getinstrucciones()) {
-// 				if (i instanceof Exec) {
-// 					var resultador = i.interpretar(ast, tabla);
-// 					if (resultador instanceof Errores) {
-// 						listaErrores.push(resultador);
-// 						ast.actualizaConsola(
-// 							(<Errores>resultador).returnError()
-// 						);
-// 					}
-// 				}
-// 			}
-// 			arbolNuevo = ast;
-// 			/*res.send({
-//           resultado: ast.getconsola(),
-//           errores: listaErrores,
-//           tabla: ast.getSimbolos(),
-//         });*/
-// 		} catch (err) {
-// 			/*res.json({ error: err, errores: listaErrores });*/
-// 		}
-// 	}
-// 	public graficar() {
-// 		let otro = arbolNuevo;
-// 		if (otro == null) return /*res.json({ msg: false })*/;
-// 		let arbolAst = new nodoAST('RAIZ');
-// 		let nodoINS = new nodoAST('INSTRUCCIONES');
-// 		otro.getinstrucciones().forEach((element) => {
-// 			nodoINS.agregarHijoAST(element.getNodo());
-// 		});
-// 		arbolAst.agregarHijoAST(nodoINS);
-// 		graficarArbol(<nodoAST>arbolAst);
-// 		return /*res.json({ msg: true })*/;
-// 	}
-// }
-// export const listado_Errores = new Listado_Errores();
+var Listado_Errores = /** @class */ (function () {
+    function Listado_Errores() {
+        this.ast = new Arbol_1.default([]);
+        this.tabla = new tablaSimbolos_1.default();
+    }
+    Object.defineProperty(Listado_Errores.prototype, "ast", {
+        get: function () {
+            return this._ast;
+        },
+        set: function (value) {
+            this._ast = value;
+            this._ast.settablaGlobal(this.tabla);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Listado_Errores.prototype.interpretar = function () {
+        exports.listaErrores = new Array();
+        // let parser = require('../analizador');
+        try {
+            // let ast = new Arbol(parser.parse(entrada));
+            var tabla = new tablaSimbolos_1.default();
+            ast.settablaGlobal(tabla);
+            for (var _i = 0, _a = ast.getinstrucciones(); _i < _a.length; _i++) {
+                var i = _a[_i];
+                if (i instanceof Metodos_1.default || i instanceof Funciones_1.default) {
+                    ast.getfunciones().push(i);
+                }
+            }
+            for (var _b = 0, _c = ast.getinstrucciones(); _b < _c.length; _b++) {
+                var i = _c[_b];
+                if (i instanceof Errores_1.default) {
+                    exports.listaErrores.push(i);
+                    ast.actualizaConsola(i.returnError());
+                }
+                if (i instanceof Metodos_1.default ||
+                    i instanceof Funciones_1.default ||
+                    i instanceof Exec_1.default)
+                    continue;
+                if (i instanceof Declaracion_1.default ||
+                    i instanceof Asignacion_1.default ||
+                    i instanceof declaracionVectores_1.default ||
+                    i instanceof declaracionListas_1.default ||
+                    i instanceof asignacionVector_1.default ||
+                    i instanceof asignacionLista_1.default ||
+                    i instanceof agregarLista_1.default) {
+                    var resultador = i.interpretar(ast, tabla);
+                    if (resultador instanceof Errores_1.default) {
+                        exports.listaErrores.push(resultador);
+                        ast.actualizaConsola(resultador.returnError());
+                    }
+                }
+                else {
+                    var error = new Errores_1.default('SEMANTICO', 'SENTENCIA FUERA DE METODO', i.fila, i.columna);
+                    exports.listaErrores.push(error);
+                    ast.actualizaConsola(error.returnError());
+                }
+            }
+            for (var _d = 0, _e = ast.getinstrucciones(); _d < _e.length; _d++) {
+                var i = _e[_d];
+                if (i instanceof Exec_1.default) {
+                    var resultador = i.interpretar(ast, tabla);
+                    if (resultador instanceof Errores_1.default) {
+                        exports.listaErrores.push(resultador);
+                        ast.actualizaConsola(resultador.returnError());
+                    }
+                }
+            }
+            arbolNuevo = ast;
+            /*res.send({
+          resultado: ast.getconsola(),
+          errores: listaErrores,
+          tabla: ast.getSimbolos(),
+        });*/
+        }
+        catch (err) {
+            /*res.json({ error: err, errores: listaErrores });*/
+        }
+    };
+    Listado_Errores.prototype.traducir = function () {
+        console.log('Traduciendo...');
+        this.traducirFunciones();
+        this.traducirMetodos();
+        shared_1.setValueResult('int main {\n');
+        shared_1.setValueResult('\tH = 0; P = 0\n');
+        this.traducirGlobales();
+        this.traducirPrincipal();
+        shared_1.setValueResult('}');
+        shared_1.addHeaderResult();
+    };
+    Listado_Errores.prototype.traducirFunciones = function () {
+        var _this = this;
+        var instrucciones = this._ast
+            .getinstrucciones()
+            .filter(function (instruccion) { return instruccion instanceof Funciones_1.default; });
+        console.log(instrucciones);
+        instrucciones.forEach(function (instruccion) {
+            instruccion.traducir(_this._ast, _this.tabla);
+        });
+    };
+    Listado_Errores.prototype.traducirMetodos = function () {
+        var _this = this;
+        var instrucciones = this._ast
+            .getinstrucciones()
+            .filter(function (instruccion) {
+            return instruccion instanceof Metodos_1.default &&
+                instruccion.identificador !== 'main';
+        });
+        console.log(instrucciones);
+        instrucciones.forEach(function (instruccion) {
+            instruccion.traducir(_this._ast, _this.tabla);
+        });
+    };
+    Listado_Errores.prototype.traducirGlobales = function () {
+        var _this = this;
+        var instrucciones = this._ast
+            .getinstrucciones()
+            .filter(function (instruccion) {
+            return instruccion instanceof Declaracion_1.default ||
+                instruccion instanceof Asignacion_1.default ||
+                instruccion instanceof declaracionVectores_1.default ||
+                instruccion instanceof declaracionListas_1.default;
+        });
+        instrucciones.forEach(function (instruccion) {
+            if (instruccion instanceof Declaracion_1.default) {
+                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
+                shared_1.setValueResult(result);
+            }
+            else if (instruccion instanceof Asignacion_1.default) {
+                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
+                shared_1.setValueResult(result);
+            }
+            else if (instruccion instanceof declaracionVectores_1.default) {
+                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
+                shared_1.setValueResult(result);
+            }
+            else if (instruccion instanceof declaracionListas_1.default) {
+                var result = instruccion.traducir(_this.ast, _this.tabla).codigo3d;
+                shared_1.setValueResult(result);
+            }
+        });
+    };
+    Listado_Errores.prototype.traducirPrincipal = function () {
+        var instrucciones = this._ast
+            .getinstrucciones()
+            .filter(function (instruccion) {
+            return instruccion instanceof Metodos_1.default &&
+                instruccion.identificador === 'main';
+        });
+        if (instrucciones.length !== 1) {
+            shared_1.setValueConsole('Se encontró más de un método principal\n');
+            shared_1.clearValueResult();
+        }
+        else if (instrucciones.length === 0) {
+            shared_1.clearValueResult();
+            shared_1.setValueConsole('No se encontró un método principal\n');
+        }
+        var result = instrucciones[0].traducir(this._ast, this.tabla).codigo3d;
+        shared_1.setValueResult(result);
+    };
+    Listado_Errores.prototype.graficar = function () {
+        var otro = arbolNuevo;
+        if (otro == null)
+            return /*res.json({ msg: false })*/;
+        var arbolAst = new nodoAST_1.default('RAIZ');
+        var nodoINS = new nodoAST_1.default('INSTRUCCIONES');
+        otro.getinstrucciones().forEach(function (element) {
+            nodoINS.agregarHijoAST(element.getNodo());
+        });
+        arbolAst.agregarHijoAST(nodoINS);
+        graficar_1.default(arbolAst);
+        return /*res.json({ msg: true })*/;
+    };
+    return Listado_Errores;
+}());
+exports.Listado_Errores = Listado_Errores;
 
-},{}],9:[function(require,module,exports){
+},{"../../Reportes/graficar":51,"../../shared":54,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Instrucciones/Asignacion":15,"../Instrucciones/Declaracion":26,"../Instrucciones/Exec":28,"../Instrucciones/Funciones":29,"../Instrucciones/Metodos":33,"../Instrucciones/agregarLista":37,"../Instrucciones/asignacionLista":38,"../Instrucciones/asignacionVector":39,"../Instrucciones/declaracionListas":41,"../Instrucciones/declaracionVectores":42,"../TS/Arbol":45,"../TS/tablaSimbolos":48}],9:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1893,7 +2002,7 @@ var Cadena = /** @class */ (function (_super) {
             der.tipo === Tipo_1.tipoDato.CADENA) ||
             der.tipo === Tipo_1.tipoDato.CARACTER) {
             var temp = Codigo3d_1.new_temporal();
-            var temp_valor = Codigo3d_1.new_temporal();
+            var t_valor = Codigo3d_1.new_temporal();
             var label1 = Codigo3d_1.new_etiqueta();
             var label2 = Codigo3d_1.new_etiqueta();
             var label3 = Codigo3d_1.new_etiqueta();
@@ -1901,12 +2010,12 @@ var Cadena = /** @class */ (function (_super) {
             c3d += temp + " = H;\n";
             if (izq.tipo === Tipo_1.tipoDato.CADENA) {
                 c3d += label1 + ":\n";
-                c3d += "\t" + temp_valor + " = heap[(int) " + izq.temporal + "];\n";
-                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + izq.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
                 c3d += "\t" + izq.temporal + " = " + izq.temporal + " + 1;\n";
-                c3d += "\t" + temp_valor + " = heap[(int) " + izq.temporal + "];\n";
-                c3d += "\tif (" + temp_valor + " != -1) goto " + label1 + ";\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + izq.temporal + "];\n";
+                c3d += "\tif (" + t_valor + " != -1) goto " + label1 + ";\n";
                 c3d += "\tgoto " + label2 + ";\n";
             }
             else {
@@ -1915,12 +2024,12 @@ var Cadena = /** @class */ (function (_super) {
             }
             if (der.tipo === Tipo_1.tipoDato.CADENA) {
                 c3d += label2 + ":\n";
-                c3d += "\t" + temp_valor + " = heap[(int) " + der.temporal + "];\n";
-                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + der.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
                 c3d += "\t" + der.temporal + " = " + der.temporal + " + 1;\n";
-                c3d += "\t" + temp_valor + " = heap[(int) " + der.temporal + "];\n";
-                c3d += "\tif (" + temp_valor + " != -1) goto " + label2 + ";\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + der.temporal + "];\n";
+                c3d += "\tif (" + t_valor + " != -1) goto " + label2 + ";\n";
                 c3d += "\tgoto " + label3 + ";\n";
             }
             else {
@@ -1953,7 +2062,8 @@ var Cadena = /** @class */ (function (_super) {
             der.tipo === Tipo_1.tipoDato.ENTERO) {
             var temp = Codigo3d_1.new_temporal();
             var temp_izq = Codigo3d_1.new_temporal();
-            var temp_valor = Codigo3d_1.new_temporal();
+            var t_valor = Codigo3d_1.new_temporal();
+            var t_cont = Codigo3d_1.new_temporal();
             var label1 = Codigo3d_1.new_etiqueta();
             var label2 = Codigo3d_1.new_etiqueta();
             var label3 = Codigo3d_1.new_etiqueta();
@@ -1961,29 +2071,30 @@ var Cadena = /** @class */ (function (_super) {
             var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
             c3d += "\t" + temp + " = H;\n";
             c3d += "\t" + temp_izq + " = " + izq.temporal + ";\n";
+            c3d += "\t" + t_cont + " = " + der.temporal + ";\n";
             c3d += label1 + ":\n";
             if (izq.tipo === Tipo_1.tipoDato.CADENA) {
                 c3d += label3 + ":\n";
-                c3d += "\t" + temp_valor + " = heap[(int) " + temp_izq + "];\n";
-                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + temp_izq + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
                 c3d += "\t" + temp_izq + " = " + temp_izq + " + 1;\n";
-                c3d += "\t" + temp_valor + " = heap[(int) " + temp_izq + "];\n";
-                c3d += "\tif (" + temp_valor + " != -1) goto " + label3 + ";\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + temp_izq + "];\n";
+                c3d += "\tif (" + t_valor + " != -1) goto " + label3 + ";\n";
                 c3d += "\tgoto " + label4 + ";\n";
                 c3d += label4 + ":\n";
                 c3d += "\t" + temp_izq + " = " + izq.temporal + ";\n";
-                c3d += "\t" + der.temporal + " = " + der.temporal + " - 1;\n";
-                c3d += "\tif (" + der.temporal + " > 0) goto " + label1 + ";\n";
+                c3d += "\t" + t_cont + " = " + t_cont + " - 1;\n";
+                c3d += "\tif (" + t_cont + " > 0) goto " + label1 + ";\n";
                 c3d += "\tgoto " + label2 + ";\n";
                 c3d += label2 + ":\n";
             }
             else {
-                c3d += "\t" + temp_valor + " = stack[(int) " + izq.temporal + "];\n";
-                c3d += "\theap[(int) H] = " + temp_valor + ";\n";
+                c3d += "\t" + t_valor + " = stack[(int) " + izq.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
-                c3d += "\t" + der.temporal + " = " + der.temporal + " - 1;\n";
-                c3d += "\tif (" + der.temporal + " > 0) goto " + label1 + ";\n";
+                c3d += "\t" + t_cont + " = " + t_cont + " - 1;\n";
+                c3d += "\tif (" + t_cont + " > 0) goto " + label1 + ";\n";
                 c3d += "\tgoto " + label2 + ";\n";
                 c3d += "\t" + label2 + ":\n";
             }
@@ -3297,7 +3408,7 @@ var condIf = /** @class */ (function (_super) {
         this.condIf.forEach(function (cif) {
             c3d += cif.traducir(arbol, nuevaTabla).codigo3d;
             // TODO: Evaluar return y continue
-            c3d += "\tgoto " + l_exit + ":\n";
+            c3d += "\tgoto " + l_exit + ";\n";
         });
         resCondicion.etq_falsas.forEach(function (etiqueta) {
             c3d += etiqueta + ":\n";
@@ -3308,15 +3419,15 @@ var condIf = /** @class */ (function (_super) {
             this.condElse.forEach(function (celse) {
                 c3d += celse.traducir(arbol, nuevaTabla_1).codigo3d;
                 // TODO: Evaluar return y continue
-                c3d += "\tgoto " + l_exit + ":\n";
+                c3d += "\tgoto " + l_exit + ";\n";
             });
         }
         else if (this.condElseIf !== undefined) {
             c3d += this.condElseIf.traducir(arbol, tabla).codigo3d;
             // TODO: Evaluar return y continue
-            c3d += "\tgoto " + l_exit + ":\n";
+            c3d += "\tgoto " + l_exit + ";\n";
         }
-        c3d += "\t" + l_exit + ":\n";
+        c3d += l_exit + ":\n";
         c3d += '\t// ==========> END IF\n';
         res.codigo3d = c3d;
         res.tipo = 0;
@@ -4055,7 +4166,7 @@ var Declaracion = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Declaracion;
 
-},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":51,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46,"../TS/Tipo":47}],27:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46,"../TS/Tipo":47}],27:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4693,7 +4804,7 @@ var LlamadaFuncMetd = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = LlamadaFuncMetd;
 
-},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":51,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47,"../TS/tablaSimbolos":48,"./Declaracion":26,"./Funciones":29,"./Metodos":33,"./declaracionListas":41,"./declaracionVectores":42}],32:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47,"../TS/tablaSimbolos":48,"./Declaracion":26,"./Funciones":29,"./Metodos":33,"./declaracionListas":41,"./declaracionVectores":42}],32:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5654,7 +5765,7 @@ var declaracionListas = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = declaracionListas;
 
-},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":51,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46}],42:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46}],42:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5889,7 +6000,7 @@ var getValueByDataType = function (tipo) {
     }
 };
 
-},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":51,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46,"../TS/Tipo":47}],43:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46,"../TS/Tipo":47}],43:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -6190,7 +6301,7 @@ var Print = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Print;
 
-},{"../../shared":53,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],45:[function(require,module,exports){
+},{"../../shared":54,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],45:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -6298,7 +6409,7 @@ var Arbol = /** @class */ (function () {
 }());
 exports.default = Arbol;
 
-},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":51,"../Instrucciones/Funciones":29,"../Instrucciones/Metodos":33,"./tablaSimbolos":48}],46:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Instrucciones/Funciones":29,"../Instrucciones/Metodos":33,"./tablaSimbolos":48}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Simbolo = /** @class */ (function () {
@@ -7106,6 +7217,7 @@ const modiLista = require('./Instrucciones/asignacionLista');
 const agregarLista= require('./Instrucciones/agregarLista');
 const funcNativa= require('./Instrucciones/funcNativa');
 const casteo= require('./Instrucciones/casteo');
+const main = require('./Instrucciones/Main')
 /* generated by jison-lex 0.3.4 */
 var lexer = (function(){
 var lexer = ({
@@ -7430,7 +7542,7 @@ pushState:function pushState (condition) {
 stateStackSize:function stateStackSize() {
         return this.conditionStack.length;
     },
-options: {"case-insensitive":true},
+options: {"case-sensitive":true},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
@@ -7584,7 +7696,7 @@ case 73:console.log("error Lexico")
 break;
 }
 },
-rules: [/^(?:[ \r\t]+)/i,/^(?:\n+)/i,/^(?:\/\/.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:if\b)/i,/^(?:else\b)/i,/^(?:print\b)/i,/^(?:println\b)/i,/^(?:null\b)/i,/^(?:int\b)/i,/^(?:char\b)/i,/^(?:double\b)/i,/^(?:boolean\b)/i,/^(?:string\b)/i,/^(?:while\b)/i,/^(?:do\b)/i,/^(?:break\b)/i,/^(?:continue\b)/i,/^(?:return\b)/i,/^(?:switch\b)/i,/^(?:case\b)/i,/^(?:default\b)/i,/^(?:for\b)/i,/^(?:void\b)/i,/^(?:new\b)/i,/^(?:list\b)/i,/^(?:add\b)/i,/^(?:tolowercase\b)/i,/^(?:touppercase\b)/i,/^(?:length\b)/i,/^(?:caracterOfPosition\b)/i,/^(?:substring\b)/i,/^(?:parse\b)/i,/^(?:toint\b)/i,/^(?:todouble\b)/i,/^(?:typeof\b)/i,/^(?:\{)/i,/^(?:,)/i,/^(?:\})/i,/^(?:\|\|)/i,/^(?:&&)/i,/^(?:&)/i,/^(?:;)/i,/^(?:\()/i,/^(?:\))/i,/^(?:\[)/i,/^(?:\])/i,/^(?:\+\+)/i,/^(?:\+)/i,/^(?:--)/i,/^(?:-)/i,/^(?:\/)/i,/^(?:\*)/i,/^(?:%)/i,/^(?:==)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:=)/i,/^(?:!=)/i,/^(?:!)/i,/^(?:<)/i,/^(?:>)/i,/^(?:\^)/i,/^(?:\?)/i,/^(?::)/i,/^(?:\.)/i,/^(?:"[^\"]*")/i,/^(?:[0-9]+(\.[0-9]+)\b)/i,/^(?:[0-9]+\b)/i,/^(?:'[^\']')/i,/^(?:(true|false)\b)/i,/^(?:([a-zA-Z])[a-zA-Z0-9_]*)/i,/^(?:$)/i,/^(?:.)/i],
+rules: [/^(?:[ \r\t]+)/,/^(?:\n+)/,/^(?:\/\/.*)/,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/,/^(?:if\b)/,/^(?:else\b)/,/^(?:print\b)/,/^(?:println\b)/,/^(?:null\b)/,/^(?:int\b)/,/^(?:char\b)/,/^(?:double\b)/,/^(?:boolean\b)/,/^(?:String\b)/,/^(?:while\b)/,/^(?:do\b)/,/^(?:break\b)/,/^(?:continue\b)/,/^(?:return\b)/,/^(?:switch\b)/,/^(?:case\b)/,/^(?:default\b)/,/^(?:for\b)/,/^(?:void\b)/,/^(?:new\b)/,/^(?:list\b)/,/^(?:add\b)/,/^(?:tolowercase\b)/,/^(?:touppercase\b)/,/^(?:length\b)/,/^(?:caracterOfPosition\b)/,/^(?:substring\b)/,/^(?:parse\b)/,/^(?:toint\b)/,/^(?:todouble\b)/,/^(?:typeof\b)/,/^(?:\{)/,/^(?:,)/,/^(?:\})/,/^(?:\|\|)/,/^(?:&&)/,/^(?:&)/,/^(?:;)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:\+\+)/,/^(?:\+)/,/^(?:--)/,/^(?:-)/,/^(?:\/)/,/^(?:\*)/,/^(?:%)/,/^(?:==)/,/^(?:<=)/,/^(?:>=)/,/^(?:=)/,/^(?:!=)/,/^(?:!)/,/^(?:<)/,/^(?:>)/,/^(?:\^)/,/^(?:\?)/,/^(?::)/,/^(?:\.)/,/^(?:"[^\"]*")/,/^(?:[0-9]+(\.[0-9]+)\b)/,/^(?:[0-9]+\b)/,/^(?:'[^\']')/,/^(?:(true|false)\b)/,/^(?:([a-zA-Z])[a-zA-Z0-9_]*)/,/^(?:$)/,/^(?:.)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73],"inclusive":true}}
 });
 return lexer;
@@ -7615,7 +7727,7 @@ if (typeof module !== 'undefined' && require.main === module) {
 }
 }
 }).call(this)}).call(this,require('_process'))
-},{"./Excepciones/Errores":7,"./Excepciones/Listado_Errores":8,"./Expresiones/Aritmetica":9,"./Expresiones/Cadenas":10,"./Expresiones/Identificador":11,"./Expresiones/Logica":12,"./Expresiones/Primitivo":13,"./Expresiones/Relacional":14,"./Instrucciones/Asignacion":15,"./Instrucciones/Break":16,"./Instrucciones/Ciclicas/condDoWhile":17,"./Instrucciones/Ciclicas/condFor":18,"./Instrucciones/Ciclicas/condWhile":19,"./Instrucciones/Condicionales/condIf":20,"./Instrucciones/Condicionales/condIfTernario":21,"./Instrucciones/Condicionales/condSwitch":22,"./Instrucciones/Condicionales/condSwitchCase":23,"./Instrucciones/Condicionales/condSwitchDefault":24,"./Instrucciones/Continue":25,"./Instrucciones/Declaracion":26,"./Instrucciones/Decremento":27,"./Instrucciones/Exec":28,"./Instrucciones/Funciones":29,"./Instrucciones/Incremento":30,"./Instrucciones/LlamadaFuncMetd":31,"./Instrucciones/Metodos":33,"./Instrucciones/Return":34,"./Instrucciones/accesoLista":35,"./Instrucciones/accesoVector":36,"./Instrucciones/agregarLista":37,"./Instrucciones/asignacionLista":38,"./Instrucciones/asignacionVector":39,"./Instrucciones/casteo":40,"./Instrucciones/declaracionListas":41,"./Instrucciones/declaracionVectores":42,"./Instrucciones/funcNativa":43,"./Instrucciones/print":44,"./TS/Tipo":47,"_process":3,"fs":1,"path":2}],50:[function(require,module,exports){
+},{"./Excepciones/Errores":7,"./Excepciones/Listado_Errores":8,"./Expresiones/Aritmetica":9,"./Expresiones/Cadenas":10,"./Expresiones/Identificador":11,"./Expresiones/Logica":12,"./Expresiones/Primitivo":13,"./Expresiones/Relacional":14,"./Instrucciones/Asignacion":15,"./Instrucciones/Break":16,"./Instrucciones/Ciclicas/condDoWhile":17,"./Instrucciones/Ciclicas/condFor":18,"./Instrucciones/Ciclicas/condWhile":19,"./Instrucciones/Condicionales/condIf":20,"./Instrucciones/Condicionales/condIfTernario":21,"./Instrucciones/Condicionales/condSwitch":22,"./Instrucciones/Condicionales/condSwitchCase":23,"./Instrucciones/Condicionales/condSwitchDefault":24,"./Instrucciones/Continue":25,"./Instrucciones/Declaracion":26,"./Instrucciones/Decremento":27,"./Instrucciones/Exec":28,"./Instrucciones/Funciones":29,"./Instrucciones/Incremento":30,"./Instrucciones/LlamadaFuncMetd":31,"./Instrucciones/Main":32,"./Instrucciones/Metodos":33,"./Instrucciones/Return":34,"./Instrucciones/accesoLista":35,"./Instrucciones/accesoVector":36,"./Instrucciones/agregarLista":37,"./Instrucciones/asignacionLista":38,"./Instrucciones/asignacionVector":39,"./Instrucciones/casteo":40,"./Instrucciones/declaracionListas":41,"./Instrucciones/declaracionVectores":42,"./Instrucciones/funcNativa":43,"./Instrucciones/print":44,"./TS/Tipo":47,"_process":3,"fs":1,"path":2}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function obtenerValor(valor) {
@@ -7641,6 +7753,41 @@ function obtenerValor(valor) {
 exports.default = obtenerValor;
 
 },{}],51:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var child_process_1 = require("child_process");
+var fs = require('fs');
+var cuerpo = '';
+var contador = 0;
+function graficarArbol(arbolitos) {
+    contador = 1;
+    cuerpo = '';
+    graphAST('n0', arbolitos);
+    var principal = "digraph arbolAST{ \n      n0[label=\"" + arbolitos.getValor().replace('"', '\\"') + "\"];\n      " + cuerpo + "\n    }";
+    fs.writeFile('arbolAST.dot', principal, function () { });
+    child_process_1.exec('dot -Tsvg arbolAST.dot -o ../Frontend/Typesty/src/assets/arbolAST.svg', function (error, stdout, stderr) {
+        if (error) {
+            return;
+        }
+        if (stderr) {
+            return;
+        }
+    });
+}
+exports.default = graficarArbol;
+function graphAST(texto, padre) {
+    for (var _i = 0, _a = padre.getHijos(); _i < _a.length; _i++) {
+        var hijo = _a[_i];
+        var nombreHijo = "n" + contador;
+        cuerpo += nombreHijo + "[label=\"" + hijo
+            .getValor()
+            .replace('"', '\\"') + "\"];\n      " + texto + " -> " + nombreHijo + ";";
+        contador++;
+        graphAST(nombreHijo, hijo);
+    }
+}
+
+},{"child_process":1,"fs":1}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reporteTabla = void 0;
@@ -7691,7 +7838,7 @@ var reporteTabla = /** @class */ (function () {
 }());
 exports.reporteTabla = reporteTabla;
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -7713,6 +7860,8 @@ var agregarLista_1 = __importDefault(require("./Analizador/Instrucciones/agregar
 var Main_1 = __importDefault(require("./Analizador/Instrucciones/Main"));
 var Codigo3d_1 = require("./Analizador/Abstracto/Codigo3d");
 var print_1 = __importDefault(require("./Analizador/Instrucciones/print"));
+var Listado_Errores_1 = require("./Analizador/Excepciones/Listado_Errores");
+var listaErrores = new Listado_Errores_1.Listado_Errores();
 var file = document.querySelector('#file');
 var open_file = document.querySelector('#open_file');
 var clear_file = document.querySelector('#clear_file');
@@ -7753,12 +7902,8 @@ analize === null || analize === void 0 ? void 0 : analize.addEventListener('clic
     sourceEditor.save();
     var source = my_source.value;
     var ast = analize_source(source);
-    ast.geterrores().forEach(function (error) {
-        var str_error = error.getTipoError + " en [" + error.getFila + "," + error.getcolumna + "]: " + error.getDesc;
-        console.error(str_error);
-        shared_1.setValueConsole(str_error);
-    });
-    console.log(ast);
+    listaErrores.ast = ast;
+    listaErrores.interpretar();
 });
 compile === null || compile === void 0 ? void 0 : compile.addEventListener('click', function () {
     shared_1.clearValueResult();
@@ -7768,7 +7913,9 @@ compile === null || compile === void 0 ? void 0 : compile.addEventListener('clic
     var source = my_source.value;
     // TODO: Pasar traductor a clase
     var ast = analize_source(source);
-    traducir(ast);
+    listaErrores.ast = ast;
+    listaErrores.traducir();
+    // traducir(ast);
 });
 reports === null || reports === void 0 ? void 0 : reports.addEventListener('click', function () {
     hideSubmenu('.submenu', 1);
@@ -7905,7 +8052,7 @@ var escribirImprimir = function (imprimir, ast, tabla) {
     shared_1.setValueResult(c3d);
 };
 
-},{"./Analizador/Abstracto/Codigo3d":4,"./Analizador/Instrucciones/Declaracion":26,"./Analizador/Instrucciones/Exec":28,"./Analizador/Instrucciones/Funciones":29,"./Analizador/Instrucciones/Main":32,"./Analizador/Instrucciones/Metodos":33,"./Analizador/Instrucciones/agregarLista":37,"./Analizador/Instrucciones/asignacionLista":38,"./Analizador/Instrucciones/asignacionVector":39,"./Analizador/Instrucciones/declaracionListas":41,"./Analizador/Instrucciones/declaracionVectores":42,"./Analizador/Instrucciones/print":44,"./Analizador/TS/Arbol":45,"./Analizador/TS/tablaSimbolos":48,"./Analizador/analizador":49,"./shared":53}],53:[function(require,module,exports){
+},{"./Analizador/Abstracto/Codigo3d":4,"./Analizador/Excepciones/Listado_Errores":8,"./Analizador/Instrucciones/Declaracion":26,"./Analizador/Instrucciones/Exec":28,"./Analizador/Instrucciones/Funciones":29,"./Analizador/Instrucciones/Main":32,"./Analizador/Instrucciones/Metodos":33,"./Analizador/Instrucciones/agregarLista":37,"./Analizador/Instrucciones/asignacionLista":38,"./Analizador/Instrucciones/asignacionVector":39,"./Analizador/Instrucciones/declaracionListas":41,"./Analizador/Instrucciones/declaracionVectores":42,"./Analizador/Instrucciones/print":44,"./Analizador/TS/Arbol":45,"./Analizador/TS/tablaSimbolos":48,"./Analizador/analizador":49,"./shared":54}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setValueConsole = exports.addHeaderResult = exports.clearValueResult = exports.setValueResult = void 0;
@@ -7941,5 +8088,5 @@ var setValueConsole = function (texto) {
 };
 exports.setValueConsole = setValueConsole;
 
-},{"./Analizador/Abstracto/Codigo3d":4}]},{},[52])(52)
+},{"./Analizador/Abstracto/Codigo3d":4}]},{},[53])(53)
 });
