@@ -199,9 +199,11 @@ export default class declaracionVectores extends Instruccion {
 				if (resValor.tipo !== -1) valores.push(resValor);
 			});
 
-			let posRelativa = tabla.setVariable3d(
-				new Simbolo(this.tipo, this.identificador)
-			);
+			let simbolo = new Simbolo(this.tipo, this.identificador);
+			simbolo.length = this.listaValores?.length
+				? this.listaValores.length
+				: 20;
+			let posRelativa = tabla.setVariable3d(simbolo);
 			if (posRelativa < 0) return res;
 
 			let contador = this.listaValores?.length;

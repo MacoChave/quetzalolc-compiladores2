@@ -6,6 +6,7 @@ export default class Simbolo {
 	private valor: any; //este es el valor que va a recibir
 	private _posRelativa: number;
 	private _posAbsoluta: number;
+	private _length: number;
 
 	constructor(tipo: Tipo, identificador: String, valor?: any) {
 		this.tipo = tipo;
@@ -13,6 +14,7 @@ export default class Simbolo {
 		this.valor = valor;
 		this._posRelativa = 0;
 		this._posAbsoluta = 0;
+		this._length = 0;
 	}
 	//getters y setters
 	public gettipo(): Tipo {
@@ -44,5 +46,11 @@ export default class Simbolo {
 	}
 	public set posAbsoluta(value: number) {
 		this._posAbsoluta = value;
+	}
+	public get length(): number {
+		return this._length;
+	}
+	public set length(value: number) {
+		this._length = value;
 	}
 }

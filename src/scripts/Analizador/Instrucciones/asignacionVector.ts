@@ -1,4 +1,4 @@
-import { Codigo3d } from '../Abstracto/Codigo3d';
+import { Codigo3d, new_temporal } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -84,6 +84,28 @@ export default class asignacionVector extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
-		throw new Error('Method not implemented.');
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: '',
+			tipo: -1,
+		};
+
+		let variable = tabla.getVariable(this.identificador);
+		if (variable === null) return res;
+
+		let index = this.posicion.traducir(arbol, tabla);
+		if (index.tipo === -1) return res;
+
+		let c3d: string = '';
+		let temp: string = new_temporal();
+
+		c3d += `${index.codigo3d}`;
+		c3d += `${temp} = ${index.temporal};\n`;
+
+		return res;
 	}
 }

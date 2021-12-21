@@ -59,6 +59,9 @@ export default class Primitivo extends Instruccion {
 		} else if (this.tipoDato.getTipo() === tipoDato.CARACTER) {
 			res.temporal = `${this.valor}`;
 		} else if (this.tipoDato.getTipo() === tipoDato.CADENA) {
+			/* *********************
+			 * VALIDAR SI VIENE $
+			 ************************/
 			if (this.valor.includes('$')) {
 				this.concatStringWithId(arbol, tabla);
 			}
@@ -186,5 +189,31 @@ export default class Primitivo extends Instruccion {
 		// CONCATENAR STRING
 		// let temp = new_temporal();
 		// c3d += `\t${temp} = H;\n`;
+	}
+
+	concatStringWithIdFromInterprete(arbol: Arbol, tabla: tablaSimbolos) {
+		let res = '';
+		let valorSplitted = this.valor.split('$');
+		let str = valorSplitted[0];
+		res += str;
+		for (let index = 1; index < valorSplitted.length; index++) {
+			const element = valorSplitted[index];
+			if (element.includes(' ')) {
+				let i = element.indexOf(' ');
+				let id = new Identificador(
+					element.slice(0, i),
+					this.fila,
+					this.columna
+				);
+				let result = id.interpretar(arbol, tabla);
+				res += String(result);
+			} else {
+				let id = new Identificador(element, this.fila, this.columna);
+				let result = id.traducir(arbol, tabla);
+
+				res += String(result);
+			}
+		}
+		return res;
 	}
 }
