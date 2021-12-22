@@ -1,4 +1,4 @@
-import { Codigo3d, new_temporal } from '../Abstracto/Codigo3d';
+import { Codigo3d, new_etiqueta, new_temporal } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -100,12 +100,51 @@ export default class asignacionVector extends Instruccion {
 		let index = this.posicion.traducir(arbol, tabla);
 		if (index.tipo === -1) return res;
 
-		let c3d: string = '';
-		let temp: string = new_temporal();
+		let valor = this.expresion.traducir(arbol, tabla);
+		if (variable.gettipo().getTipo() !== valor.tipo) return res;
 
-		c3d += `${index.codigo3d}`;
-		c3d += `${temp} = ${index.temporal};\n`;
+		let c3d = '\t // ==========> ASIGNACION VECTOR\n';
+		c3d += `${index.codigo3d}${valor.codigo3d}`;
 
+		let t_size: string = new_temporal();
+		let t_pivote: string = new_temporal();
+		let l_exit: string = new_etiqueta();
+
+		c3d += `\t${t_pivote} = stack[(int) ${variable.posAbsoluta}];\n`;
+		c3d += `\t${t_size} = heap[(int) ${t_pivote}];\n`;
+		c3d += `\tif (${index.temporal} > ${t_size}) goto ${l_exit};\n`;
+		c3d += `\t${t_pivote} = ${t_pivote} + 1;\n`;
+
+		if (valor.tipo === tipoDato.CADENA) {
+			let label: string = new_etiqueta();
+			let t_char: string = new_temporal();
+			let t_index: string = new_temporal();
+
+			c3d += `\t${t_index} = H;\n`;
+			c3d += `${label}:\n`;
+			c3d += `\t${t_char} = heap[(int) ${valor.temporal}];\n`;
+			c3d += `\theap[(int) H] = ${t_char};\n`;
+			c3d += `\tH = H + 1;\n`;
+			c3d += `\t${valor.temporal} = ${valor.temporal} + 1;\n`;
+			c3d += `\t${t_char} = heap[(int) ${valor.temporal}];\n`;
+			c3d += `\tif (${t_char} != -1) goto ${label};\n`;
+			c3d += `\theap[(int) H] = -1;\n`;
+			c3d += `\tH = H + 1;\n`;
+			c3d += `\t${t_pivote} = ${t_pivote} + ${index.temporal};\n`;
+			c3d += `\theap[(int) ${t_pivote}] = ${t_index};\n`;
+		} else {
+			let t_char: string = new_temporal();
+			let t_index: string = new_temporal();
+			c3d += `\t${t_char} = ${valor.temporal};\n`;
+			c3d += `\t${t_pivote} = ${t_pivote} + ${index.temporal};\n`;
+			c3d += `\t${t_index} = heap[(int) ${t_pivote}];\n`;
+			c3d += `\theap[(int) ${t_index}] = ${t_char};\n`;
+		}
+
+		c3d += `${l_exit}:\n`;
+		c3d += '\t // ==========> END ASIGNACION VECTOR\n';
+
+		res.codigo3d = c3d;
 		return res;
 	}
 }

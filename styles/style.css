@@ -1,7 +1,9 @@
 :root {
 	--primary: #448aff;
 	--primary-400: #69a1ff;
+	--accent-700: #3d8c40;
 	--accent: #4caf50;
+	--accent-400: #70bf73;
 	--neutro-dark: #000000;
 	--neutro-light: #ffffff;
 	--input-background: #d8d8d8;
@@ -104,4 +106,24 @@
 
 .title {
 	font-family: 'Rubik', sans-serif;
+}
+
+#copy_c3d {
+	background: var(--accent);
+	border: var(--input-border);
+	color: var(--neutro-light);
+	cursor: pointer;
+	padding: 0.5em 1.5em;
+}
+
+#copy_c3d:hover {
+	background: var(--accent-400);
+	border: var(--input-border);
+	color: var(--neutro-light);
+}
+
+#copy_c3d:active {
+	background: var(--accent-700);
+	border: var(--input-border);
+	color: var(--neutro-light);
 }

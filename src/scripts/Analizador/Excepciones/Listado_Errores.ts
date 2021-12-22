@@ -198,7 +198,8 @@ export class Listado_Errores {
 			return;
 		}
 		result += instrucciones[0].traducir(this._ast, this.tabla).codigo3d;
-		result += '}';
+		result += '\treturn;\n';
+		result += '}\n';
 		setValueResult(result);
 	}
 

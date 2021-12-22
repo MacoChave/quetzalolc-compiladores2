@@ -1,4 +1,4 @@
-import { Codigo3d } from '../Abstracto/Codigo3d';
+import { Codigo3d, new_etiqueta, new_temporal } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -47,6 +47,46 @@ export default class accesoVector extends Instruccion {
 	}
 
 	traducir(arbol: Arbol, tabla: tablaSimbolos): Codigo3d {
-		throw new Error('Method not implemented.');
+		let res: Codigo3d = {
+			codigo3d: '',
+			etq_falsas: [],
+			etq_salida: [],
+			etq_verdaderas: [],
+			pos: 0,
+			temporal: '',
+			tipo: -1,
+		};
+		let index = this.expresion.traducir(arbol, tabla);
+		if (index.tipo !== tipoDato.ENTERO) return res;
+
+		let variable = tabla.getVariable(this.identificador);
+		if (variable === null) return res;
+
+		let c3d = '\t// ==========> ACCESO VECTOR\n';
+		c3d += `${index.codigo3d}`;
+		let t_pivote = new_temporal();
+		let t_size = new_temporal();
+		let t_ptr = new_temporal();
+		let l_exit = new_etiqueta();
+
+		c3d += `\t${t_pivote} = stack[(int) ${variable.posAbsoluta}];\n`;
+		c3d += `\t${t_size} = heap[(int) ${t_pivote}];\n`;
+		c3d += `\tif (${index.temporal} > ${t_size}) goto ${l_exit};\n`;
+		c3d += `\t${t_pivote} = ${t_pivote} + 1;\n`;
+		c3d += `\t${t_pivote} = ${t_pivote} + ${index.temporal};\n`;
+		c3d += `\t${t_ptr} = heap[(int) ${t_pivote}];\n`;
+		if (variable.gettipo().getTipo() !== tipoDato.CADENA) {
+			let t_valor = new_temporal();
+			c3d += `\t${t_valor} = heap[(int) ${t_ptr}];\n`;
+			res.temporal = t_valor;
+		} else {
+			res.temporal = t_ptr;
+		}
+		c3d += `${l_exit}:\n`;
+		c3d += '\t// ==========> END ACCESO VECTOR';
+
+		res.codigo3d = c3d;
+		res.tipo = variable.gettipo().getTipo();
+		return res;
 	}
 }

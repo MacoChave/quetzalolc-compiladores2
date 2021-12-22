@@ -194,67 +194,69 @@ export default class declaracionVectores extends Instruccion {
 		if (this.tipoDeclaracion) return res;
 		else {
 			let valores: Codigo3d[] = [];
+			// Traducir valores
 			this.listaValores?.forEach((valor) => {
 				let resValor = valor.traducir(arbol, tabla);
 				if (resValor.tipo !== -1) valores.push(resValor);
 			});
 
+			// TODO: Guardar en stack al final
+			// Guardar en stack
 			let simbolo = new Simbolo(this.tipo, this.identificador);
 			simbolo.length = this.listaValores?.length
 				? this.listaValores.length
-				: 20;
-			let posRelativa = tabla.setVariable3d(simbolo);
-			if (posRelativa < 0) return res;
+				: 0;
+			let posAbsoluta = tabla.setVariable3d(simbolo);
+			if (posAbsoluta < 0) return res;
 
-			let contador = this.listaValores?.length;
-			contador = contador === 0 ? 20 : contador;
-			let size = getSizeByDataType(this.tipo.getTipo());
-			let defaultValue = getValueByDataType(this.tipo.getTipo());
+			// Obtener tamaño y valores por defecto
+			let arrLenght = this.listaValores?.length
+				? this.listaValores?.length
+				: 10;
+			let defaultValueItem = getDefaultValueByDataType(
+				this.tipo.getTipo()
+			);
 
+			// Agregar c3d de valores
 			valores.forEach((valor) => {
 				c3d += `${valor.codigo3d}\n`;
 			});
-			if (valores.length > 0) {
-				if (this.tipo.getTipo() === tipoDato.CADENA) {
-					// c3d += `\t${valores[0].temporal} = H;\n`;
-					c3d += `\tstack[(int) ${posRelativa}] = ${valores[0].temporal};\n`;
-				} else {
-					let temp = new_temporal();
-					c3d += `\t${temp} = H;\n`;
-					valores.forEach((valor) => {
-						c3d += `\theap[(int) H] = ${valor.temporal};\n`;
-						c3d += `\tH = H + 1;\n`;
-					});
-					c3d += `\tstack[(int) ${posRelativa}] = ${temp};\n`;
-				}
-			} else {
-				let temp = new_temporal();
-				let t_cont = new_temporal();
-				let t_size = new_temporal();
-				let t_sizeaux = new_temporal();
-				let label1 = new_etiqueta();
-				let label2 = new_etiqueta();
-				let label3 = new_etiqueta();
-				let label4 = new_etiqueta();
 
-				c3d += `\t${temp} = H;\n`;
-				c3d += `\t${t_cont} = ${contador};\n`;
-				c3d += `\t${t_size} = ${size};\n`;
-				c3d += `${label1}:\n`;
-				c3d += `\t${t_sizeaux} = ${t_size};\n`;
-				c3d += `${label2}:\n`;
-				c3d += `\theap[(int) H] = ${defaultValue};\n`;
-				c3d += `\tH = H + 1;\n`;
-				c3d += `\t${t_sizeaux} = ${t_sizeaux} - 1;\n`;
-				c3d += `\tif (${t_sizeaux} >= 0) goto ${label2};\n`;
-				c3d += `\tgoto ${label3};\n`;
-				c3d += `${label3}:\n`;
-				c3d += `\t${t_cont} = ${t_cont} - 1;\n`;
-				c3d += `\tif (${t_cont} >= 0) goto ${label1};\n`;
-				c3d += `\tgoto ${label4};\n`;
-				c3d += `${label4}:\n`;
-				c3d += `\tstack[(int) ${posRelativa}] = ${temp};\n`;
-			}
+			let t_pivote: string = new_temporal(); // Pivote de arreglo
+			let t_item: string = new_temporal(); // Pivote de items
+			c3d += `\t${t_pivote} = H;\n`;
+			c3d += `\theap[(int) H] = ${arrLenght};\n`;
+			c3d += `\tH = H + ${arrLenght + 1};\n`;
+			c3d += `\t${t_item} = ${t_pivote} + 1;\n`;
+			valores.forEach((valor) => {
+				if (this.tipo.getTipo() === tipoDato.CADENA) {
+					let label: string = new_etiqueta();
+					let t_index: string = new_temporal();
+					let t_char: string = new_temporal();
+					c3d += `\t${t_index} = H;\n`;
+					c3d += `${label}:\n`;
+					c3d += `\t${t_char} = heap[(int) ${valor.temporal}];\n`;
+					c3d += `\theap[(int) H] = ${t_char};\n`;
+					c3d += `\tH = H + 1;\n`;
+					c3d += `\t${valor.temporal} = ${valor.temporal} + 1;\n`;
+					c3d += `\t${t_char} = heap[(int) ${valor.temporal}];\n`;
+					c3d += `\tif (${t_char} != -1) goto ${label};\n`;
+					c3d += `\theap[(int) H] = -1;\n`;
+					c3d += `\tH = H + 1;\n`;
+					c3d += `\theap[(int) ${t_item}] = ${t_index};\n`;
+					c3d += `\t${t_item} = ${t_item} + 1;\n`;
+				} else {
+					let t_index: string = new_temporal();
+					let t_char: string = new_temporal();
+					c3d += `\t${t_index} = H;\n`;
+					c3d += `\t${t_char} = ${valor.temporal};\n`;
+					c3d += `\theap[(int) H] = ${t_char};\n`;
+					c3d += `\tH = H + 1;\n`;
+					c3d += `\theap[(int) ${t_item}] = ${t_index};\n`;
+					c3d += `\t${t_item} = ${t_item} + 1;\n`;
+				}
+			});
+			c3d += `\tstack[(int) ${posAbsoluta}] = ${t_pivote};\n`;
 		}
 
 		c3d += '\t// ==========> END DECLARACION VECTOR\n';
@@ -263,26 +265,7 @@ export default class declaracionVectores extends Instruccion {
 	}
 }
 
-const getSizeByDataType = (tipo: tipoDato): number => {
-	switch (tipo) {
-		case tipoDato.BOOLEANO:
-			return 1;
-		case tipoDato.CADENA:
-			return 1;
-		case tipoDato.CARACTER:
-			return 20;
-		case tipoDato.CARACTER:
-			return 1;
-		case tipoDato.DECIMAL:
-			return 1;
-		case tipoDato.ENTERO:
-			return 1;
-		default:
-			return 1;
-	}
-};
-
-const getValueByDataType = (tipo: tipoDato): string => {
+const getDefaultValueByDataType = (tipo: tipoDato): string => {
 	switch (tipo) {
 		case tipoDato.BOOLEANO:
 			return '0';
@@ -295,6 +278,6 @@ const getValueByDataType = (tipo: tipoDato): string => {
 		case tipoDato.ENTERO:
 			return '0';
 		default:
-			return '0';
+			return '0.0';
 	}
 };
