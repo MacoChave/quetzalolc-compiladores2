@@ -38,7 +38,7 @@ const modiLista = require('./Instrucciones/asignacionLista');
 const agregarLista= require('./Instrucciones/agregarLista');
 const funcNativa= require('./Instrucciones/funcNativa');
 const casteo= require('./Instrucciones/casteo');
-const main = require('./Instrucciones/Main')
+const mainP = require('./Instrucciones/Main')
 %}
 //definicion lexica
 %lex 
@@ -67,7 +67,7 @@ const main = require('./Instrucciones/Main')
 "break"         return 'RESBREAK';
 "continue"      return 'RESCONTINUE';
 "return"        return 'RESRETURN';
-// "main"          return 'RESMAIN';
+"main"          return 'RESMAIN';
 "switch"        return 'RESSWITCH';
 "case"          return 'RESCASE';
 "default"       return 'RESDEFAULT';
@@ -243,13 +243,13 @@ INSTRUCCION:
     |CONDINCREMENTO  PTCOMA             {$$=$1;}
     |CONDECREMENTO PTCOMA               {$$=$1;}
     |CONDFOR                            {$$=$1;}
+    |FUNCMAIN PTCOMA                    {$$=$1;}
     |METODOS                            {$$=$1;}
     |LLAMADA  PTCOMA                    {$$=$1;}
     |EJECUTAR PTCOMA                    {$$=$1;}
     |FUNCIONES                          {$$=$1;}
     |VECTORES PTCOMA                    {$$=$1;}
     |ASIGVECTORES PTCOMA                {$$=$1;}
-    // |FUNCMAIN PTCOMA                    {$$=$1;}
         |error PTCOMA                   {
                                             // inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));
                                             console.log(`Error sintactico, se esperaba un token en esta linea ${@1.first_line}, ${@1.first_column}`);
@@ -273,7 +273,7 @@ IMPRIMIR_ARGS
     ;
 
 DECLARACION:
-    TIPODATO IDENTIFICADOR        {$$= new declaracion.default($1,@1.first_line,@1.first_column,$2);}
+    TIPODATO PARLLAMADA        {$$= new declaracion.default($1,@1.first_line,@1.first_column,$2);}
     |TIPODATO IDENTIFICADOR IGUAL EXPRESION   {$$= new declaracion.default($1,@1.first_line,@1.first_column,$2,$4);}
     ;
 TIPODATO:
@@ -442,6 +442,6 @@ BLOQUEINSTRUCCION:
     |LLAVEABRE LLAVECIERRA              {$$=[];}
     ;
 
-// FUNCMAIN:
-//     RESVOID RESMAIN PARABRE PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=new main.default($1,@1.first_line,@1.first_column,$6);}
-//     ;
+FUNCMAIN:
+     RESVOID RESMAIN PARABRE PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=new mainP.default($1,@1.first_line,@1.first_column,$6);}
+     ;

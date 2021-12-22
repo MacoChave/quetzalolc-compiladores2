@@ -10,13 +10,13 @@ import obtenerValor from '../../Reportes/cambiarTipo';
 import { Codigo3d, new_stackPos } from '../Abstracto/Codigo3d';
 export default class Declaracion extends Instruccion {
 	private tipo: Tipo;
-	private identificador: string;
+	private identificador: string[];
 	private valor: Instruccion | undefined;
 	constructor(
 		tipo: Tipo,
 		fila: number,
 		columna: number,
-		id: string,
+		id: string[],
 		valor?: Instruccion
 	) {
 		super(tipo, fila, columna);
@@ -27,7 +27,9 @@ export default class Declaracion extends Instruccion {
 	public getNodo(): nodoAST {
 		let nodo = new nodoAST('DECLARACION');
 		nodo.agregarHijo(obtenerValor(this.tipo.getTipo()) + '');
-		nodo.agregarHijo(this.identificador);
+		for(let ids = 0; ids < this.identificador.length; ids++){
+			nodo.agregarHijo(this.identificador[ids]);
+		}
 		if (this.valor != undefined) {
 			nodo.agregarHijo('=');
 			nodo.agregarHijoAST(this.valor.getNodo());
@@ -39,15 +41,16 @@ export default class Declaracion extends Instruccion {
 		if (this.valor === undefined) {
 			switch (this.tipo.getTipo()) {
 				case tipoDato.ENTERO:
+					for(let ids = 0; ids < this.identificador.length; ids++){
 					if (
 						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador, 0)
+							new Simbolo(this.tipo, this.identificador[ids], 0)
 						) == 'La variable existe actualmente'
 					) {
 						return new Errores(
 							'SEMANTICO',
 							'LA VARIABLE ' +
-								this.identificador +
+								this.identificador[ids] +
 								' EXISTE ACTUALMENTE',
 							this.fila,
 							this.columna
@@ -55,7 +58,7 @@ export default class Declaracion extends Instruccion {
 					} else {
 						if (
 							!arbol.actualizarTabla(
-								this.identificador,
+								this.identificador[ids],
 								'0',
 								this.fila.toString(),
 								tabla.getNombre().toString(),
@@ -63,7 +66,7 @@ export default class Declaracion extends Instruccion {
 							)
 						) {
 							let nuevoSimbolo = new reporteTabla(
-								this.identificador,
+								this.identificador[ids],
 								'0',
 								'Variable',
 								obtenerValor(this.tipo.getTipo()) + '',
@@ -73,18 +76,20 @@ export default class Declaracion extends Instruccion {
 							);
 							arbol.listaSimbolos.push(nuevoSimbolo);
 						}
+					}
 					}
 					break;
 				case tipoDato.DECIMAL:
+					for(let ids = 0; ids < this.identificador.length; ids++){
 					if (
 						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador, 0.0)
+							new Simbolo(this.tipo, this.identificador[ids], 0.0)
 						) == 'La variable existe actualmente'
 					) {
 						return new Errores(
 							'SEMANTICO',
 							'LA VARIABLE ' +
-								this.identificador +
+								this.identificador[ids] +
 								' EXISTE ACTUALMENTE',
 							this.fila,
 							this.columna
@@ -92,7 +97,7 @@ export default class Declaracion extends Instruccion {
 					} else {
 						if (
 							!arbol.actualizarTabla(
-								this.identificador,
+								this.identificador[ids],
 								'0.0',
 								this.fila.toString(),
 								tabla.getNombre().toString(),
@@ -100,7 +105,7 @@ export default class Declaracion extends Instruccion {
 							)
 						) {
 							let nuevoSimbolo = new reporteTabla(
-								this.identificador,
+								this.identificador[ids],
 								'0.0',
 								'Variable',
 								obtenerValor(this.tipo.getTipo()) + '',
@@ -111,17 +116,19 @@ export default class Declaracion extends Instruccion {
 							arbol.listaSimbolos.push(nuevoSimbolo);
 						}
 					}
+				}
 					break;
 				case tipoDato.CARACTER:
+					for(let ids = 0; ids < this.identificador.length; ids++){
 					if (
 						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador, '\u0000')
+							new Simbolo(this.tipo, this.identificador[ids], '\u0000')
 						) == 'La variable existe actualmente'
 					) {
 						return new Errores(
 							'SEMANTICO',
 							'LA VARIABLE ' +
-								this.identificador +
+								this.identificador[ids] +
 								' EXISTE ACTUALMENTE',
 							this.fila,
 							this.columna
@@ -129,7 +136,7 @@ export default class Declaracion extends Instruccion {
 					} else {
 						if (
 							!arbol.actualizarTabla(
-								this.identificador,
+								this.identificador[ids],
 								'\u0000',
 								this.fila.toString(),
 								tabla.getNombre().toString(),
@@ -137,7 +144,7 @@ export default class Declaracion extends Instruccion {
 							)
 						) {
 							let nuevoSimbolo = new reporteTabla(
-								this.identificador,
+								this.identificador[ids],
 								'\u0000',
 								'Variable',
 								obtenerValor(this.tipo.getTipo()) + '',
@@ -148,17 +155,19 @@ export default class Declaracion extends Instruccion {
 							arbol.listaSimbolos.push(nuevoSimbolo);
 						}
 					}
+				}
 					break;
 				case tipoDato.CADENA:
+					for(let ids = 0; ids < this.identificador.length; ids++){
 					if (
 						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador, '')
+							new Simbolo(this.tipo, this.identificador[ids], '')
 						) == 'La variable existe actualmente'
 					) {
 						return new Errores(
 							'SEMANTICO',
 							'LA VARIABLE ' +
-								this.identificador +
+								this.identificador[ids] +
 								' EXISTE ACTUALMENTE',
 							this.fila,
 							this.columna
@@ -166,7 +175,7 @@ export default class Declaracion extends Instruccion {
 					} else {
 						if (
 							!arbol.actualizarTabla(
-								this.identificador,
+								this.identificador[ids],
 								'',
 								this.fila.toString(),
 								tabla.getNombre().toString(),
@@ -174,7 +183,7 @@ export default class Declaracion extends Instruccion {
 							)
 						) {
 							let nuevoSimbolo = new reporteTabla(
-								this.identificador,
+								this.identificador[ids],
 								'',
 								'Variable',
 								obtenerValor(this.tipo.getTipo()) + '',
@@ -185,11 +194,13 @@ export default class Declaracion extends Instruccion {
 							arbol.listaSimbolos.push(nuevoSimbolo);
 						}
 					}
+				}
 					break;
 				case tipoDato.BOOLEANO:
+					for(let ids = 0; ids < this.identificador.length; ids++){
 					if (
 						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador, true)
+							new Simbolo(this.tipo, this.identificador[ids], true)
 						) == 'La variable existe actualmente'
 					) {
 						return new Errores(
@@ -203,7 +214,7 @@ export default class Declaracion extends Instruccion {
 					} else {
 						if (
 							!arbol.actualizarTabla(
-								this.identificador,
+								this.identificador[ids],
 								'true',
 								this.fila.toString(),
 								tabla.getNombre().toString(),
@@ -211,7 +222,7 @@ export default class Declaracion extends Instruccion {
 							)
 						) {
 							let nuevoSimbolo = new reporteTabla(
-								this.identificador,
+								this.identificador[ids],
 								'true',
 								'Variable',
 								obtenerValor(this.tipo.getTipo()) + '',
@@ -222,6 +233,7 @@ export default class Declaracion extends Instruccion {
 							arbol.listaSimbolos.push(nuevoSimbolo);
 						}
 					}
+				}
 					break;
 			}
 		} else {
@@ -234,15 +246,16 @@ export default class Declaracion extends Instruccion {
 					this.columna
 				);
 			} else {
+				for(let ids = 0; ids < this.identificador.length; ids++){
 				if (
 					tabla.setVariable(
-						new Simbolo(this.tipo, this.identificador, val)
+						new Simbolo(this.tipo, this.identificador[ids], val)
 					) == 'La variable existe actualmente'
 				) {
 					return new Errores(
 						'SEMANTICO',
 						'LA VARIABLE ' +
-							this.identificador +
+							this.identificador[ids] +
 							' EXISTE ACTUALMENTE',
 						this.fila,
 						this.columna
@@ -250,7 +263,7 @@ export default class Declaracion extends Instruccion {
 				} else {
 					if (
 						!arbol.actualizarTabla(
-							this.identificador,
+							this.identificador[ids],
 							val,
 							this.fila.toString(),
 							tabla.getNombre().toString(),
@@ -258,7 +271,7 @@ export default class Declaracion extends Instruccion {
 						)
 					) {
 						let nuevoSimbolo = new reporteTabla(
-							this.identificador,
+							this.identificador[ids],
 							val,
 							'Variable',
 							obtenerValor(this.tipo.getTipo()) + '',
@@ -269,6 +282,7 @@ export default class Declaracion extends Instruccion {
 						arbol.listaSimbolos.push(nuevoSimbolo);
 					}
 				}
+			}
 			}
 		}
 	}
@@ -286,10 +300,11 @@ export default class Declaracion extends Instruccion {
 		let c3d: string = '\t// ==========> DECLARACION\n';
 		if (this.valor === undefined) {
 			// SIN INICIALIZAR
+			for(let ids = 0; ids < this.identificador.length; ids++){
 			if (this.tipo.getTipo() === tipoDato.ENTERO) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.ENTERO),
-					this.identificador
+					this.identificador[ids]
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -298,7 +313,7 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.DECIMAL) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.DECIMAL),
-					this.identificador
+					this.identificador[ids]
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -307,7 +322,7 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.CARACTER) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.CARACTER),
-					this.identificador
+					this.identificador[ids]
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -316,7 +331,7 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.CADENA) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.CADENA),
-					this.identificador
+					this.identificador[ids]
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -325,13 +340,14 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.BOOLEANO) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.BOOLEANO),
-					this.identificador
+					this.identificador[ids]
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
 
 				c3d = `\tstack[(int) ${posRelativa}] = 0;\n`;
 			}
+		}
 		} else {
 			// INICIALIZADO
 			let valor: Codigo3d = this.valor.traducir(arbol, tabla);
@@ -340,7 +356,7 @@ export default class Declaracion extends Instruccion {
 			c3d += `${valor.codigo3d}\n`;
 			let simbolo = new Simbolo(
 				new Tipo(valor.tipo),
-				this.identificador,
+				this.identificador[0],
 				''
 			);
 			let posRelativa = tabla.setVariable3d(simbolo);

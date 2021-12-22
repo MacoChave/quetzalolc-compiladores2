@@ -21,14 +21,19 @@ export default class Main extends Instruccion {
 	}
 	public getNodo(): nodoAST {
 		let nodo = new nodoAST('MAIN');
-		nodo.agregarHijo(obtenerValor(this.tipoDato.getTipo()) + '');
+		let instrucciones = new nodoAST('INSTRUCCIONES');
+		this.instrucciones.forEach((element) => {
+			nodo.agregarHijoAST(element.getNodo());
+		});
+		nodo.agregarHijoAST(instrucciones);
+		/*nodo.agregarHijo(obtenerValor(this.tipoDato.getTipo()) + '');
 		nodo.agregarHijo('(');
 		nodo.agregarHijo(')');
 		nodo.agregarHijo('{');
 		this.instrucciones.forEach((element) => {
 			nodo.agregarHijoAST(element.getNodo());
 		});
-		nodo.agregarHijo('}');
+		nodo.agregarHijo('}');*/
 		return nodo;
 	}
 	public interpretar(arbol: Arbol, tabla: tablaSimbolos) {
