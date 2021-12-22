@@ -7,6 +7,7 @@ export default class tablaSimbolos {
 	private tipoDato: Tipo;
 	private tablaActual: Map<String, Simbolo>;
 	private nombreDato: String;
+	private entorno: String = "";
 	constructor(anterior?: tablaSimbolos) {
 		this.tablaAnterior = anterior;
 		this.tablaActual = new Map<String, Simbolo>();

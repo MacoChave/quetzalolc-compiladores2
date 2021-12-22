@@ -35,6 +35,9 @@ export default class Primitivo extends Instruccion {
 		if (this.tipoDato.getTipo() == tipoDato.NULO) {
 			return null;
 		}
+		if(this.tipoDato.getTipo() == tipoDato.CADENA && this.valor.includes('$')) {
+			return this.concatStringWithIdFromInterprete(arbol,tabla);
+		}
 		return this.valor;
 	}
 

@@ -14,7 +14,7 @@ export default function graficarArbol(arbolitos: nodoAST) {
     }`;
 	fs.writeFile('arbolAST.dot', principal, () => {});
 	exec(
-		'dot -Tsvg arbolAST.dot -o ../Frontend/Typesty/src/assets/arbolAST.svg',
+		'dot -Tsvg arbolAST.dot -o arbolAST.svg',
 		(error, stdout, stderr) => {
 			if (error) {
 				return;
