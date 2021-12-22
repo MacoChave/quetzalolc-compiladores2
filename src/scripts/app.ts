@@ -36,8 +36,11 @@ const symbols_table = document.querySelector('#symbols_table');
 const errors_table = document.querySelector('#errors_table');
 const grammar_table = document.querySelector('#grammar_table');
 const show_ast = document.querySelector('#show_ast');
+const copy_c3d = document.querySelector('#copy_c3d');
 
 const my_source = <HTMLInputElement>document.querySelector('#my_source');
+
+const my_result = <HTMLInputElement>document.querySelector('#my_result');
 
 const hideSubmenu = (selector: string, idx: number) => {
 	document.querySelectorAll(selector)[idx].classList.toggle('submenu--hide');
@@ -105,6 +108,14 @@ errors_table?.addEventListener('click', () => {});
 grammar_table?.addEventListener('click', () => {});
 
 show_ast?.addEventListener('click', () => {});
+
+copy_c3d?.addEventListener('click', () => {
+	consoleEditor.save();
+	navigator.clipboard
+		.writeText(my_result.value)
+		.then(() => console.info('Code copied succesfully...'))
+		.catch((err) => console.error('Something went wrong ', err));
+});
 
 const analize_source = (source: string): Arbol => {
 	console.log('ANALIZANDO...');
