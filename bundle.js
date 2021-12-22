@@ -8075,19 +8075,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var parser = require('./Analizador/analizador');
 var shared_1 = require("./shared");
 var Arbol_1 = __importDefault(require("./Analizador/TS/Arbol"));
-var tablaSimbolos_1 = __importDefault(require("./Analizador/TS/tablaSimbolos"));
-var Funciones_1 = __importDefault(require("./Analizador/Instrucciones/Funciones"));
-var Metodos_1 = __importDefault(require("./Analizador/Instrucciones/Metodos"));
-var Exec_1 = __importDefault(require("./Analizador/Instrucciones/Exec"));
-var Declaracion_1 = __importDefault(require("./Analizador/Instrucciones/Declaracion"));
-var declaracionVectores_1 = __importDefault(require("./Analizador/Instrucciones/declaracionVectores"));
-var declaracionListas_1 = __importDefault(require("./Analizador/Instrucciones/declaracionListas"));
-var asignacionVector_1 = __importDefault(require("./Analizador/Instrucciones/asignacionVector"));
-var asignacionLista_1 = __importDefault(require("./Analizador/Instrucciones/asignacionLista"));
-var agregarLista_1 = __importDefault(require("./Analizador/Instrucciones/agregarLista"));
-var Main_1 = __importDefault(require("./Analizador/Instrucciones/Main"));
 var Codigo3d_1 = require("./Analizador/Abstracto/Codigo3d");
-var print_1 = __importDefault(require("./Analizador/Instrucciones/print"));
 var Listado_Errores_1 = require("./Analizador/Excepciones/Listado_Errores");
 var listaErrores = new Listado_Errores_1.Listado_Errores();
 var file = document.querySelector('#file');
@@ -8151,8 +8139,12 @@ reports === null || reports === void 0 ? void 0 : reports.addEventListener('clic
     hideSubmenu('.submenu', 1);
 });
 symbols_table === null || symbols_table === void 0 ? void 0 : symbols_table.addEventListener('click', function () { });
-errors_table === null || errors_table === void 0 ? void 0 : errors_table.addEventListener('click', function () { });
-grammar_table === null || grammar_table === void 0 ? void 0 : grammar_table.addEventListener('click', function () { });
+errors_table === null || errors_table === void 0 ? void 0 : errors_table.addEventListener('click', function () {
+    console.log(listaErrores.ast.geterrores());
+});
+grammar_table === null || grammar_table === void 0 ? void 0 : grammar_table.addEventListener('click', function () {
+    console.log(listaErrores.ast.gettablaGlobal());
+});
 show_ast === null || show_ast === void 0 ? void 0 : show_ast.addEventListener('click', function () { });
 copy_c3d === null || copy_c3d === void 0 ? void 0 : copy_c3d.addEventListener('click', function () {
     consoleEditor.save();
@@ -8165,131 +8157,8 @@ var analize_source = function (source) {
     console.log('ANALIZANDO...');
     return new Arbol_1.default(parser.parse(source));
 };
-var traducir = function (ast) {
-    var tabla = new tablaSimbolos_1.default();
-    ast.settablaGlobal(tabla);
-    var instrucciones = ast.getinstrucciones();
-    var funciones = instrucciones.filter(function (value, index, arr) {
-        return value instanceof Funciones_1.default;
-    });
-    var metodos = instrucciones.filter(function (value, index, arr) {
-        return value instanceof Metodos_1.default;
-    });
-    var ejecutar = instrucciones.filter(function (value, index, arr) {
-        return value instanceof Exec_1.default;
-    });
-    var declara = instrucciones.filter(function (value, index, arr) {
-        return value instanceof Declaracion_1.default;
-    });
-    var declaraVector = instrucciones.filter(function (value, index, arr) {
-        return value instanceof declaracionVectores_1.default;
-    });
-    var declaraLista = instrucciones.filter(function (value, index, arr) {
-        return value instanceof declaracionListas_1.default;
-    });
-    var asignaVector = instrucciones.filter(function (value, index, arr) {
-        return value instanceof asignacionVector_1.default;
-    });
-    var asignaLista = instrucciones.filter(function (value, index, arr) {
-        return value instanceof asignacionLista_1.default;
-    });
-    var agregaLista = instrucciones.filter(function (value, index, arr) {
-        return value instanceof agregarLista_1.default;
-    });
-    var metodoMain = instrucciones.filter(function (value, index, arr) {
-        return value instanceof Main_1.default;
-    });
-    var imprimir = instrucciones.filter(function (value, index, arr) {
-        return value instanceof print_1.default;
-    });
-    metodoMain = metodos.filter(function (value) {
-        return value.identificador === 'main';
-    });
-    if (metodoMain.length !== 1) {
-        if (metodoMain.length > 1)
-            shared_1.setValueConsole('Hay más de 1 método principal');
-        else
-            shared_1.setValueConsole('No se encontró un método principal');
-        return;
-    }
-    console.log({
-        funciones: funciones,
-        metodos: metodos,
-        metodoMain: metodoMain,
-    });
-    shared_1.setValueResult("int main() {\n\tH = 0;\n\tP = 0;\n");
-    escribirDeclara(declara, ast, tabla);
-    escribirDeclaraVector(declaraVector, ast, tabla);
-    escribirDeclaraLista(declaraLista, ast, tabla);
-    escribirAsignaVector(asignaVector, ast, tabla);
-    escribirAsignaLista(asignaLista, ast, tabla);
-    escribirImprimir(imprimir, ast, tabla);
-    escribirMain(metodoMain, ast, tabla);
-    shared_1.setValueResult('}\n\n');
-    escribirFunciones(funciones, ast, tabla);
-    escribirMetodos(metodos, ast, tabla);
-    shared_1.addHeaderResult();
-};
-var escribirDeclara = function (declaracion, ast, tabla) {
-    var c3d = '';
-    declaracion.forEach(function (instruccion) {
-        c3d += instruccion.traducir(ast, tabla).codigo3d;
-    });
-    shared_1.setValueResult(c3d);
-};
-var escribirDeclaraVector = function (declaracion, ast, tabla) {
-    var c3d = '';
-    declaracion.forEach(function (instruccion) {
-        c3d += instruccion.traducir(ast, tabla).codigo3d;
-    });
-    shared_1.setValueResult(c3d);
-};
-var escribirDeclaraLista = function (declaracion, ast, tabla) {
-    var c3d = '';
-    declaracion.forEach(function (instruccion) { });
-    shared_1.setValueResult(c3d);
-};
-var escribirAsignaVector = function (asignacion, ast, tabla) {
-    var c3d = '';
-    asignacion.forEach(function (instruccion) {
-        // c3d += instruccion.traducir(ast, tabla).codigo3d
-    });
-    shared_1.setValueResult(c3d);
-};
-var escribirAsignaLista = function (asignacion, ast, tabla) {
-    asignacion.forEach(function (instruccion) { });
-};
-var escribirMain = function (metodoMain, ast, tabla) {
-    var c3d = '';
-    metodoMain.forEach(function (instruccion) {
-        c3d += instruccion.traducir(ast, tabla).codigo3d;
-    });
-    shared_1.setValueResult(c3d);
-};
-var escribirFunciones = function (funciones, ast, tabla) {
-    var c3d = '';
-    funciones.forEach(function (instruccion) {
-        c3d += instruccion.traducir(ast, tabla).codigo3d;
-    });
-    shared_1.setValueResult(c3d);
-};
-var escribirMetodos = function (metodos, ast, tabla) {
-    var c3d = '';
-    metodos.forEach(function (instruccion) {
-        if (instruccion.identificador !== 'main')
-            c3d += instruccion.traducir(ast, tabla).codigo3d;
-    });
-    shared_1.setValueResult(c3d);
-};
-var escribirImprimir = function (imprimir, ast, tabla) {
-    var c3d = '';
-    imprimir.forEach(function (instruccion) {
-        c3d += instruccion.traducir(ast, tabla).codigo3d;
-    });
-    shared_1.setValueResult(c3d);
-};
 
-},{"./Analizador/Abstracto/Codigo3d":4,"./Analizador/Excepciones/Listado_Errores":8,"./Analizador/Instrucciones/Declaracion":26,"./Analizador/Instrucciones/Exec":28,"./Analizador/Instrucciones/Funciones":29,"./Analizador/Instrucciones/Main":32,"./Analizador/Instrucciones/Metodos":33,"./Analizador/Instrucciones/agregarLista":37,"./Analizador/Instrucciones/asignacionLista":38,"./Analizador/Instrucciones/asignacionVector":39,"./Analizador/Instrucciones/declaracionListas":41,"./Analizador/Instrucciones/declaracionVectores":42,"./Analizador/Instrucciones/print":44,"./Analizador/TS/Arbol":45,"./Analizador/TS/tablaSimbolos":48,"./Analizador/analizador":49,"./shared":54}],54:[function(require,module,exports){
+},{"./Analizador/Abstracto/Codigo3d":4,"./Analizador/Excepciones/Listado_Errores":8,"./Analizador/TS/Arbol":45,"./Analizador/analizador":49,"./shared":54}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setValueConsole = exports.addHeaderResult = exports.clearValueResult = exports.setValueResult = void 0;

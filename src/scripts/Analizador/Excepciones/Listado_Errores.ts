@@ -19,12 +19,9 @@ import {
 	setValueConsole,
 	setValueResult,
 } from '../../shared';
-import { Codigo3d } from '../Abstracto/Codigo3d';
 
 export let listaErrores: Array<Errores>;
 let arbolNuevo: Arbol;
-let contador: number;
-let cuerpo: string;
 //tablas arboles y excepcciones
 
 export class Listado_Errores {
@@ -132,7 +129,7 @@ export class Listado_Errores {
 			.getinstrucciones()
 			.filter((instruccion) => instruccion instanceof Funciones);
 		instrucciones.forEach((instruccion) => {
-			setValueResult(`\nvoid ${instruccion.identificador} {\n`);
+			setValueResult(`\nvoid ${instruccion.identificador} () {\n`);
 			let result = instruccion.traducir(this._ast, this.tabla).codigo3d;
 			setValueResult(result);
 			setValueResult('}\n');
@@ -147,7 +144,7 @@ export class Listado_Errores {
 					instruccion.identificador !== 'main'
 			);
 		instrucciones.forEach((instruccion) => {
-			setValueResult(`\nvoid ${instruccion.identificador} {\n`);
+			setValueResult(`\nvoid ${instruccion.identificador} () {\n`);
 			let result = instruccion.traducir(this._ast, this.tabla).codigo3d;
 			setValueResult(result);
 			setValueResult('}\n');

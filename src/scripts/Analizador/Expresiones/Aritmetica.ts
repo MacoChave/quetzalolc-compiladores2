@@ -661,7 +661,9 @@ export default class Aritmetica extends Instruccion {
 		};
 		let temp: string = new_temporal();
 		let c3d: string = `${izq.codigo3d}\n${der.codigo3d}\n`;
-		c3d += `\t${temp} = ${izq.temporal} ${op} ${der.temporal};\n`;
+		if (op === '%')
+			c3d += `\t${temp} = (int) ${izq.temporal} ${op} (int) ${der.temporal};\n`;
+		else c3d += `\t${temp} = ${izq.temporal} ${op} ${der.temporal};\n`;
 
 		if (izq.tipo === tipoDato.DECIMAL || der.tipo === tipoDato.DECIMAL) {
 			res.tipo = tipoDato.DECIMAL;
