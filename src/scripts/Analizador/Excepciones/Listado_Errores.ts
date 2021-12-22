@@ -13,6 +13,7 @@ import graficarArbol from '../../Reportes/graficar';
 import asignacionVector from '../Instrucciones/asignacionVector';
 import asignacionLista from '../Instrucciones/asignacionLista';
 import agregarLista from '../Instrucciones/agregarLista';
+import funcMain from '../Instrucciones/Main';
 import {
 	addHeaderResult,
 	clearValueResult,
@@ -29,7 +30,7 @@ export class Listado_Errores {
 	private tabla: tablaSimbolos;
 
 	constructor() {
-		this.ast = new Arbol([]);
+		this._ast = new Arbol([]);
 		this.tabla = new tablaSimbolos();
 	}
 
@@ -41,12 +42,13 @@ export class Listado_Errores {
 		this._ast.settablaGlobal(this.tabla);
 	}
 
-	public interpretar() {
+	public interpretar(texto_Entrada: string) {
 		listaErrores = new Array<Errores>();
-		// let parser = require('../analizador');
-
+		let parser = require('../../Analizador/analizador');
+		 let entrada = texto_Entrada;
+		console.log('Analizaremos');
 		try {
-			// let ast = new Arbol(parser.parse(entrada));
+			 let ast = new Arbol(parser.parse(entrada));
 
 			var tabla = new tablaSimbolos();
 			ast.settablaGlobal(tabla);
@@ -94,18 +96,14 @@ export class Listado_Errores {
 					ast.actualizaConsola((<Errores>error).returnError());
 				}
 			}
-			for (let i of ast.getinstrucciones()) {
-				if (i instanceof Exec) {
-					var resultador = i.interpretar(ast, tabla);
-					if (resultador instanceof Errores) {
-						listaErrores.push(resultador);
-						ast.actualizaConsola(
-							(<Errores>resultador).returnError()
-						);
-					}
-				}
-			}
-			arbolNuevo = ast;
+			this._ast = ast;
+			arbolNuevo = this._ast;
+			console.log(ast.getSimbolos());
+      		console.log(ast.getfunciones());
+      		console.log(ast.getconsola());
+			/*console.log(ast.getSimbolos());
+      		console.log(ast.getfunciones());
+      		console.log(ast.getconsola());*/
 			/*res.send({
           resultado: ast.getconsola(),
           errores: listaErrores,
@@ -113,6 +111,7 @@ export class Listado_Errores {
         });*/
 		} catch (err) {
 			/*res.json({ error: err, errores: listaErrores });*/
+			console.log('No pude interpretar')
 		}
 	}
 

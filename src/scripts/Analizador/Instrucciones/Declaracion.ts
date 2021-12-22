@@ -304,7 +304,8 @@ export default class Declaracion extends Instruccion {
 			if (this.tipo.getTipo() === tipoDato.ENTERO) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.ENTERO),
-					this.identificador[ids]
+					this.identificador[ids],
+					0
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -313,7 +314,8 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.DECIMAL) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.DECIMAL),
-					this.identificador[ids]
+					this.identificador[ids],
+					0.0
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -322,7 +324,8 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.CARACTER) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.CARACTER),
-					this.identificador[ids]
+					this.identificador[ids],
+					''
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -331,7 +334,8 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.CADENA) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.CADENA),
-					this.identificador[ids]
+					this.identificador[ids],
+					''
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -340,7 +344,8 @@ export default class Declaracion extends Instruccion {
 			} else if (this.tipo.getTipo() === tipoDato.BOOLEANO) {
 				let simbolo = new Simbolo(
 					new Tipo(tipoDato.BOOLEANO),
-					this.identificador[ids]
+					this.identificador[ids],
+					true
 				);
 				let posRelativa = tabla.setVariable3d(simbolo);
 				if (posRelativa < 0) return res;
@@ -354,9 +359,10 @@ export default class Declaracion extends Instruccion {
 			if (valor.tipo === -1) return res;
 
 			c3d += `${valor.codigo3d}\n`;
+			for(let ids = 0; ids < this.identificador.length; ids++){
 			let simbolo = new Simbolo(
 				new Tipo(valor.tipo),
-				this.identificador[0],
+				this.identificador[ids],
 				''
 			);
 			let posRelativa = tabla.setVariable3d(simbolo);
@@ -364,6 +370,7 @@ export default class Declaracion extends Instruccion {
 			if (posRelativa < 0) return res;
 
 			c3d += `\tstack[(int) ${posRelativa}] = ${valor.temporal};\n`;
+			}
 		}
 		c3d += '\t// ==========> END DECLARACION\n';
 		res.codigo3d = c3d;

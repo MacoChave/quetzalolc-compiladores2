@@ -9,18 +9,20 @@ import Arbol from '../TS/Arbol';
 import tablaSimbolos from '../TS/tablaSimbolos';
 import graficarArbol from '../../Reportes/graficar';
 import asignacionVector from '../Instrucciones/asignacionVector';
-import funcMain from '../Instrucciones/Main';
+import Main from '../Instrucciones/Main';
 
 export let listaErrores: Array<Errores>;
 let arbolNuevo: Arbol;
 let contador: number;
 let cuerpo: string;
 //tablas arboles y excepcciones
-class ControlInterprete {
+export class ControlInterprete {
   public interpretar(texto_Entrada: string) {
     listaErrores = new Array<Errores>();
     let parser = require('../../Analizador/analizador');
     let entrada = texto_Entrada;
+    console.log('Analizando....')
+    //console.log(entrada);
     try {
       let ast = new Arbol(parser.parse(entrada));
       var tabla = new tablaSimbolos();
@@ -65,10 +67,11 @@ class ControlInterprete {
           ast.actualizaConsola((<Errores>error).returnError());
         }
       }
-      for (let i of ast.getinstrucciones()) {
-        
-      }
+      
       arbolNuevo = ast;
+      console.log(ast.getSimbolos());
+      console.log(ast.getfunciones());
+      console.log(ast.getconsola());
       /*res.send({
         resultado: ast.getconsola(),
         errores: listaErrores,
@@ -91,4 +94,3 @@ class ControlInterprete {
     return ""//res.json({ msg: true });
   }
 }
-export const ontrolInterprete = new ControlInterprete();

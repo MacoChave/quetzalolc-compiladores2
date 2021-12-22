@@ -23,8 +23,10 @@ import { clear_data } from './Analizador/Abstracto/Codigo3d';
 import Print from './Analizador/Instrucciones/print';
 import LlamadaFuncMetd from './Analizador/Instrucciones/LlamadaFuncMetd';
 import { Listado_Errores } from './Analizador/Excepciones/Listado_Errores';
+import { ControlInterprete } from './Analizador/Excepciones/ControlInterprete';
 
 let listaErrores = new Listado_Errores();
+let pruebaErrores =  new ControlInterprete();
 
 const file = document.querySelector('#file');
 const open_file = document.querySelector('#open_file');
@@ -79,9 +81,10 @@ analize?.addEventListener('click', () => {
 	setValueConsole('Interpretando la entrada...\n\n');
 	sourceEditor.save();
 	let source = my_source.value;
-	let ast: Arbol = analize_source(source);
+	listaErrores.interpretar(source);
+	/*let ast: Arbol = analize_source(source);
 	listaErrores.ast = ast;
-	listaErrores.interpretar();
+	listaErrores.interpretar();*/
 });
 
 compile?.addEventListener('click', () => {

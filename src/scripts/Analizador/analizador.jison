@@ -38,7 +38,7 @@ const modiLista = require('./Instrucciones/asignacionLista');
 const agregarLista= require('./Instrucciones/agregarLista');
 const funcNativa= require('./Instrucciones/funcNativa');
 const casteo= require('./Instrucciones/casteo');
-const mainP = require('./Instrucciones/Main')
+const main = require('./Instrucciones/Main')
 %}
 //definicion lexica
 %lex 
@@ -67,7 +67,7 @@ const mainP = require('./Instrucciones/Main')
 "break"         return 'RESBREAK';
 "continue"      return 'RESCONTINUE';
 "return"        return 'RESRETURN';
-"main"          return 'RESMAIN';
+//"main"          return 'RESMAIN';
 "switch"        return 'RESSWITCH';
 "case"          return 'RESCASE';
 "default"       return 'RESDEFAULT';
@@ -243,7 +243,7 @@ INSTRUCCION:
     |CONDINCREMENTO  PTCOMA             {$$=$1;}
     |CONDECREMENTO PTCOMA               {$$=$1;}
     |CONDFOR                            {$$=$1;}
-    |FUNCMAIN PTCOMA                    {$$=$1;}
+    //|FUNCMAIN PTCOMA                    {$$=$1;}
     |METODOS                            {$$=$1;}
     |LLAMADA  PTCOMA                    {$$=$1;}
     |EJECUTAR PTCOMA                    {$$=$1;}
@@ -273,8 +273,8 @@ IMPRIMIR_ARGS
     ;
 
 DECLARACION:
-    TIPODATO PARLLAMADA        {$$= new declaracion.default($1,@1.first_line,@1.first_column,$2);}
-    |TIPODATO IDENTIFICADOR IGUAL EXPRESION   {$$= new declaracion.default($1,@1.first_line,@1.first_column,$2,$4);}
+    TIPODATO LISTAIDENTIFICADORES        {$$= new declaracion.default($1,@1.first_line,@1.first_column,$2);}
+    |TIPODATO IDENTIFICADOR IGUAL EXPRESION   {$$= new declaracion.default($1,@1.first_line,@1.first_column,[$2],$4);}
     ;
 TIPODATO:
     RESINT                      {$$= new Tipo.default(Tipo.tipoDato.ENTERO);}
@@ -283,6 +283,12 @@ TIPODATO:
     |RESDOUBLE                  {$$= new Tipo.default(Tipo.tipoDato.DECIMAL);}
     |RESSTRING                  {$$= new Tipo.default(Tipo.tipoDato.CADENA);}
 ;
+
+LISTAIDENTIFICADORES:
+    LISTAIDENTIFICADORES COMA IDENTIFICADOR    {$1.push($3); $$=$1;} 
+    |IDENTIFICADOR                             {$$=[$1];}
+    ;
+
 ASIGNACION:
     IDENTIFICADOR IGUAL EXPRESION  {$$=new asignacion.default($1,$3,@1.first_line,@1.first_column);}
 ;
@@ -330,6 +336,7 @@ EXPRESION:
     |FUNCNATIVA PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$3,@1.first_line,@1.first_column); }
     |TIPODATO PUNTO RESPARSE PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$5,@1.first_line,@1.first_column); } 
     ;
+     
 CONDICIONIF:
     RESIF PARABRE EXPRESION /*COND1*/PARCIERRA BLOQUEINSTRUCCION                                                        {$$= new condIf.default(@1.first_line,@1.first_column,$3,$5,undefined,undefined);}
     |RESIF PARABRE EXPRESION/*COND1*/ PARCIERRA BLOQUEINSTRUCCION RESELSE/*true*/ BLOQUEINSTRUCCION    {$$= new condIf.default(@1.first_line,@1.first_column,$3,$5,$7,undefined);}
@@ -387,6 +394,11 @@ ACTUALIZACION:
     |CONDECREMENTO {$$=$1;}
     |ASIGNACION    {$$=$1;}
     ;
+
+FUNCMAIN:
+    RESVOID RESMAIN PARABRE PARCIERRA BLOQUEINSTRUCCION {$$=new main.default(new Tipo.default(Tipo.tipoDato.VOID),@1.first_line,@1.first_column,$5);}
+    ;
+
 METODOS:
     RESVOID IDENTIFICADOR PARABRE PARAMETROS PARCIERRA BLOQUEINSTRUCCION {$$=new metodos.default(new Tipo.default(Tipo.tipoDato.VOID),@1.first_line,@1.first_column,$2,$4,$6);}
     |RESVOID IDENTIFICADOR PARABRE PARCIERRA BLOQUEINSTRUCCION           {$$=new metodos.default(new Tipo.default(Tipo.tipoDato.VOID),@1.first_line,@1.first_column,$2,[],$5);}
@@ -441,7 +453,3 @@ BLOQUEINSTRUCCION:
     LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=$2;}
     |LLAVEABRE LLAVECIERRA              {$$=[];}
     ;
-
-FUNCMAIN:
-     RESVOID RESMAIN PARABRE PARCIERRA LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=new mainP.default($1,@1.first_line,@1.first_column,$6);}
-     ;

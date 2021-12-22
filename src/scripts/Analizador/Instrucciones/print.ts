@@ -32,6 +32,7 @@ export default class Print extends Instruccion {
 		return nodo;
 	}
 	public interpretar(arbol: Arbol, tabla: tablaSimbolos) {
+		console.log('Entre aqui en print');
 		this.expresion.forEach((expr) => {
 			let valor = expr.interpretar(arbol, tabla);
 			if (valor instanceof Errores) return valor;

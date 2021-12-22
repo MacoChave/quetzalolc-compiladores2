@@ -36,29 +36,40 @@ export default class Main extends Instruccion {
 		nodo.agregarHijo('}');*/
 		return nodo;
 	}
+	/*public interpretar(arbol: Arbol, tabla: tablaSimbolos) {
+		let listaErrores = new Array<Errores>();
+		for (let i = 0; i < this.instrucciones.length; i++) {
+			let val = this.instrucciones[i].interpretar(arbol, tabla);
+			if (val instanceof Errores){ 
+				arbol.geterrores().push(val);
+				arbol.actualizaConsola(val.toString());
+				listaErrores.push(val);
+			}
+		}
+		return listaErrores;
+	}*/
+
 	public interpretar(arbol: Arbol, tabla: tablaSimbolos) {
 		for (let i = 0; i < this.instrucciones.length; i++) {
 			let val = this.instrucciones[i].interpretar(arbol, tabla);
 			if (val instanceof Errores) return val;
-			if (val instanceof Return) {
-				if (val.valor != null) {
-					if (this.tipoDato.getTipo() == val.tipoDato.getTipo())
-						return val.valor;
-					else
+			if (this.instrucciones[i] instanceof Return) {
+				if (val instanceof Return) {
+					if (val.valor != null) {
 						return new Errores(
 							'SEMANTICO',
-							'TIPOS DE DATOS DIFERENTES',
+							'NO PUEDE DEVOLVER UN VALOR EN UN METODO',
 							this.fila,
 							this.columna
 						);
-				} else {
+					} else break;
+				} else
 					return new Errores(
 						'SEMANTICO',
-						'DEBE DEVOLVER UN VALOR EN LA FUNCION',
+						'NO PUEDE DEVOLVER UN VALOR EN UN METODO',
 						this.fila,
 						this.columna
 					);
-				}
 			}
 		}
 	}
