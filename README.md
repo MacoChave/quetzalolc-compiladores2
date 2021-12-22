@@ -5,6 +5,19 @@
   - [Previa](#previa)
   - [Preparación](#preparación)
 
+<p align="center">
+  <a href="https://github.com/mhankbarbar"><img title="QuetzalOLC" src="https://img.shields.io/badge/QuetzalOLC-G31-blue?style=for-the-badge&logo=github"></a>
+</p>
+
+----
+<p align="center">
+  <a href="https://github.com/mhankbarbar"><img title="" src="https://img.shields.io/github/license/macochave/quetzalolc-compiladores2?style=flat&logo=github" > </a>
+  <a href="https://github.com/mhankbarbar"><img title="" src="https://img.shields.io/npm/v/npm?style=flat&logo=npm" > </a>
+  <a href="https://github.com/mhankbarbar"><img title="" src="https://img.shields.io/npm/v/jison?label=jison?style=flat&logo=npm" > </a>
+  <a href="https://github.com/mhankbarbar"><img title="" src="https://img.shields.io/npm/v/codemirror?label=CodeMirror?style=flat&logo=npm" > </a>
+</p>
+----
+
 ## Manuales
 
 - [Manual de usuario](./UserManual.md)
