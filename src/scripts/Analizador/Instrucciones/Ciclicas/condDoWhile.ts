@@ -92,6 +92,7 @@ export default class condWhile extends Instruccion {
 			c3d += element.traducir(arbol, newTabla).codigo3d;
 		});
 
+		c3d += `${condicion.codigo3d}`;
 		condicion.etq_falsas.forEach((element) => {
 			c3d += `${element}:\n`;
 		});
