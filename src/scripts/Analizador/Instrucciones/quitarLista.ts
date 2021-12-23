@@ -6,27 +6,23 @@ import Arbol from '../TS/Arbol';
 import tablaSimbolos from '../TS/tablaSimbolos';
 import Tipo, { tipoDato } from '../TS/Tipo';
 
-export default class agregarLista extends Instruccion {
+export default class quitarLista extends Instruccion {
 	private identificador: string;
-	private expresion: Instruccion;
 
 	constructor(
 		identificador: string,
-		expresion: Instruccion,
 		fila: number,
 		columna: number
 	) {
 		super(new Tipo(tipoDato.ENTERO), fila, columna);
 		this.identificador = identificador.toLowerCase();
-		this.expresion = expresion;
 	}
 	public getNodo() {
-		let nodo = new nodoAST('AGREGAR-VECTOR');
+		let nodo = new nodoAST('QUITAR-VECTOR');
 		nodo.agregarHijo(this.identificador);
 		nodo.agregarHijo('.');
-		nodo.agregarHijo('push');
+		nodo.agregarHijo('pop');
 		nodo.agregarHijo('(');
-		nodo.agregarHijoAST(this.expresion.getNodo());
 		nodo.agregarHijo(')');
 		nodo.agregarHijo(';');
 		return nodo;
@@ -35,18 +31,7 @@ export default class agregarLista extends Instruccion {
 		let ide = tabla.getVariable(this.identificador);
 		if (ide != null) {
 			let arreglo = ide.getvalor();
-			let exp = this.expresion.interpretar(arbol, tabla);
-			if (exp instanceof Errores) return exp;
-			if (ide.gettipo().getTipo() != this.expresion.tipoDato.getTipo())
-				return new Errores(
-					'SEMANTICO',
-					'VARIABLE ' +
-						this.identificador +
-						' TIPOS DE DATOS DIFERENTES',
-					this.fila,
-					this.columna
-				);
-			arreglo.push(exp);
+			arreglo.pop();
 			ide.setvalor(arreglo);
 			arbol.actualizarTabla(
 				this.identificador,

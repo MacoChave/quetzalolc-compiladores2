@@ -36,6 +36,7 @@ const listas = require('./Instrucciones/declaracionListas');
 const accesoLista = require('./Instrucciones/accesoLista');
 const modiLista = require('./Instrucciones/asignacionLista');
 const agregarLista= require('./Instrucciones/agregarLista');
+const quitarLista= require('./Instrucciones/quitarLista');
 const funcNativa= require('./Instrucciones/funcNativa');
 const casteo= require('./Instrucciones/casteo');
 const main = require('./Instrucciones/Main')
@@ -93,6 +94,8 @@ const main = require('./Instrucciones/Main')
 "tan"           return 'RESTAN';
 "sqrt"          return 'RESSQRT';
 "pow"           return 'RESPOW';
+"push"          return 'RESPUSH';
+"pop"           return 'RESPOP'
 //simbolos
 "{"             return 'LLAVEABRE';
 ","             return 'COMA';
@@ -257,6 +260,7 @@ INSTRUCCION:
     |FUNCIONES                          {$$=$1;}
     |VECTORES FINISHLINEA                    {$$=$1;}
     |ASIGVECTORES FINISHLINEA                {$$=$1;}
+    |AGREGARVECTORES FINISHLINEA              {$$=$1;}
         |error FINISHLINEA                   {
                                             // inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));
                                             console.log(`Error sintactico, se esperaba un token en esta linea ${@1.first_line}, ${@1.first_column}`);
@@ -456,6 +460,10 @@ ACCESOVECTOR:
     ;
 ASIGVECTORES:
     IDENTIFICADOR CORCHABRE EXPRESION CORCHCIERRA IGUAL EXPRESION {$$=new modiVector.default($1, $3, $6,@1.first_line,@1.first_column);}
+    ;
+AGREGARVECTORES:
+    IDENTIFICADOR PUNTO RESPUSH PARABRE EXPRESION PARCIERRA {$$=new agregarLista.default($1,$5,@1.first_line,@1.first_column);}
+    |IDENTIFICADOR PUNTO RESPOP PARABRE PARCIERRA {$$=new quitarLista.default($1,@1.first_line,@1.first_column);}
     ;
 FUNCNATIVA:
     RESLOW          {$$=$1;}
