@@ -80,7 +80,7 @@ export default class LlamadaFuncMetd extends Instruccion {
 							metodo.parametros[param].tipato,
 							metodo.fila,
 							metodo.columna,
-							metodo.parametros[param].identificador
+							[metodo.parametros[param].identificador]
 						);
 					}
 					let nuevaDec = dec.interpretar(arbol, nuevaTabla);
@@ -161,7 +161,7 @@ export default class LlamadaFuncMetd extends Instruccion {
 						metodo.parametros[param].tipato,
 						metodo.fila,
 						metodo.columna,
-						metodo.parametros[param].identificador
+						[metodo.parametros[param].identificador]
 					);
 					let nuevaDec = dec.interpretar(arbol, nuevaTabla);
 					if (nuevaDec instanceof Errores) return nuevaDec;

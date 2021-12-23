@@ -22,15 +22,10 @@ export default class Exec extends Instruccion {
 		this.parametros = parametros;
 	}
 	public getNodo(): nodoAST {
-		let nodo = new nodoAST('EXEC');
-		nodo.agregarHijo('exec');
-		nodo.agregarHijo(this.identificador + '');
-		nodo.agregarHijo('(');
+		let nodo = new nodoAST('MAIN');
 		this.parametros.forEach((element) => {
 			nodo.agregarHijoAST(element.getNodo());
 		});
-		nodo.agregarHijo(')');
-		nodo.agregarHijo(';');
 		return nodo;
 	}
 	public interpretar(arbol: Arbol, tabla: tablaSimbolos) {
@@ -38,7 +33,7 @@ export default class Exec extends Instruccion {
 		if (funcion == null)
 			return new Errores(
 				'SEMANTICO',
-				'NO SE ENCONTRO LA FUNCION',
+				'NO SE ENCONTRO EL METODO MAIN',
 				this.fila,
 				this.columna
 			);

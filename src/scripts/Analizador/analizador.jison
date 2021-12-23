@@ -73,18 +73,26 @@ const main = require('./Instrucciones/Main')
 "default"       return 'RESDEFAULT';
 "for"           return 'RESFOR';
 "void"          return 'RESVOID';
+"exec"          return 'RESEXEC';
 "new"           return 'RESNUEVO';
 "list"          return 'RESLIST';
 "add"           return 'RESADD';
-"tolowercase"   return 'RESLOW'; //listo
-"touppercase"   return 'RESUP'; //listo
-"length"        return 'RESLENG'; //listo
-"caracterOfPosition" return 'RESCAROFPOS';
-"substring"     return 'RESSUBSTRING';
+"toLowercase"   return 'RESLOW'; //listoEnClase
+"toUppercase"   return 'RESUP'; //listoEnClase
+"length"        return 'RESLENG'; //listoEnClase
+"caracterOfPosition" return 'RESCAROFPOS';//enGramatica
+"subString"     return 'RESSUBSTRING';//enGramatica
+"string"        return 'RESSTRINGNATIVA';//enGramatica
 "parse"         return 'RESPARSE';
-"toint"         return 'RESTOINT'; //listo
-"todouble"      return 'RESTODOU';
+"toInt"         return 'RESTOINT'; //enGramatica
+"toDouble"      return 'RESTODOU'; //enGramatica
 "typeof"        return 'RESTYPE'; //listo
+"sin"           return 'RESSIN';
+"log10"         return 'RESLOG';
+"cos"           return 'RESCOS';
+"tan"           return 'RESTAN';
+"sqrt"          return 'RESSQRT';
+"pow"           return 'RESPOW';
 //simbolos
 "{"             return 'LLAVEABRE';
 ","             return 'COMA';
@@ -231,33 +239,36 @@ INSTRUCCIONES: INSTRUCCIONES INSTRUCCION     {if($2!=false)$1.push($2);$$=$1;}
 
 INSTRUCCION: 
     IMPRIMIR                            {$$=$1;}
-    |DECLARACION   PTCOMA               {$$=$1;}
-    |ASIGNACION    PTCOMA               {$$=$1;}
+    |DECLARACION   FINISHLINEA               {$$=$1;}
+    |ASIGNACION    FINISHLINEA               {$$=$1;}
     |CONDICIONIF                        {$$=$1;}
     |CONDICIONWHILE                     {$$=$1;}
     |CONDICIONDOWHILE                   {$$=$1;}
     |CONDBREAK                          {$$=$1;}
     |CODCONTINUE                        {$$=$1;}
-    |CONDRETURN PTCOMA                  {$$=$1;}
+    |CONDRETURN FINISHLINEA                  {$$=$1;}
     |CONDSWITCH                         {$$=$1;}
-    |CONDINCREMENTO  PTCOMA             {$$=$1;}
-    |CONDECREMENTO PTCOMA               {$$=$1;}
+    |CONDINCREMENTO  FINISHLINEA             {$$=$1;}
+    |CONDECREMENTO FINISHLINEA               {$$=$1;}
     |CONDFOR                            {$$=$1;}
-    //|FUNCMAIN PTCOMA                    {$$=$1;}
     |METODOS                            {$$=$1;}
-    |LLAMADA  PTCOMA                    {$$=$1;}
-    |EJECUTAR PTCOMA                    {$$=$1;}
+    |LLAMADA  FINISHLINEA                    {$$=$1;}
+    |EJECUTAR FINISHLINEA                    {$$=$1;}
     |FUNCIONES                          {$$=$1;}
-    |VECTORES PTCOMA                    {$$=$1;}
-    |ASIGVECTORES PTCOMA                {$$=$1;}
-        |error PTCOMA                   {
+    |VECTORES FINISHLINEA                    {$$=$1;}
+    |ASIGVECTORES FINISHLINEA                {$$=$1;}
+        |error FINISHLINEA                   {
                                             // inicio.listaErrores.push(new errores.default('ERROR SINTACTICO',"Se esperaba un token en esta linea",@1.first_line,@1.first_column));
                                             console.log(`Error sintactico, se esperaba un token en esta linea ${@1.first_line}, ${@1.first_column}`);
                                             $$=false;
                                         }
     ;
-IMPRIMIR: RESPRINT PARABRE IMPRIMIR_ARGS PARCIERRA  PTCOMA         {$$=new print.default($3, false,@1.first_line,@1.first_column);}
-        | RESPRINTLN PARABRE IMPRIMIR_ARGS PARCIERRA  PTCOMA         {$$=new print.default($3, true,@1.first_line,@1.first_column);}
+
+FINISHLINEA: PTCOMA {$$=null;}
+            |/*nada*/
+        ;
+IMPRIMIR: RESPRINT PARABRE IMPRIMIR_ARGS PARCIERRA  FINISHLINEA         {$$=new print.default($3, false,@1.first_line,@1.first_column);}
+        | RESPRINTLN PARABRE IMPRIMIR_ARGS PARCIERRA  FINISHLINEA         {$$=new print.default($3, true,@1.first_line,@1.first_column);}
 ;//{};
 
 IMPRIMIR_ARGS
@@ -333,8 +344,13 @@ EXPRESION:
     |IDENTIFICADOR              {$$=new identificador.default($1,@1.first_line,@1.first_column);}
     |LLAMADA                    {$$=$1;}
     |ACCESOVECTOR               {$$=$1;}
-    |FUNCNATIVA PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$3,@1.first_line,@1.first_column); }
-    |TIPODATO PUNTO RESPARSE PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$5,@1.first_line,@1.first_column); } 
+    |EXPRESION PUNTO FUNCNATIVA PARABRE PARCIERRA {$$=new funcNativa.default($3,$1,@1.first_line,@1.first_column,0,0);}
+    |EXPRESION PUNTO FUNCNATIVA PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($3,$1,@1.first_line,@1.first_column,$5,0);}
+    |EXPRESION PUNTO FUNCNATIVA PARABRE EXPRESION COMA EXPRESION PARCIERRA {$$=new funcNativa.default($3,$1,@1.first_line,@1.first_column,$5,$7);}
+    |FUNCNATIVA PUNTO RESPARSE PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$3,@1.first_line,@1.first_column); }
+    |FUNCNATIVA PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$3,@1.first_line,@1.first_column,0,0); }
+    |FUNCNATIVA PARABRE EXPRESION COMA EXPRESION PARCIERRA {$$=new funcNativa.default($1,$3,@1.first_line,@1.first_column,$3,$5); }
+    |TIPODATO PUNTO RESPARSE PARABRE EXPRESION PARCIERRA {$$=new funcNativa.default($1,$5,@1.first_line,@1.first_column,0,0); } 
     ;
      
 CONDICIONIF:
@@ -346,16 +362,16 @@ CONDICIONWHILE:
     RESWHILE PARABRE EXPRESION PARCIERRA BLOQUEINSTRUCCION              {$$=new condWhile.default($3,$5,@1.first_line,@1.first_column);}
     ;
 CONDICIONDOWHILE:
-    RESDO BLOQUEINSTRUCCION RESWHILE PARABRE EXPRESION PARCIERRA PTCOMA {$$=new condDoWhile.default($5,$2,@1.first_line,@1.first_column);}
+    RESDO BLOQUEINSTRUCCION RESWHILE PARABRE EXPRESION PARCIERRA FINISHLINEA {$$=new condDoWhile.default($5,$2,@1.first_line,@1.first_column);}
     ;
 IFTERNARIO:
     EXPRESION INTERROGACION EXPRESION DOSPUNTOS EXPRESION   {$$=new condTernario.default($1,$3,$5,@1.first_line,@1.first_column);}
     ;
 CONDBREAK:
-    RESBREAK PTCOMA                                                     {$$=new condBreak.default(@1.first_line,@1.first_column); }
+    RESBREAK FINISHLINEA                                                     {$$=new condBreak.default(@1.first_line,@1.first_column); }
     ;
 CODCONTINUE:
-    RESCONTINUE PTCOMA                                                  {$$=new condContinue.default(@1.first_line,@1.first_column); }
+    RESCONTINUE FINISHLINEA                                                  {$$=new condContinue.default(@1.first_line,@1.first_column); }
     ;
 CONDRETURN:
     RESRETURN                                                     {$$=new condReturn.default(@1.first_line,@1.first_column); }
@@ -383,7 +399,7 @@ CONDECREMENTO:
     EXPRESION MENOSDES                                                           {$$=new Decremento.default($1,@1.first_line,@1.first_column);}
     ;
 CONDFOR:
-    RESFOR PARABRE DECLASIG PTCOMA EXPRESION PTCOMA ACTUALIZACION PARCIERRA BLOQUEINSTRUCCION {$$=new condFor.default($3,$5,$7,$9,@1.first_line,@1.first_column);}
+    RESFOR PARABRE DECLASIG FINISHLINEA EXPRESION FINISHLINEA ACTUALIZACION PARCIERRA BLOQUEINSTRUCCION {$$=new condFor.default($3,$5,$7,$9,@1.first_line,@1.first_column);}
     ;
 DECLASIG:
     DECLARACION {$$=$1;}
@@ -445,9 +461,21 @@ FUNCNATIVA:
     RESLOW          {$$=$1;}
     |RESUP          {$$=$1;}
     |RESLENG        {$$=$1;}
-    |RESTRUN        {$$=$1;}
-    |RESROUND       {$$=$1;}
+    |RESCAROFPOS    {$$=$1;}
     |RESTYPE        {$$=$1;}
+    |RESTOINT       {$$=$1;}
+    |RESTODOU       {$$=$1;}
+    |RESSUBSTRING   {$$=$1;}
+    |RESSTRINGNATIVA {$$=$1;}
+    |RESINT          {$$=$1;}
+    |RESDOUBLE       {$$=$1;}
+    |RESBOOL         {$$=$1;}
+    |RESSIN         {$$=$1;}
+    |RESLOG         {$$=$1;}
+    |RESCOS         {$$=$1;}
+    |RESTAN         {$$=$1;}
+    |RESSQRT        {$$=$1;}
+    |RESPOW         {$$=$1;}
     ;
 BLOQUEINSTRUCCION:
     LLAVEABRE INSTRUCCIONES LLAVECIERRA {$$=$2;}

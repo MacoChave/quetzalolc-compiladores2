@@ -12,15 +12,21 @@ export default class funcNativa extends Instruccion {
 	private identificador: string;
 	private expresion: Instruccion;
 	private ide: string;
+	private posicion: Instruccion;
+	private final: Instruccion;
 	constructor(
 		identificador: string,
 		expresion: Instruccion,
 		fila: number,
-		columna: number
+		columna: number,
+		posicion: Instruccion,
+		final: Instruccion,
 	) {
 		super(new Tipo(tipoDato.ENTERO), fila, columna);
 		this.identificador = identificador.toLowerCase();
 		this.expresion = expresion;
+		this.posicion = posicion;
+		this.final = final;
 		if (expresion instanceof Identificador)
 			this.ide = expresion.identificador.toString();
 		else this.ide = '';
@@ -70,6 +76,43 @@ export default class funcNativa extends Instruccion {
 						this.fila,
 						this.columna
 					);
+			case 'caracterofposition':
+				let pos = this.posicion.interpretar(arbol,tabla);
+				if (this.posicion.tipoDato.getTipo() != tipoDato.ENTERO)
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO DIFERENTE',
+						this.fila,
+						this.columna
+					);
+				if (this.expresion.tipoDato.getTipo() != tipoDato.CADENA)
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION TOUPPER',
+						this.fila,
+						this.columna
+					);
+				this.tipoDato = new Tipo(tipoDato.CADENA);
+				return exp.toString()[pos];
+			case 'substring':
+				let pos1 = this.posicion.interpretar(arbol,tabla);
+				let pos2 = this.final.interpretar(arbol,tabla);		
+				if ((this.posicion.tipoDato.getTipo() != tipoDato.ENTERO && this.final.tipoDato.getTipo() != tipoDato.ENTERO))
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO DIFERENTE',
+						this.fila,
+						this.columna
+					);
+				if (this.expresion.tipoDato.getTipo() != tipoDato.CADENA)
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION SUBTRING',
+						this.fila,
+						this.columna
+					);
+				this.tipoDato = new Tipo(tipoDato.CADENA);
+				return exp.toString().substr(pos1,pos2);
 			case 'toint':
 				this.tipoDato = new Tipo(tipoDato.ENTERO);
 				if (
@@ -80,7 +123,21 @@ export default class funcNativa extends Instruccion {
 				else
 					return new Errores(
 						'SEMANTICO',
-						'TIPO DE DATO INCOMPATIBLE CON FUNCION TRUNCATE',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION TOINT',
+						this.fila,
+						this.columna
+					);
+			case 'todouble':
+				this.tipoDato = new Tipo(tipoDato.ENTERO);
+				if (
+					this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
+					this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
+				)
+					return parseFloat(exp);
+				else
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION TODOUBLE',
 						this.fila,
 						this.columna
 					);
@@ -178,6 +235,99 @@ export default class funcNativa extends Instruccion {
 						this.columna
 					);
 				}
+			case 'sin':
+				this.tipoDato = new Tipo(tipoDato.ENTERO);
+				if (
+					this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
+					this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
+				)
+					return Math.sin(parseInt(exp));
+				else
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION SIN',
+						this.fila,
+						this.columna
+					);
+			case 'cos':
+				this.tipoDato = new Tipo(tipoDato.ENTERO);
+				if (
+					this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
+					this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
+				)
+					return Math.cos(parseInt(exp));
+				else
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION TOINT',
+						this.fila,
+						this.columna
+					);
+			case 'tan':
+				this.tipoDato = new Tipo(tipoDato.ENTERO);
+				if (
+					this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
+					this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
+				)
+					return Math.tan(parseInt(exp));
+				else
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION TOINT',
+						this.fila,
+						this.columna
+					);
+			case 'sqrt':
+				this.tipoDato = new Tipo(tipoDato.ENTERO);
+				if (
+					this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
+					this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
+				)
+					return Math.sqrt(parseInt(exp));
+				else
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION TOINT',
+						this.fila,
+						this.columna
+					);
+			case 'log10':
+				this.tipoDato = new Tipo(tipoDato.ENTERO);
+				if (
+					this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
+					this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
+				)
+					return Math.log10(parseInt(exp));
+				else
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION TOINT',
+						this.fila,
+						this.columna
+					);
+			case 'pow':
+				let posPow = this.posicion.interpretar(arbol,tabla);
+				let posPow2 = this.final.interpretar(arbol,tabla);	
+				this.tipoDato = new Tipo(tipoDato.ENTERO);
+				if ((this.posicion.tipoDato.getTipo() != tipoDato.ENTERO && this.final.tipoDato.getTipo() != tipoDato.ENTERO))
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO DIFERENTE',
+						this.fila,
+						this.columna
+					);
+				if (
+					this.expresion.tipoDato.getTipo() == tipoDato.DECIMAL ||
+					this.expresion.tipoDato.getTipo() == tipoDato.ENTERO
+				)
+					return Math.pow(posPow,posPow2);
+				else
+					return new Errores(
+						'SEMANTICO',
+						'TIPO DE DATO INCOMPATIBLE CON FUNCION POW',
+						this.fila,
+						this.columna
+					);
 			default:
 				return new Errores(
 					'SEMANTICO',
