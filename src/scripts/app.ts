@@ -73,11 +73,13 @@ compile?.addEventListener('click', () => {
 	setValueConsole('Compilando la entrada...\n\n');
 	sourceEditor.save();
 	let source = my_source.value;
+	//listaErrores.interpretar(source);
 	// TODO: Pasar traductor a clase
-	let ast: Arbol = analize_source(source);
+	/*let ast: Arbol = analize_source(source);
 	listaErrores.ast = ast;
+	listaErrores.traducir();*/
+	listaErrores.interpretar(source);
 	listaErrores.traducir();
-	// traducir(ast);
 });
 
 reports?.addEventListener('click', () => {

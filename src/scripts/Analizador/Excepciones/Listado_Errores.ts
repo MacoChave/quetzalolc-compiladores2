@@ -13,7 +13,6 @@ import graficarArbol from '../../Reportes/graficar';
 import asignacionVector from '../Instrucciones/asignacionVector';
 import asignacionLista from '../Instrucciones/asignacionLista';
 import agregarLista from '../Instrucciones/agregarLista';
-import funcMain from '../Instrucciones/Main';
 import {
 	addHeaderResult,
 	clearValueResult,
@@ -45,7 +44,7 @@ export class Listado_Errores {
 	public interpretar(texto_Entrada: string) {
 		listaErrores = new Array<Errores>();
 		let parser = require('../../Analizador/analizador');
-		 let entrada = texto_Entrada;
+		let entrada = texto_Entrada + '\n\n exec main();';
 		console.log('Analizaremos');
 		try {
 			 let ast = new Arbol(parser.parse(entrada));
@@ -96,11 +95,20 @@ export class Listado_Errores {
 					ast.actualizaConsola((<Errores>error).returnError());
 				}
 			}
+			for (let i of ast.getinstrucciones()) {
+				if (i instanceof Exec) {
+				  var resultador = i.interpretar(ast, tabla);
+				  if (resultador instanceof Errores) {
+					listaErrores.push(resultador);
+					ast.actualizaConsola((<Errores>resultador).returnError());
+				  }
+				}
+			}
 			this._ast = ast;
 			arbolNuevo = this._ast;
-			console.log(ast.getSimbolos());
-      		console.log(ast.getfunciones());
-      		console.log(ast.getconsola());
+			console.log(this._ast.getSimbolos());
+      		console.log(this._ast.getfunciones());
+      		console.log(this._ast.getconsola());
 			/*console.log(ast.getSimbolos());
       		console.log(ast.getfunciones());
       		console.log(ast.getconsola());*/
