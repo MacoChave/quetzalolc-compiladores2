@@ -10,7 +10,7 @@
 
 ## Interfaz gráfica
 
-[](./assets/GUI.jpeg)
+![](./assets/GUI.jpeg)
 
 La aplicación, cuenta con cuatro apartados:
 - Navbar
@@ -19,7 +19,7 @@ La aplicación, cuenta con cuatro apartados:
 - Editor de código destino (sólo lectura)
 ### Área de navegación
 
-[](./assets/GUI_Navigation.jpg)
+![](./assets/GUI_Navigation.jpg)
 
 Los pasos para la usabilidad de la aplicación web es la siguiente:
 
@@ -33,13 +33,13 @@ Los pasos para la usabilidad de la aplicación web es la siguiente:
 8. Aquí, puede observar los distintos reportes que se puede generar
 ### Área de código fuente
 
-[](./assets/GUI_Source.jpg)
+![](./assets/GUI_Source.jpg)
 ### Área de código de 3 direcciones
 
-[](./assets/GUI_Result.jpg)
+![](./assets/GUI_Result.jpg)
 ### Área de la consola
 
-[](./assets/GUI_Console.png)
+![](./assets/GUI_Console.png)
 ## Navegación
 
-[](./assets/GUI_Navbar.jpg)
+![](./assets/GUI_Navbar.jpg)
