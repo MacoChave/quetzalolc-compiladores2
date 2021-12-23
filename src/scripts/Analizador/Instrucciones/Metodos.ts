@@ -86,6 +86,7 @@ export default class Metodos extends Instruccion {
 			temporal: '',
 			tipo: -1,
 		};
+		console.log(this.instrucciones);
 		this.instrucciones.forEach((instruccion) => {
 			res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d;
 		});

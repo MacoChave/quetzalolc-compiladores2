@@ -27,7 +27,7 @@ export default class Declaracion extends Instruccion {
 	public getNodo(): nodoAST {
 		let nodo = new nodoAST('DECLARACION');
 		nodo.agregarHijo(obtenerValor(this.tipo.getTipo()) + '');
-		for(let ids = 0; ids < this.identificador.length; ids++){
+		for (let ids = 0; ids < this.identificador.length; ids++) {
 			nodo.agregarHijo(this.identificador[ids]);
 		}
 		if (this.valor != undefined) {
@@ -41,199 +41,219 @@ export default class Declaracion extends Instruccion {
 		if (this.valor === undefined) {
 			switch (this.tipo.getTipo()) {
 				case tipoDato.ENTERO:
-					for(let ids = 0; ids < this.identificador.length; ids++){
-					if (
-						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador[ids], 0)
-						) == 'La variable existe actualmente'
-					) {
-						return new Errores(
-							'SEMANTICO',
-							'LA VARIABLE ' +
-								this.identificador[ids] +
-								' EXISTE ACTUALMENTE',
-							this.fila,
-							this.columna
-						);
-					} else {
+					for (let ids = 0; ids < this.identificador.length; ids++) {
 						if (
-							!arbol.actualizarTabla(
-								this.identificador[ids],
-								'0',
-								this.fila.toString(),
-								tabla.getNombre().toString(),
-								this.columna.toString()
-							)
+							tabla.setVariable(
+								new Simbolo(
+									this.tipo,
+									this.identificador[ids],
+									0
+								)
+							) == 'La variable existe actualmente'
 						) {
-							let nuevoSimbolo = new reporteTabla(
-								this.identificador[ids],
-								'0',
-								'Variable',
-								obtenerValor(this.tipo.getTipo()) + '',
-								tabla.getNombre(),
-								this.fila.toString(),
-								this.columna.toString()
+							return new Errores(
+								'SEMANTICO',
+								'LA VARIABLE ' +
+									this.identificador[ids] +
+									' EXISTE ACTUALMENTE',
+								this.fila,
+								this.columna
 							);
-							arbol.listaSimbolos.push(nuevoSimbolo);
+						} else {
+							if (
+								!arbol.actualizarTabla(
+									this.identificador[ids],
+									'0',
+									this.fila.toString(),
+									tabla.getNombre().toString(),
+									this.columna.toString()
+								)
+							) {
+								let nuevoSimbolo = new reporteTabla(
+									this.identificador[ids],
+									'0',
+									'Variable',
+									obtenerValor(this.tipo.getTipo()) + '',
+									tabla.getNombre(),
+									this.fila.toString(),
+									this.columna.toString()
+								);
+								arbol.listaSimbolos.push(nuevoSimbolo);
+							}
 						}
-					}
 					}
 					break;
 				case tipoDato.DECIMAL:
-					for(let ids = 0; ids < this.identificador.length; ids++){
-					if (
-						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador[ids], 0.0)
-						) == 'La variable existe actualmente'
-					) {
-						return new Errores(
-							'SEMANTICO',
-							'LA VARIABLE ' +
-								this.identificador[ids] +
-								' EXISTE ACTUALMENTE',
-							this.fila,
-							this.columna
-						);
-					} else {
+					for (let ids = 0; ids < this.identificador.length; ids++) {
 						if (
-							!arbol.actualizarTabla(
-								this.identificador[ids],
-								'0.0',
-								this.fila.toString(),
-								tabla.getNombre().toString(),
-								this.columna.toString()
-							)
+							tabla.setVariable(
+								new Simbolo(
+									this.tipo,
+									this.identificador[ids],
+									0.0
+								)
+							) == 'La variable existe actualmente'
 						) {
-							let nuevoSimbolo = new reporteTabla(
-								this.identificador[ids],
-								'0.0',
-								'Variable',
-								obtenerValor(this.tipo.getTipo()) + '',
-								tabla.getNombre(),
-								this.fila.toString(),
-								this.columna.toString()
+							return new Errores(
+								'SEMANTICO',
+								'LA VARIABLE ' +
+									this.identificador[ids] +
+									' EXISTE ACTUALMENTE',
+								this.fila,
+								this.columna
 							);
-							arbol.listaSimbolos.push(nuevoSimbolo);
+						} else {
+							if (
+								!arbol.actualizarTabla(
+									this.identificador[ids],
+									'0.0',
+									this.fila.toString(),
+									tabla.getNombre().toString(),
+									this.columna.toString()
+								)
+							) {
+								let nuevoSimbolo = new reporteTabla(
+									this.identificador[ids],
+									'0.0',
+									'Variable',
+									obtenerValor(this.tipo.getTipo()) + '',
+									tabla.getNombre(),
+									this.fila.toString(),
+									this.columna.toString()
+								);
+								arbol.listaSimbolos.push(nuevoSimbolo);
+							}
 						}
 					}
-				}
 					break;
 				case tipoDato.CARACTER:
-					for(let ids = 0; ids < this.identificador.length; ids++){
-					if (
-						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador[ids], '\u0000')
-						) == 'La variable existe actualmente'
-					) {
-						return new Errores(
-							'SEMANTICO',
-							'LA VARIABLE ' +
-								this.identificador[ids] +
-								' EXISTE ACTUALMENTE',
-							this.fila,
-							this.columna
-						);
-					} else {
+					for (let ids = 0; ids < this.identificador.length; ids++) {
 						if (
-							!arbol.actualizarTabla(
-								this.identificador[ids],
-								'\u0000',
-								this.fila.toString(),
-								tabla.getNombre().toString(),
-								this.columna.toString()
-							)
+							tabla.setVariable(
+								new Simbolo(
+									this.tipo,
+									this.identificador[ids],
+									'\u0000'
+								)
+							) == 'La variable existe actualmente'
 						) {
-							let nuevoSimbolo = new reporteTabla(
-								this.identificador[ids],
-								'\u0000',
-								'Variable',
-								obtenerValor(this.tipo.getTipo()) + '',
-								tabla.getNombre(),
-								this.fila.toString(),
-								this.columna.toString()
+							return new Errores(
+								'SEMANTICO',
+								'LA VARIABLE ' +
+									this.identificador[ids] +
+									' EXISTE ACTUALMENTE',
+								this.fila,
+								this.columna
 							);
-							arbol.listaSimbolos.push(nuevoSimbolo);
+						} else {
+							if (
+								!arbol.actualizarTabla(
+									this.identificador[ids],
+									'\u0000',
+									this.fila.toString(),
+									tabla.getNombre().toString(),
+									this.columna.toString()
+								)
+							) {
+								let nuevoSimbolo = new reporteTabla(
+									this.identificador[ids],
+									'\u0000',
+									'Variable',
+									obtenerValor(this.tipo.getTipo()) + '',
+									tabla.getNombre(),
+									this.fila.toString(),
+									this.columna.toString()
+								);
+								arbol.listaSimbolos.push(nuevoSimbolo);
+							}
 						}
 					}
-				}
 					break;
 				case tipoDato.CADENA:
-					for(let ids = 0; ids < this.identificador.length; ids++){
-					if (
-						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador[ids], '')
-						) == 'La variable existe actualmente'
-					) {
-						return new Errores(
-							'SEMANTICO',
-							'LA VARIABLE ' +
-								this.identificador[ids] +
-								' EXISTE ACTUALMENTE',
-							this.fila,
-							this.columna
-						);
-					} else {
+					for (let ids = 0; ids < this.identificador.length; ids++) {
 						if (
-							!arbol.actualizarTabla(
-								this.identificador[ids],
-								'',
-								this.fila.toString(),
-								tabla.getNombre().toString(),
-								this.columna.toString()
-							)
+							tabla.setVariable(
+								new Simbolo(
+									this.tipo,
+									this.identificador[ids],
+									''
+								)
+							) == 'La variable existe actualmente'
 						) {
-							let nuevoSimbolo = new reporteTabla(
-								this.identificador[ids],
-								'',
-								'Variable',
-								obtenerValor(this.tipo.getTipo()) + '',
-								tabla.getNombre(),
-								this.fila.toString(),
-								this.columna.toString()
+							return new Errores(
+								'SEMANTICO',
+								'LA VARIABLE ' +
+									this.identificador[ids] +
+									' EXISTE ACTUALMENTE',
+								this.fila,
+								this.columna
 							);
-							arbol.listaSimbolos.push(nuevoSimbolo);
+						} else {
+							if (
+								!arbol.actualizarTabla(
+									this.identificador[ids],
+									'',
+									this.fila.toString(),
+									tabla.getNombre().toString(),
+									this.columna.toString()
+								)
+							) {
+								let nuevoSimbolo = new reporteTabla(
+									this.identificador[ids],
+									'',
+									'Variable',
+									obtenerValor(this.tipo.getTipo()) + '',
+									tabla.getNombre(),
+									this.fila.toString(),
+									this.columna.toString()
+								);
+								arbol.listaSimbolos.push(nuevoSimbolo);
+							}
 						}
 					}
-				}
 					break;
 				case tipoDato.BOOLEANO:
-					for(let ids = 0; ids < this.identificador.length; ids++){
-					if (
-						tabla.setVariable(
-							new Simbolo(this.tipo, this.identificador[ids], true)
-						) == 'La variable existe actualmente'
-					) {
-						return new Errores(
-							'SEMANTICO',
-							'LA VARIABLE ' +
-								this.identificador +
-								' EXISTE ACTUALMENTE',
-							this.fila,
-							this.columna
-						);
-					} else {
+					for (let ids = 0; ids < this.identificador.length; ids++) {
 						if (
-							!arbol.actualizarTabla(
-								this.identificador[ids],
-								'true',
-								this.fila.toString(),
-								tabla.getNombre().toString(),
-								this.columna.toString()
-							)
+							tabla.setVariable(
+								new Simbolo(
+									this.tipo,
+									this.identificador[ids],
+									true
+								)
+							) == 'La variable existe actualmente'
 						) {
-							let nuevoSimbolo = new reporteTabla(
-								this.identificador[ids],
-								'true',
-								'Variable',
-								obtenerValor(this.tipo.getTipo()) + '',
-								tabla.getNombre(),
-								this.fila.toString(),
-								this.columna.toString()
+							return new Errores(
+								'SEMANTICO',
+								'LA VARIABLE ' +
+									this.identificador +
+									' EXISTE ACTUALMENTE',
+								this.fila,
+								this.columna
 							);
-							arbol.listaSimbolos.push(nuevoSimbolo);
+						} else {
+							if (
+								!arbol.actualizarTabla(
+									this.identificador[ids],
+									'true',
+									this.fila.toString(),
+									tabla.getNombre().toString(),
+									this.columna.toString()
+								)
+							) {
+								let nuevoSimbolo = new reporteTabla(
+									this.identificador[ids],
+									'true',
+									'Variable',
+									obtenerValor(this.tipo.getTipo()) + '',
+									tabla.getNombre(),
+									this.fila.toString(),
+									this.columna.toString()
+								);
+								arbol.listaSimbolos.push(nuevoSimbolo);
+							}
 						}
 					}
-				}
 					break;
 			}
 		} else {
@@ -246,43 +266,43 @@ export default class Declaracion extends Instruccion {
 					this.columna
 				);
 			} else {
-				for(let ids = 0; ids < this.identificador.length; ids++){
-				if (
-					tabla.setVariable(
-						new Simbolo(this.tipo, this.identificador[ids], val)
-					) == 'La variable existe actualmente'
-				) {
-					return new Errores(
-						'SEMANTICO',
-						'LA VARIABLE ' +
-							this.identificador[ids] +
-							' EXISTE ACTUALMENTE',
-						this.fila,
-						this.columna
-					);
-				} else {
+				for (let ids = 0; ids < this.identificador.length; ids++) {
 					if (
-						!arbol.actualizarTabla(
-							this.identificador[ids],
-							val,
-							this.fila.toString(),
-							tabla.getNombre().toString(),
-							this.columna.toString()
-						)
+						tabla.setVariable(
+							new Simbolo(this.tipo, this.identificador[ids], val)
+						) == 'La variable existe actualmente'
 					) {
-						let nuevoSimbolo = new reporteTabla(
-							this.identificador[ids],
-							val,
-							'Variable',
-							obtenerValor(this.tipo.getTipo()) + '',
-							tabla.getNombre(),
-							this.fila.toString(),
-							this.columna.toString()
+						return new Errores(
+							'SEMANTICO',
+							'LA VARIABLE ' +
+								this.identificador[ids] +
+								' EXISTE ACTUALMENTE',
+							this.fila,
+							this.columna
 						);
-						arbol.listaSimbolos.push(nuevoSimbolo);
+					} else {
+						if (
+							!arbol.actualizarTabla(
+								this.identificador[ids],
+								val,
+								this.fila.toString(),
+								tabla.getNombre().toString(),
+								this.columna.toString()
+							)
+						) {
+							let nuevoSimbolo = new reporteTabla(
+								this.identificador[ids],
+								val,
+								'Variable',
+								obtenerValor(this.tipo.getTipo()) + '',
+								tabla.getNombre(),
+								this.fila.toString(),
+								this.columna.toString()
+							);
+							arbol.listaSimbolos.push(nuevoSimbolo);
+						}
 					}
 				}
-			}
 			}
 		}
 	}
@@ -298,80 +318,70 @@ export default class Declaracion extends Instruccion {
 			tipo: -1,
 		};
 		let c3d: string = '\t// ==========> DECLARACION\n';
-		if (this.valor === undefined) {
-			// SIN INICIALIZAR
-			for(let ids = 0; ids < this.identificador.length; ids++){
-			if (this.tipo.getTipo() === tipoDato.ENTERO) {
-				let simbolo = new Simbolo(
-					new Tipo(tipoDato.ENTERO),
-					this.identificador[ids],
-					0
-				);
+		this.identificador.forEach((id) => {
+			if (this.valor === undefined) {
+				// SIN INICIALIZAR
+				if (this.tipo.getTipo() === tipoDato.ENTERO) {
+					let simbolo = new Simbolo(new Tipo(tipoDato.ENTERO), id, 0);
+					let posRelativa = tabla.setVariable3d(simbolo);
+					if (posRelativa < 0) return res;
+
+					c3d += `\tstack[(int) ${posRelativa}] = 0;\n`;
+				} else if (this.tipo.getTipo() === tipoDato.DECIMAL) {
+					let simbolo = new Simbolo(
+						new Tipo(tipoDato.DECIMAL),
+						id,
+						0.0
+					);
+					let posRelativa = tabla.setVariable3d(simbolo);
+					if (posRelativa < 0) return res;
+
+					c3d += `\tstack[(int) ${posRelativa}] = 0.0;\n`;
+				} else if (this.tipo.getTipo() === tipoDato.CARACTER) {
+					let simbolo = new Simbolo(
+						new Tipo(tipoDato.CARACTER),
+						id,
+						''
+					);
+					let posRelativa = tabla.setVariable3d(simbolo);
+					if (posRelativa < 0) return res;
+
+					c3d += `\tstack[(int) ${posRelativa}] = '';\n`;
+				} else if (this.tipo.getTipo() === tipoDato.CADENA) {
+					let simbolo = new Simbolo(
+						new Tipo(tipoDato.CADENA),
+						id,
+						''
+					);
+					let posRelativa = tabla.setVariable3d(simbolo);
+					if (posRelativa < 0) return res;
+
+					c3d += `\tstack[(int) ${posRelativa}] = -1;\n`;
+				} else if (this.tipo.getTipo() === tipoDato.BOOLEANO) {
+					let simbolo = new Simbolo(
+						new Tipo(tipoDato.BOOLEANO),
+						id,
+						true
+					);
+					let posRelativa = tabla.setVariable3d(simbolo);
+					if (posRelativa < 0) return res;
+
+					c3d += `\tstack[(int) ${posRelativa}] = 0;\n`;
+				}
+			} else {
+				// INICIALIZADO
+				let valor: Codigo3d = this.valor.traducir(arbol, tabla);
+				if (valor.tipo === -1) return res;
+
+				c3d += `${valor.codigo3d}\n`;
+				let simbolo = new Simbolo(new Tipo(valor.tipo), id, '');
 				let posRelativa = tabla.setVariable3d(simbolo);
+
 				if (posRelativa < 0) return res;
 
-				c3d = `\tstack[(int) ${posRelativa}] = 0;\n`;
-			} else if (this.tipo.getTipo() === tipoDato.DECIMAL) {
-				let simbolo = new Simbolo(
-					new Tipo(tipoDato.DECIMAL),
-					this.identificador[ids],
-					0.0
-				);
-				let posRelativa = tabla.setVariable3d(simbolo);
-				if (posRelativa < 0) return res;
-
-				c3d = `\tstack[(int) ${posRelativa}] = 0.0;\n`;
-			} else if (this.tipo.getTipo() === tipoDato.CARACTER) {
-				let simbolo = new Simbolo(
-					new Tipo(tipoDato.CARACTER),
-					this.identificador[ids],
-					''
-				);
-				let posRelativa = tabla.setVariable3d(simbolo);
-				if (posRelativa < 0) return res;
-
-				c3d = `\tstack[(int) ${posRelativa}] = '';\n`;
-			} else if (this.tipo.getTipo() === tipoDato.CADENA) {
-				let simbolo = new Simbolo(
-					new Tipo(tipoDato.CADENA),
-					this.identificador[ids],
-					''
-				);
-				let posRelativa = tabla.setVariable3d(simbolo);
-				if (posRelativa < 0) return res;
-
-				c3d = `\tstack[(int) ${posRelativa}] = -1;\n`;
-			} else if (this.tipo.getTipo() === tipoDato.BOOLEANO) {
-				let simbolo = new Simbolo(
-					new Tipo(tipoDato.BOOLEANO),
-					this.identificador[ids],
-					true
-				);
-				let posRelativa = tabla.setVariable3d(simbolo);
-				if (posRelativa < 0) return res;
-
-				c3d = `\tstack[(int) ${posRelativa}] = 0;\n`;
+				c3d += `\tstack[(int) ${posRelativa}] = ${valor.temporal};\n`;
 			}
-		}
-		} else {
-			// INICIALIZADO
-			let valor: Codigo3d = this.valor.traducir(arbol, tabla);
-			if (valor.tipo === -1) return res;
-
-			c3d += `${valor.codigo3d}\n`;
-			for(let ids = 0; ids < this.identificador.length; ids++){
-			let simbolo = new Simbolo(
-				new Tipo(valor.tipo),
-				this.identificador[ids],
-				''
-			);
-			let posRelativa = tabla.setVariable3d(simbolo);
-
-			if (posRelativa < 0) return res;
-
-			c3d += `\tstack[(int) ${posRelativa}] = ${valor.temporal};\n`;
-			}
-		}
+		});
 		c3d += '\t// ==========> END DECLARACION\n';
 		res.codigo3d = c3d;
 		return res;

@@ -244,6 +244,8 @@ export default class LlamadaFuncMetd extends Instruccion {
 			tipo: -1,
 		};
 		let c3d = '';
+
+		res.codigo3d = c3d;
 		return res;
 	}
 }

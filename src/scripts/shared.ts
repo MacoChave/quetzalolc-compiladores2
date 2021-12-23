@@ -8,6 +8,11 @@ export const setValueResult = (res: string) => {
 	resultEditor.save();
 };
 
+export const clearValueConsole = () => {
+	consoleEditor.setValue('');
+	consoleEditor.save();
+};
+
 export const clearValueResult = () => {
 	resultEditor.setValue('');
 	resultEditor.save();

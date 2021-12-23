@@ -75,7 +75,19 @@ export default class Print extends Instruccion {
 		let c3d: string = '';
 
 		if (valor.tipo === tipoDato.BOOLEANO) {
-			c3d += `\tprintf("%i", (int) ${valor.temporal});\n`;
+			let temp = new_temporal();
+			let l_exit = new_etiqueta();
+			valor.etq_verdaderas.forEach((element) => {
+				c3d += `${element}:\n`;
+			});
+			c3d += `\t${temp} = 1;\n`;
+			c3d += `\tgoto ${l_exit};\n`;
+			valor.etq_falsas.forEach((element) => {
+				c3d += `${element}:\n`;
+			});
+			c3d += `\t${temp} = 0;\n`;
+			c3d += `${l_exit}:`;
+			c3d += `\tprintf("%i", (int) ${temp});\n`;
 		} else if (valor.tipo === tipoDato.CARACTER) {
 			c3d += `\tprintf("%c", (char) ${valor.temporal});\n`;
 		} else if (valor.tipo === tipoDato.CADENA) {

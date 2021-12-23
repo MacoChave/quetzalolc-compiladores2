@@ -1,4 +1,4 @@
-import { Codigo3d, new_etiqueta, new_temporal } from '../../Abstracto/Codigo3d';
+import { Codigo3d, new_etiqueta } from '../../Abstracto/Codigo3d';
 import { Instruccion } from '../../Abstracto/Instruccion';
 import nodoAST from '../../Abstracto/nodoAST';
 import Errores from '../../Excepciones/Errores';
@@ -137,7 +137,6 @@ export default class condIf extends Instruccion {
 		let l_exit = new_etiqueta();
 
 		let resCondicion = this.cond1.traducir(arbol, tabla);
-		// console.log(resCondicion);
 		if (resCondicion.tipo === -1) return res;
 
 		c3d += resCondicion.codigo3d;
@@ -148,31 +147,38 @@ export default class condIf extends Instruccion {
 		let nuevaTabla = new tablaSimbolos(tabla);
 		nuevaTabla.setNombre('If');
 
+		c3d += `\t // -> IF\n`;
 		this.condIf.forEach((cif) => {
-			c3d += cif.traducir(arbol, nuevaTabla).codigo3d;
+			let c3dIf = cif.traducir(arbol, nuevaTabla).codigo3d;
+			c3d += c3dIf;
 			// TODO: Evaluar return y continue
-			c3d += `\tgoto ${l_exit};\n`;
 		});
+		c3d += `\tgoto ${l_exit};\n`;
 
 		resCondicion.etq_falsas.forEach((etiqueta) => {
 			c3d += `${etiqueta}:\n`;
 		});
 
 		if (this.condElse !== undefined) {
+			c3d += `\t // -> ELSE\n`;
 			let nuevaTabla = new tablaSimbolos(tabla);
 			nuevaTabla.setNombre('else');
 			this.condElse.forEach((celse) => {
-				c3d += celse.traducir(arbol, nuevaTabla).codigo3d;
+				let sent = celse.traducir(arbol, nuevaTabla).codigo3d;
+				c3d += sent;
 				// TODO: Evaluar return y continue
-				c3d += `\tgoto ${l_exit};\n`;
 			});
-		} else if (this.condElseIf !== undefined) {
+			c3d += `\tgoto ${l_exit};\n`;
+			c3d += `${l_exit}: // FIN DE ELSE IF\n`;
+		}
+		if (this.condElseIf !== undefined) {
+			c3d += `\t // -> ELSE IF\n`;
 			c3d += this.condElseIf.traducir(arbol, tabla).codigo3d;
 			// TODO: Evaluar return y continue
 			c3d += `\tgoto ${l_exit};\n`;
 		}
 
-		c3d += `${l_exit}:\n`;
+		if (this.condElse === undefined) c3d += `${l_exit}:\n`;
 		c3d += '\t// ==========> END IF\n';
 		res.codigo3d = c3d;
 		res.tipo = 0;

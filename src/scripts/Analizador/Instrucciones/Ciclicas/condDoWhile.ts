@@ -6,7 +6,7 @@ import Arbol from '../../TS/Arbol';
 import tablaSimbolos from '../../TS/tablaSimbolos';
 import Tipo, { tipoDato } from '../../TS/Tipo';
 import Return from '../Return';
-import { Codigo3d } from '../../Abstracto/Codigo3d';
+import { Codigo3d, new_etiqueta } from '../../Abstracto/Codigo3d';
 
 export default class condWhile extends Instruccion {
 	private condicion: Instruccion;
@@ -72,8 +72,35 @@ export default class condWhile extends Instruccion {
 			temporal: '',
 			tipo: -1,
 		};
-		let c3d = '\t/// ==========> \n';
-		c3d = '\t/// ==========> END\n';
+		let newTabla = new tablaSimbolos(tabla);
+		newTabla.setNombre('Do While');
+		let condicion: Codigo3d = this.condicion.traducir(arbol, newTabla);
+		if (condicion.tipo !== tipoDato.BOOLEANO) return res;
+
+		let l_exit: string = new_etiqueta();
+		let localSt: string | null = localStorage.getItem('l_exit');
+		let l_exitArr = localSt ? JSON.parse(localSt) : [];
+		l_exitArr.push(l_exit);
+		localStorage.setItem('l_exit', JSON.stringify(l_exitArr));
+
+		let c3d = '\t// ==========> DO WHILE\n';
+		condicion.etq_verdaderas.forEach((element) => {
+			c3d += `${element}:\n`;
+		});
+
+		this.expresion.forEach((element) => {
+			c3d += element.traducir(arbol, newTabla).codigo3d;
+		});
+
+		condicion.etq_falsas.forEach((element) => {
+			c3d += `${element}:\n`;
+		});
+		c3d += `${l_exit}:\n`;
+		c3d += '\t// ==========> END DO WHILE\n';
+
+		l_exitArr.pop();
+		localStorage.setItem('l_exit', JSON.stringify(l_exitArr));
+		res.codigo3d = c3d;
 		return res;
 	}
 }

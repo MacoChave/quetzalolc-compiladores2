@@ -1,32 +1,11 @@
 let parser = require('./Analizador/analizador');
 
-import {
-	addHeaderResult,
-	clearValueResult,
-	setValueConsole,
-	setValueResult,
-} from './shared';
+import { clearValueConsole, clearValueResult, setValueConsole } from './shared';
 import Arbol from './Analizador/TS/Arbol';
-import tablaSimbolos from './Analizador/TS/tablaSimbolos';
-import Funciones from './Analizador/Instrucciones/Funciones';
-import Metodos from './Analizador/Instrucciones/Metodos';
-import Exec from './Analizador/Instrucciones/Exec';
-import Declaracion from './Analizador/Instrucciones/Declaracion';
-import declaracionVectores from './Analizador/Instrucciones/declaracionVectores';
-import declaracionListas from './Analizador/Instrucciones/declaracionListas';
-import asignacionVector from './Analizador/Instrucciones/asignacionVector';
-import asignacionLista from './Analizador/Instrucciones/asignacionLista';
-import agregarLista from './Analizador/Instrucciones/agregarLista';
-import Main from './Analizador/Instrucciones/Main';
-import { Instruccion } from './Analizador/Abstracto/Instruccion';
 import { clear_data } from './Analizador/Abstracto/Codigo3d';
-import Print from './Analizador/Instrucciones/print';
-import LlamadaFuncMetd from './Analizador/Instrucciones/LlamadaFuncMetd';
 import { Listado_Errores } from './Analizador/Excepciones/Listado_Errores';
-import { ControlInterprete } from './Analizador/Excepciones/ControlInterprete';
 
 let listaErrores = new Listado_Errores();
-let pruebaErrores =  new ControlInterprete();
 
 const file = document.querySelector('#file');
 const open_file = document.querySelector('#open_file');
@@ -78,6 +57,7 @@ clear_file?.addEventListener('click', () => {
 });
 
 analize?.addEventListener('click', () => {
+	clearValueConsole();
 	setValueConsole('Interpretando la entrada...\n\n');
 	sourceEditor.save();
 	let source = my_source.value;

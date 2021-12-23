@@ -1,4 +1,4 @@
-import { Codigo3d, new_temporal } from '../Abstracto/Codigo3d';
+import { Codigo3d } from '../Abstracto/Codigo3d';
 import { Instruccion } from '../Abstracto/Instruccion';
 import nodoAST from '../Abstracto/nodoAST';
 import Errores from '../Excepciones/Errores';
@@ -78,7 +78,20 @@ export default class Asignacion extends Instruccion {
 		if (variable === null) return res;
 
 		let valor = this.valor.traducir(arbol, tabla);
-		if (variable.gettipo().getTipo() !== valor.tipo) return res;
+		if (
+			variable.gettipo().getTipo() === tipoDato.ENTERO &&
+			(valor.tipo === tipoDato.ENTERO || valor.tipo === tipoDato.DECIMAL)
+		)
+			if (variable.gettipo().getTipo() !== valor.tipo) {
+				if (
+					!(
+						variable.gettipo().getTipo() === tipoDato.ENTERO &&
+						(valor.tipo === tipoDato.ENTERO ||
+							valor.tipo === tipoDato.DECIMAL)
+					)
+				)
+					return res;
+			}
 
 		// let temp = new_temporal()
 		let c3d = '\t// ==========> ASIGNACION\n';

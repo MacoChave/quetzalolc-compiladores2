@@ -738,7 +738,7 @@ exports.clear_data = clear_data;
 var new_temporal = function () {
     var temp_number = cont_temporales;
     cont_temporales++;
-    var temp = "t".concat(temp_number);
+    var temp = "t" + temp_number;
     temporales.push(temp);
     return temp;
 };
@@ -746,7 +746,7 @@ exports.new_temporal = new_temporal;
 var new_etiqueta = function () {
     var etiqueta = cont_etiquetas;
     cont_etiquetas++;
-    return "L".concat(etiqueta);
+    return "L" + etiqueta;
 };
 exports.new_etiqueta = new_etiqueta;
 var new_stackPos = function () {
@@ -763,7 +763,7 @@ var agregarCabecera = function () {
     header += 'double P;\n';
     header += 'double H;\n\n';
     temporales.forEach(function (temp) {
-        header += "float ".concat(temp, ";\n");
+        header += "float " + temp + ";\n";
     });
     return header;
 };
@@ -881,106 +881,6 @@ exports.default = nodoAST;
 
 },{}],7:[function(require,module,exports){
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ControlInterprete = exports.listaErrores = void 0;
-var nodoAST_1 = __importDefault(require("../Abstracto/nodoAST"));
-var Errores_1 = __importDefault(require("../Excepciones/Errores"));
-var Asignacion_1 = __importDefault(require("../Instrucciones/Asignacion"));
-var Declaracion_1 = __importDefault(require("../Instrucciones/Declaracion"));
-var declaracionVectores_1 = __importDefault(require("../Instrucciones/declaracionVectores"));
-var Funciones_1 = __importDefault(require("../Instrucciones/Funciones"));
-var Metodos_1 = __importDefault(require("../Instrucciones/Metodos"));
-var Arbol_1 = __importDefault(require("../TS/Arbol"));
-var tablaSimbolos_1 = __importDefault(require("../TS/tablaSimbolos"));
-var graficar_1 = __importDefault(require("../../Reportes/graficar"));
-var asignacionVector_1 = __importDefault(require("../Instrucciones/asignacionVector"));
-var arbolNuevo;
-var contador;
-var cuerpo;
-//tablas arboles y excepcciones
-var ControlInterprete = /** @class */ (function () {
-    function ControlInterprete() {
-    }
-    ControlInterprete.prototype.interpretar = function (texto_Entrada) {
-        exports.listaErrores = new Array();
-        var parser = require('../../Analizador/analizador');
-        var entrada = texto_Entrada;
-        console.log('Analizando....');
-        //console.log(entrada);
-        try {
-            var ast = new Arbol_1.default(parser.parse(entrada));
-            var tabla = new tablaSimbolos_1.default();
-            ast.settablaGlobal(tabla);
-            //Manejo de pasadas
-            //busqueda y guardado de funciones o metodos
-            for (var _i = 0, _a = ast.getinstrucciones(); _i < _a.length; _i++) {
-                var i = _a[_i];
-                if ((i instanceof Metodos_1.default || i instanceof Funciones_1.default)) {
-                    ast.getfunciones().push(i);
-                }
-            }
-            for (var _b = 0, _c = ast.getinstrucciones(); _b < _c.length; _b++) {
-                var i = _c[_b];
-                //busqueda de errores y actualizacion de consola
-                if (i instanceof Errores_1.default) {
-                    exports.listaErrores.push(i);
-                    ast.actualizaConsola(i.returnError());
-                }
-                //si encuentra metodos o funciones que continue
-                if (i instanceof Metodos_1.default || i instanceof Funciones_1.default)
-                    continue;
-                if (i instanceof Declaracion_1.default ||
-                    i instanceof Asignacion_1.default ||
-                    i instanceof declaracionVectores_1.default ||
-                    i instanceof asignacionVector_1.default) {
-                    var resultador = i.interpretar(ast, tabla);
-                    if (resultador instanceof Errores_1.default) {
-                        exports.listaErrores.push(resultador);
-                        ast.actualizaConsola(resultador.returnError());
-                    }
-                }
-                else {
-                    var error = new Errores_1.default('SEMANTICO', 'SENTENCIA FUERA DE METODO', i.fila, i.columna);
-                    exports.listaErrores.push(error);
-                    ast.actualizaConsola(error.returnError());
-                }
-            }
-            arbolNuevo = ast;
-            console.log(ast.getSimbolos());
-            console.log(ast.getfunciones());
-            console.log(ast.getconsola());
-            /*res.send({
-              resultado: ast.getconsola(),
-              errores: listaErrores,
-              tabla: ast.getSimbolos(),
-            });*/
-        }
-        catch (err) {
-            //res.json({ error: err, errores: listaErrores });
-        }
-    };
-    ControlInterprete.prototype.graficar = function (req, res) {
-        var otro = arbolNuevo;
-        if (otro == null)
-            return; //res.json({ msg: false });
-        var arbolAst = new nodoAST_1.default('RAIZ');
-        var nodoINS = new nodoAST_1.default('INSTRUCCIONES');
-        otro.getinstrucciones().forEach(function (element) {
-            nodoINS.agregarHijoAST(element.getNodo());
-        });
-        arbolAst.agregarHijoAST(nodoINS);
-        (0, graficar_1.default)(arbolAst);
-        return ""; //res.json({ msg: true });
-    };
-    return ControlInterprete;
-}());
-exports.ControlInterprete = ControlInterprete;
-
-},{"../../Analizador/analizador":50,"../../Reportes/graficar":52,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../Instrucciones/Asignacion":16,"../Instrucciones/Declaracion":27,"../Instrucciones/Funciones":30,"../Instrucciones/Metodos":34,"../Instrucciones/asignacionVector":40,"../Instrucciones/declaracionVectores":43,"../TS/Arbol":46,"../TS/tablaSimbolos":49}],8:[function(require,module,exports){
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Errores = /** @class */ (function () {
     function Errores(tipo, desc, fila, columna) {
@@ -1009,7 +909,7 @@ var Errores = /** @class */ (function () {
 }());
 exports.default = Errores;
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -1118,7 +1018,7 @@ var Listado_Errores = /** @class */ (function () {
         this.traducirFunciones();
         this.traducirMetodos();
         this.traducirPrincipal(globales);
-        (0, shared_1.addHeaderResult)();
+        shared_1.addHeaderResult();
     };
     Listado_Errores.prototype.traducirFunciones = function () {
         var _this = this;
@@ -1126,10 +1026,10 @@ var Listado_Errores = /** @class */ (function () {
             .getinstrucciones()
             .filter(function (instruccion) { return instruccion instanceof Funciones_1.default; });
         instrucciones.forEach(function (instruccion) {
-            (0, shared_1.setValueResult)("\nvoid ".concat(instruccion.identificador, " () {\n"));
+            shared_1.setValueResult("\nvoid " + instruccion.identificador + " () {\n");
             var result = instruccion.traducir(_this._ast, _this.tabla).codigo3d;
-            (0, shared_1.setValueResult)(result);
-            (0, shared_1.setValueResult)('}\n');
+            shared_1.setValueResult(result);
+            shared_1.setValueResult('}\n');
         });
     };
     Listado_Errores.prototype.traducirMetodos = function () {
@@ -1141,10 +1041,10 @@ var Listado_Errores = /** @class */ (function () {
                 instruccion.identificador !== 'main';
         });
         instrucciones.forEach(function (instruccion) {
-            (0, shared_1.setValueResult)("\nvoid ".concat(instruccion.identificador, " () {\n"));
+            shared_1.setValueResult("\nvoid " + instruccion.identificador + " () {\n");
             var result = instruccion.traducir(_this._ast, _this.tabla).codigo3d;
-            (0, shared_1.setValueResult)(result);
-            (0, shared_1.setValueResult)('}\n');
+            shared_1.setValueResult(result);
+            shared_1.setValueResult('}\n');
         });
     };
     Listado_Errores.prototype.traducirGlobales = function () {
@@ -1186,18 +1086,18 @@ var Listado_Errores = /** @class */ (function () {
         });
         if (instrucciones.length !== 1) {
             if (instrucciones.length === 0) {
-                (0, shared_1.setValueConsole)('No se encontró un método principal\n');
+                shared_1.setValueConsole('No se encontró un método principal\n');
             }
             else {
-                (0, shared_1.setValueConsole)('Se encontró más de un método principal\n');
-                (0, shared_1.clearValueResult)();
+                shared_1.setValueConsole('Se encontró más de un método principal\n');
+                shared_1.clearValueResult();
             }
             return;
         }
         result += instrucciones[0].traducir(this._ast, this.tabla).codigo3d;
         result += '\treturn;\n';
         result += '}\n';
-        (0, shared_1.setValueResult)(result);
+        shared_1.setValueResult(result);
     };
     Listado_Errores.prototype.graficar = function () {
         var otro = arbolNuevo;
@@ -1209,14 +1109,14 @@ var Listado_Errores = /** @class */ (function () {
             nodoINS.agregarHijoAST(element.getNodo());
         });
         arbolAst.agregarHijoAST(nodoINS);
-        (0, graficar_1.default)(arbolAst);
+        graficar_1.default(arbolAst);
         return /*res.json({ msg: true })*/;
     };
     return Listado_Errores;
 }());
 exports.Listado_Errores = Listado_Errores;
 
-},{"../../Analizador/analizador":50,"../../Reportes/graficar":52,"../../shared":55,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../Instrucciones/Asignacion":16,"../Instrucciones/Declaracion":27,"../Instrucciones/Exec":29,"../Instrucciones/Funciones":30,"../Instrucciones/Metodos":34,"../Instrucciones/agregarLista":38,"../Instrucciones/asignacionLista":39,"../Instrucciones/asignacionVector":40,"../Instrucciones/declaracionListas":42,"../Instrucciones/declaracionVectores":43,"../TS/Arbol":46,"../TS/tablaSimbolos":49}],10:[function(require,module,exports){
+},{"../../Analizador/analizador":49,"../../Reportes/graficar":51,"../../shared":54,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Instrucciones/Asignacion":15,"../Instrucciones/Declaracion":26,"../Instrucciones/Exec":28,"../Instrucciones/Funciones":29,"../Instrucciones/Metodos":33,"../Instrucciones/agregarLista":37,"../Instrucciones/asignacionLista":38,"../Instrucciones/asignacionVector":39,"../Instrucciones/declaracionListas":41,"../Instrucciones/declaracionVectores":42,"../TS/Arbol":45,"../TS/tablaSimbolos":48}],9:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -1826,12 +1726,12 @@ var Aritmetica = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
-        var temp = (0, Codigo3d_1.new_temporal)();
-        var c3d = "".concat(izq.codigo3d, "\n").concat(der.codigo3d, "\n");
+        var temp = Codigo3d_1.new_temporal();
+        var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
         if (op === '%')
-            c3d += "\t".concat(temp, " = (int) ").concat(izq.temporal, " ").concat(op, " (int) ").concat(der.temporal, ";\n");
+            c3d += "\t" + temp + " = fmod(" + izq.temporal + ", " + der.temporal + ");\n";
         else
-            c3d += "\t".concat(temp, " = ").concat(izq.temporal, " ").concat(op, " ").concat(der.temporal, ";\n");
+            c3d += "\t" + temp + " = " + izq.temporal + " " + op + " " + der.temporal + ";\n";
         if (izq.tipo === Tipo_1.tipoDato.DECIMAL || der.tipo === Tipo_1.tipoDato.DECIMAL) {
             res.tipo = Tipo_1.tipoDato.DECIMAL;
         }
@@ -1857,9 +1757,9 @@ var Aritmetica = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
-        var temp = (0, Codigo3d_1.new_temporal)();
-        var c3d = "".concat(izq.codigo3d, "\n");
-        c3d += "\t".concat(temp, " = ").concat(izq.temporal, " * -1;\n");
+        var temp = Codigo3d_1.new_temporal();
+        var c3d = izq.codigo3d + "\n";
+        c3d += "\t" + temp + " = " + izq.temporal + " * -1;\n";
         if (izq.tipo === Tipo_1.tipoDato.DECIMAL)
             res.tipo = Tipo_1.tipoDato.DECIMAL;
         else if (izq.tipo === Tipo_1.tipoDato.ENTERO || izq.tipo === Tipo_1.tipoDato.CARACTER)
@@ -1883,7 +1783,7 @@ var Operadores;
     Operadores[Operadores["MENOSNUM"] = 5] = "MENOSNUM";
 })(Operadores = exports.Operadores || (exports.Operadores = {}));
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],11:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],10:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2107,44 +2007,44 @@ var Cadena = /** @class */ (function (_super) {
         if (((izq.tipo === Tipo_1.tipoDato.CADENA || izq.tipo === Tipo_1.tipoDato.CARACTER) &&
             der.tipo === Tipo_1.tipoDato.CADENA) ||
             der.tipo === Tipo_1.tipoDato.CARACTER) {
-            var temp = (0, Codigo3d_1.new_temporal)();
-            var t_valor = (0, Codigo3d_1.new_temporal)();
-            var label1 = (0, Codigo3d_1.new_etiqueta)();
-            var label2 = (0, Codigo3d_1.new_etiqueta)();
-            var label3 = (0, Codigo3d_1.new_etiqueta)();
-            var c3d = "".concat(izq.codigo3d, "\n").concat(der.codigo3d, "\n");
-            c3d += "".concat(temp, " = H;\n");
+            var temp = Codigo3d_1.new_temporal();
+            var t_valor = Codigo3d_1.new_temporal();
+            var label1 = Codigo3d_1.new_etiqueta();
+            var label2 = Codigo3d_1.new_etiqueta();
+            var label3 = Codigo3d_1.new_etiqueta();
+            var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
+            c3d += temp + " = H;\n";
             if (izq.tipo === Tipo_1.tipoDato.CADENA) {
-                c3d += "".concat(label1, ":\n");
-                c3d += "\t".concat(t_valor, " = heap[(int) ").concat(izq.temporal, "];\n");
-                c3d += "\theap[(int) H] = ".concat(t_valor, ";\n");
+                c3d += label1 + ":\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + izq.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
-                c3d += "\t".concat(izq.temporal, " = ").concat(izq.temporal, " + 1;\n");
-                c3d += "\t".concat(t_valor, " = heap[(int) ").concat(izq.temporal, "];\n");
-                c3d += "\tif (".concat(t_valor, " != -1) goto ").concat(label1, ";\n");
-                c3d += "\tgoto ".concat(label2, ";\n");
+                c3d += "\t" + izq.temporal + " = " + izq.temporal + " + 1;\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + izq.temporal + "];\n";
+                c3d += "\tif (" + t_valor + " != -1) goto " + label1 + ";\n";
+                c3d += "\tgoto " + label2 + ";\n";
             }
             else {
-                c3d += "\theap[(int) H] = ".concat(izq.temporal, ";\n");
+                c3d += "\theap[(int) H] = " + izq.temporal + ";\n";
                 c3d += '\tH = H + 1;\n';
             }
             if (der.tipo === Tipo_1.tipoDato.CADENA) {
-                c3d += "".concat(label2, ":\n");
-                c3d += "\t".concat(t_valor, " = heap[(int) ").concat(der.temporal, "];\n");
-                c3d += "\theap[(int) H] = ".concat(t_valor, ";\n");
+                c3d += label2 + ":\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + der.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
-                c3d += "\t".concat(der.temporal, " = ").concat(der.temporal, " + 1;\n");
-                c3d += "\t".concat(t_valor, " = heap[(int) ").concat(der.temporal, "];\n");
-                c3d += "\tif (".concat(t_valor, " != -1) goto ").concat(label2, ";\n");
-                c3d += "\tgoto ".concat(label3, ";\n");
+                c3d += "\t" + der.temporal + " = " + der.temporal + " + 1;\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + der.temporal + "];\n";
+                c3d += "\tif (" + t_valor + " != -1) goto " + label2 + ";\n";
+                c3d += "\tgoto " + label3 + ";\n";
             }
             else {
-                c3d += "".concat(label2, ":\n");
-                c3d += "\theap[(int) H] = ".concat(der.temporal, ";\n");
+                c3d += label2 + ":\n";
+                c3d += "\theap[(int) H] = " + der.temporal + ";\n";
                 c3d += '\tH = H + 1;\n';
-                c3d += "\tgoto ".concat(label3, ";\n");
+                c3d += "\tgoto " + label3 + ";\n";
             }
-            c3d += "".concat(label3, ":\n");
+            c3d += label3 + ":\n";
             c3d += "\theap[(int) H] = -1;\n";
             c3d += '\tH = H + 1;\n';
             res.codigo3d = c3d;
@@ -2166,43 +2066,43 @@ var Cadena = /** @class */ (function (_super) {
         };
         if ((izq.tipo === Tipo_1.tipoDato.CADENA || izq.tipo === Tipo_1.tipoDato.CARACTER) &&
             der.tipo === Tipo_1.tipoDato.ENTERO) {
-            var temp = (0, Codigo3d_1.new_temporal)();
-            var temp_izq = (0, Codigo3d_1.new_temporal)();
-            var t_valor = (0, Codigo3d_1.new_temporal)();
-            var t_cont = (0, Codigo3d_1.new_temporal)();
-            var label1 = (0, Codigo3d_1.new_etiqueta)();
-            var label2 = (0, Codigo3d_1.new_etiqueta)();
-            var label3 = (0, Codigo3d_1.new_etiqueta)();
-            var label4 = (0, Codigo3d_1.new_etiqueta)();
-            var c3d = "".concat(izq.codigo3d, "\n").concat(der.codigo3d, "\n");
-            c3d += "\t".concat(temp, " = H;\n");
-            c3d += "\t".concat(temp_izq, " = ").concat(izq.temporal, ";\n");
-            c3d += "\t".concat(t_cont, " = ").concat(der.temporal, ";\n");
-            c3d += "".concat(label1, ":\n");
+            var temp = Codigo3d_1.new_temporal();
+            var temp_izq = Codigo3d_1.new_temporal();
+            var t_valor = Codigo3d_1.new_temporal();
+            var t_cont = Codigo3d_1.new_temporal();
+            var label1 = Codigo3d_1.new_etiqueta();
+            var label2 = Codigo3d_1.new_etiqueta();
+            var label3 = Codigo3d_1.new_etiqueta();
+            var label4 = Codigo3d_1.new_etiqueta();
+            var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
+            c3d += "\t" + temp + " = H;\n";
+            c3d += "\t" + temp_izq + " = " + izq.temporal + ";\n";
+            c3d += "\t" + t_cont + " = " + der.temporal + ";\n";
+            c3d += label1 + ":\n";
             if (izq.tipo === Tipo_1.tipoDato.CADENA) {
-                c3d += "".concat(label3, ":\n");
-                c3d += "\t".concat(t_valor, " = heap[(int) ").concat(temp_izq, "];\n");
-                c3d += "\theap[(int) H] = ".concat(t_valor, ";\n");
+                c3d += label3 + ":\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + temp_izq + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
-                c3d += "\t".concat(temp_izq, " = ").concat(temp_izq, " + 1;\n");
-                c3d += "\t".concat(t_valor, " = heap[(int) ").concat(temp_izq, "];\n");
-                c3d += "\tif (".concat(t_valor, " != -1) goto ").concat(label3, ";\n");
-                c3d += "\tgoto ".concat(label4, ";\n");
-                c3d += "".concat(label4, ":\n");
-                c3d += "\t".concat(temp_izq, " = ").concat(izq.temporal, ";\n");
-                c3d += "\t".concat(t_cont, " = ").concat(t_cont, " - 1;\n");
-                c3d += "\tif (".concat(t_cont, " > 0) goto ").concat(label1, ";\n");
-                c3d += "\tgoto ".concat(label2, ";\n");
-                c3d += "".concat(label2, ":\n");
+                c3d += "\t" + temp_izq + " = " + temp_izq + " + 1;\n";
+                c3d += "\t" + t_valor + " = heap[(int) " + temp_izq + "];\n";
+                c3d += "\tif (" + t_valor + " != -1) goto " + label3 + ";\n";
+                c3d += "\tgoto " + label4 + ";\n";
+                c3d += label4 + ":\n";
+                c3d += "\t" + temp_izq + " = " + izq.temporal + ";\n";
+                c3d += "\t" + t_cont + " = " + t_cont + " - 1;\n";
+                c3d += "\tif (" + t_cont + " > 0) goto " + label1 + ";\n";
+                c3d += "\tgoto " + label2 + ";\n";
+                c3d += label2 + ":\n";
             }
             else {
-                c3d += "\t".concat(t_valor, " = stack[(int) ").concat(izq.temporal, "];\n");
-                c3d += "\theap[(int) H] = ".concat(t_valor, ";\n");
+                c3d += "\t" + t_valor + " = stack[(int) " + izq.temporal + "];\n";
+                c3d += "\theap[(int) H] = " + t_valor + ";\n";
                 c3d += '\tH = H + 1;\n';
-                c3d += "\t".concat(t_cont, " = ").concat(t_cont, " - 1;\n");
-                c3d += "\tif (".concat(t_cont, " > 0) goto ").concat(label1, ";\n");
-                c3d += "\tgoto ".concat(label2, ";\n");
-                c3d += "\t".concat(label2, ":\n");
+                c3d += "\t" + t_cont + " = " + t_cont + " - 1;\n";
+                c3d += "\tif (" + t_cont + " > 0) goto " + label1 + ";\n";
+                c3d += "\tgoto " + label2 + ";\n";
+                c3d += "\t" + label2 + ":\n";
             }
             c3d += "\theap[(int) H] = -1;\n";
             c3d += '\tH = H + 1;\n';
@@ -2222,7 +2122,7 @@ var Operadores;
     Operadores[Operadores["DUPLICIDAD"] = 1] = "DUPLICIDAD";
 })(Operadores = exports.Operadores || (exports.Operadores = {}));
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],12:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],11:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2302,9 +2202,9 @@ var Identificador = /** @class */ (function (_super) {
         var variable = tabla.getVariable(this.identificador);
         if (variable == null)
             return res;
-        var temp = (0, Codigo3d_1.new_temporal)();
+        var temp = Codigo3d_1.new_temporal();
         var stack_pos = variable.posAbsoluta;
-        res.codigo3d = "\t".concat(temp, " = stack[(int) ").concat(stack_pos, "];");
+        res.codigo3d = "\t" + temp + " = stack[(int) " + stack_pos + "];";
         res.tipo = variable.gettipo().getTipo();
         res.temporal = temp;
         return res;
@@ -2313,7 +2213,7 @@ var Identificador = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Identificador;
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],13:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],12:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2430,11 +2330,11 @@ var Logica = /** @class */ (function (_super) {
         var der = (_b = this.cond2) === null || _b === void 0 ? void 0 : _b.traducir(arbol, tabla);
         if (izq.tipo === -1 || der.tipo === -1)
             return res;
-        var c3d = "".concat(izq.codigo3d, "\n");
+        var c3d = izq.codigo3d + "\n";
         switch (this.loogica) {
             case Logicas.AND:
                 izq.etq_verdaderas.forEach(function (etiqueta, index) {
-                    c3d += "".concat(etiqueta, ":\n");
+                    c3d += etiqueta + ":\n";
                 });
                 res.etq_verdaderas = der === null || der === void 0 ? void 0 : der.etq_verdaderas;
                 izq === null || izq === void 0 ? void 0 : izq.etq_falsas.forEach(function (falsa) { return res.etq_falsas.push(falsa); });
@@ -2442,7 +2342,7 @@ var Logica = /** @class */ (function (_super) {
                 break;
             case Logicas.OR:
                 izq.etq_falsas.forEach(function (etiqueta) {
-                    c3d += "".concat(etiqueta, ":\n");
+                    c3d += etiqueta + ":\n";
                 });
                 izq === null || izq === void 0 ? void 0 : izq.etq_verdaderas.forEach(function (verdadera) {
                     return res.etq_verdaderas.push(verdadera);
@@ -2467,7 +2367,7 @@ var Logica = /** @class */ (function (_super) {
                 });
                 break;
         }
-        c3d += "".concat(der.codigo3d, "\n");
+        c3d += der.codigo3d + "\n";
         res.codigo3d = c3d;
         res.tipo = Tipo_1.tipoDato.BOOLEANO;
         return res;
@@ -2482,7 +2382,7 @@ var Logicas;
     Logicas[Logicas["NOT"] = 2] = "NOT";
 })(Logicas = exports.Logicas || (exports.Logicas = {}));
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],14:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],13:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2558,10 +2458,10 @@ var Primitivo = /** @class */ (function (_super) {
         }
         else if (this.tipoDato.getTipo() === Tipo_1.tipoDato.ENTERO ||
             this.tipoDato.getTipo() === Tipo_1.tipoDato.DECIMAL) {
-            res.temporal = "".concat(this.valor);
+            res.temporal = "" + this.valor;
         }
         else if (this.tipoDato.getTipo() === Tipo_1.tipoDato.CARACTER) {
-            res.temporal = "".concat(this.valor);
+            res.temporal = "" + this.valor;
         }
         else if (this.tipoDato.getTipo() === Tipo_1.tipoDato.CADENA) {
             /* *********************
@@ -2570,11 +2470,11 @@ var Primitivo = /** @class */ (function (_super) {
             if (this.valor.includes('$')) {
                 this.concatStringWithId(arbol, tabla);
             }
-            var temp = (0, Codigo3d_1.new_temporal)();
-            var c3d = "\t".concat(temp, " = H;\n");
+            var temp = Codigo3d_1.new_temporal();
+            var c3d = "\t" + temp + " = H;\n";
             for (var index = 0; index < this.valor.length; index++) {
                 var caracter = this.valor.charCodeAt(index);
-                c3d += "\theap[(int) H] = ".concat(caracter, ";\n");
+                c3d += "\theap[(int) H] = " + caracter + ";\n";
                 c3d += '\tH = H + 1;\n';
             }
             c3d += '\theap[(int) H] = -1;\n';
@@ -2607,17 +2507,17 @@ var Primitivo = /** @class */ (function (_super) {
                 var result = id.traducir(arbol, tabla);
                 if (result.tipo === Tipo_1.tipoDato.BOOLEANO) {
                     var c3dAux_1 = '';
-                    var t_inicio = (0, Codigo3d_1.new_temporal)();
-                    var t_data = (0, Codigo3d_1.new_temporal)();
-                    var l_true = (0, Codigo3d_1.new_etiqueta)();
-                    var l_false = (0, Codigo3d_1.new_etiqueta)();
-                    var l_exit = (0, Codigo3d_1.new_etiqueta)();
+                    var t_inicio = Codigo3d_1.new_temporal();
+                    var t_data = Codigo3d_1.new_temporal();
+                    var l_true = Codigo3d_1.new_etiqueta();
+                    var l_false = Codigo3d_1.new_etiqueta();
+                    var l_exit = Codigo3d_1.new_etiqueta();
                     c3dAux_1 += result.codigo3d;
-                    c3dAux_1 += "\t".concat(t_inicio, " = H;\n");
-                    c3dAux_1 += "\t".concat(t_data, " = ").concat(result.temporal, ";\n");
-                    c3dAux_1 += "\tif (".concat(t_data, ") goto ").concat(l_true, ";\n");
-                    c3dAux_1 += "\tgoto ".concat(l_false, ";\n");
-                    c3dAux_1 += "".concat(l_true, ":\n");
+                    c3dAux_1 += "\t" + t_inicio + " = H;\n";
+                    c3dAux_1 += "\t" + t_data + " = " + result.temporal + ";\n";
+                    c3dAux_1 += "\tif (" + t_data + ") goto " + l_true + ";\n";
+                    c3dAux_1 += "\tgoto " + l_false + ";\n";
+                    c3dAux_1 += l_true + ":\n";
                     c3dAux_1 += "\theap[(int) H] = 116;\n"; // t
                     c3dAux_1 += "\tH = H + 1;\n";
                     c3dAux_1 += "\theap[(int) H] = 114;\n"; // r
@@ -2626,8 +2526,8 @@ var Primitivo = /** @class */ (function (_super) {
                     c3dAux_1 += "\tH = H + 1;\n";
                     c3dAux_1 += "\theap[(int) H] = 101;\n"; // e
                     c3dAux_1 += "\tH = H + 1;\n";
-                    c3dAux_1 += "\tgoto ".concat(l_exit, ";\n");
-                    c3dAux_1 += "".concat(l_false, ":\n");
+                    c3dAux_1 += "\tgoto " + l_exit + ";\n";
+                    c3dAux_1 += l_false + ":\n";
                     c3dAux_1 += "\theap[(int) H] = 102;\n"; // f
                     c3dAux_1 += "\tH = H + 1;\n";
                     c3dAux_1 += "\theap[(int) H] = 97;\n"; // a
@@ -2638,29 +2538,29 @@ var Primitivo = /** @class */ (function (_super) {
                     c3dAux_1 += "\tH = H + 1;\n";
                     c3dAux_1 += "\theap[(int) H] = 101;\n"; // e
                     c3dAux_1 += "\tH = H + 1;\n";
-                    c3dAux_1 += "".concat(l_exit, ":\n");
+                    c3dAux_1 += l_exit + ":\n";
                     resList.push({ c3d: c3dAux_1, temp: t_inicio });
                 }
                 else if (result.tipo === Tipo_1.tipoDato.CADENA) {
                     var c3dAux_2 = '';
-                    var t_inicio = (0, Codigo3d_1.new_temporal)();
+                    var t_inicio = Codigo3d_1.new_temporal();
                     resList.push({ c3d: c3dAux_2, temp: t_inicio });
                 }
                 else if (result.tipo === Tipo_1.tipoDato.CARACTER) {
                     var c3dAux_3 = '';
-                    var t_inicio = (0, Codigo3d_1.new_temporal)();
-                    var t_data = (0, Codigo3d_1.new_temporal)();
-                    c3dAux_3 += "".concat(t_data, " = ").concat(result.temporal, ";\n");
+                    var t_inicio = Codigo3d_1.new_temporal();
+                    var t_data = Codigo3d_1.new_temporal();
+                    c3dAux_3 += t_data + " = " + result.temporal + ";\n";
                     resList.push({ c3d: c3dAux_3, temp: t_data });
                 }
                 else if (result.tipo === Tipo_1.tipoDato.DECIMAL) {
                     var c3dAux_4 = '';
-                    var t_inicio = (0, Codigo3d_1.new_temporal)();
+                    var t_inicio = Codigo3d_1.new_temporal();
                     resList.push({ c3d: c3dAux_4, temp: t_inicio });
                 }
                 else if (result.tipo === Tipo_1.tipoDato.ENTERO) {
                     var c3dAux_5 = '';
-                    var t_inicio = (0, Codigo3d_1.new_temporal)();
+                    var t_inicio = Codigo3d_1.new_temporal();
                     resList.push({ c3d: c3dAux_5, temp: t_inicio });
                 }
                 var str_1 = element.slice(i, element.length);
@@ -2671,7 +2571,7 @@ var Primitivo = /** @class */ (function (_super) {
                 var result = id.traducir(arbol, tabla);
                 if (result.tipo === Tipo_1.tipoDato.BOOLEANO) {
                     c3dAux += result.codigo3d;
-                    c3dAux += "\theap[(int) H] = ".concat(result.temporal, ";\n");
+                    c3dAux += "\theap[(int) H] = " + result.temporal + ";\n";
                 }
                 else if (result.tipo === Tipo_1.tipoDato.CADENA) {
                 }
@@ -2713,7 +2613,7 @@ var Primitivo = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Primitivo;
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":48,"./Identificador":12}],15:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":47,"./Identificador":11}],14:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -2839,43 +2739,43 @@ var Relacional = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
-        var label_true = (0, Codigo3d_1.new_etiqueta)();
-        var label_false = (0, Codigo3d_1.new_etiqueta)();
+        var label_true = Codigo3d_1.new_etiqueta();
+        var label_false = Codigo3d_1.new_etiqueta();
         var izq = this.cond1.traducir(arbol, tabla);
         var der = this.cond2.traducir(arbol, tabla);
-        var c3d = "".concat(izq.codigo3d, "\n").concat(der.codigo3d, "\n");
+        var c3d = izq.codigo3d + "\n" + der.codigo3d + "\n";
         if (izq.tipo === Tipo_1.tipoDato.CADENA && der.tipo === Tipo_1.tipoDato.CADENA) {
-            var label1 = (0, Codigo3d_1.new_etiqueta)();
-            var label2 = (0, Codigo3d_1.new_etiqueta)();
-            var label3 = (0, Codigo3d_1.new_etiqueta)();
-            var label4 = (0, Codigo3d_1.new_etiqueta)();
-            var t_cond = (0, Codigo3d_1.new_temporal)();
-            var t_valorIzq = (0, Codigo3d_1.new_temporal)();
-            var t_valorDer = (0, Codigo3d_1.new_temporal)();
-            c3d += "".concat(label1, ":\n");
-            c3d += "\t".concat(t_valorIzq, " = heap[(int) ").concat(izq.temporal, "];\n");
-            c3d += "\t".concat(t_valorDer, " = heap[(int) ").concat(der.temporal, "];\n");
-            c3d += "\tif (".concat(t_valorIzq, " ").concat(this.notOperacionToChar(), " ").concat(t_valorDer, ") goto ").concat(label2, ";\n");
-            c3d += "\tif (".concat(t_valorIzq, " != -1) goto ").concat(label3, ";\n");
-            c3d += "\t".concat(izq.temporal, " = ").concat(izq.temporal, " + 1;\n");
-            c3d += "\t".concat(der.temporal, " = ").concat(der.temporal, " + 1;\n");
-            c3d += "\tgoto ".concat(label1, ";\n");
-            c3d += "".concat(label2, ":\n");
-            c3d += "\t".concat(t_cond, " = 1;\n");
-            c3d += "\tgoto ".concat(label4, ";\n");
-            c3d += "".concat(label3, ":\n");
-            c3d += "\t".concat(t_cond, " = 0;\n");
-            c3d += "".concat(label4, ":\n");
-            c3d += "\tif (".concat(t_cond, ") goto ").concat(label_true, ";\n");
-            c3d += "\tgoto ".concat(label_false, ";\n");
+            var label1 = Codigo3d_1.new_etiqueta();
+            var label2 = Codigo3d_1.new_etiqueta();
+            var label3 = Codigo3d_1.new_etiqueta();
+            var label4 = Codigo3d_1.new_etiqueta();
+            var t_cond = Codigo3d_1.new_temporal();
+            var t_valorIzq = Codigo3d_1.new_temporal();
+            var t_valorDer = Codigo3d_1.new_temporal();
+            c3d += label1 + ":\n";
+            c3d += "\t" + t_valorIzq + " = heap[(int) " + izq.temporal + "];\n";
+            c3d += "\t" + t_valorDer + " = heap[(int) " + der.temporal + "];\n";
+            c3d += "\tif (" + t_valorIzq + " " + this.notOperacionToChar() + " " + t_valorDer + ") goto " + label2 + ";\n";
+            c3d += "\tif (" + t_valorIzq + " != -1) goto " + label3 + ";\n";
+            c3d += "\t" + izq.temporal + " = " + izq.temporal + " + 1;\n";
+            c3d += "\t" + der.temporal + " = " + der.temporal + " + 1;\n";
+            c3d += "\tgoto " + label1 + ";\n";
+            c3d += label2 + ":\n";
+            c3d += "\t" + t_cond + " = 1;\n";
+            c3d += "\tgoto " + label4 + ";\n";
+            c3d += label3 + ":\n";
+            c3d += "\t" + t_cond + " = 0;\n";
+            c3d += label4 + ":\n";
+            c3d += "\tif (" + t_cond + ") goto " + label_true + ";\n";
+            c3d += "\tgoto " + label_false + ";\n";
         }
         else if (izq.tipo === Tipo_1.tipoDato.CADENA || der.tipo === Tipo_1.tipoDato.CADENA)
             return res;
         else if (izq.tipo === -1 || der.tipo === -1)
             return res;
         else {
-            c3d += "\tif (".concat(izq.temporal, " ").concat(this.operacionToChar(), " ").concat(der.temporal, ") goto ").concat(label_true, ";\n");
-            c3d += "\tgoto ".concat(label_false, ";\n");
+            c3d += "\tif (" + izq.temporal + " " + this.operacionToChar() + " " + der.temporal + ") goto " + label_true + ";\n";
+            c3d += "\tgoto " + label_false + ";\n";
         }
         res.codigo3d = c3d;
         res.etq_verdaderas.push(label_true);
@@ -2944,7 +2844,7 @@ var Relacionales;
     Relacionales[Relacionales["MENORIGUAL"] = 5] = "MENORIGUAL";
 })(Relacionales = exports.Relacionales || (exports.Relacionales = {}));
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],16:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],15:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3040,12 +2940,18 @@ var Asignacion = /** @class */ (function (_super) {
         if (variable === null)
             return res;
         var valor = this.valor.traducir(arbol, tabla);
-        if (variable.gettipo().getTipo() !== valor.tipo)
-            return res;
+        if (variable.gettipo().getTipo() === Tipo_1.tipoDato.ENTERO &&
+            (valor.tipo === Tipo_1.tipoDato.ENTERO || valor.tipo === Tipo_1.tipoDato.DECIMAL))
+            if (variable.gettipo().getTipo() !== valor.tipo) {
+                if (!(variable.gettipo().getTipo() === Tipo_1.tipoDato.ENTERO &&
+                    (valor.tipo === Tipo_1.tipoDato.ENTERO ||
+                        valor.tipo === Tipo_1.tipoDato.DECIMAL)))
+                    return res;
+            }
         // let temp = new_temporal()
         var c3d = '\t// ==========> ASIGNACION\n';
-        c3d += "".concat(valor.codigo3d, "\n");
-        c3d += "\tstack[(int) ".concat(variable.posAbsoluta, "] = ").concat(valor.temporal, ";\n");
+        c3d += valor.codigo3d + "\n";
+        c3d += "\tstack[(int) " + variable.posAbsoluta + "] = " + valor.temporal + ";\n";
         c3d += '\t// ==========> END ASIGNACION\n';
         res.codigo3d = c3d;
         return res;
@@ -3054,7 +2960,7 @@ var Asignacion = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Asignacion;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],17:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],16:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3118,7 +3024,7 @@ var Break = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Break;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":48}],18:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":47}],17:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3165,6 +3071,7 @@ var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
 var tablaSimbolos_1 = __importDefault(require("../../TS/tablaSimbolos"));
 var Tipo_1 = __importStar(require("../../TS/Tipo"));
 var Return_1 = __importDefault(require("../Return"));
+var Codigo3d_1 = require("../../Abstracto/Codigo3d");
 var condWhile = /** @class */ (function (_super) {
     __extends(condWhile, _super);
     function condWhile(condicion, expresion, fila, columna) {
@@ -3221,15 +3128,38 @@ var condWhile = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
-        var c3d = '\t/// ==========> \n';
-        c3d = '\t/// ==========> END\n';
+        var newTabla = new tablaSimbolos_1.default(tabla);
+        newTabla.setNombre('Do While');
+        var condicion = this.condicion.traducir(arbol, newTabla);
+        if (condicion.tipo !== Tipo_1.tipoDato.BOOLEANO)
+            return res;
+        var l_exit = Codigo3d_1.new_etiqueta();
+        var localSt = localStorage.getItem('l_exit');
+        var l_exitArr = localSt ? JSON.parse(localSt) : [];
+        l_exitArr.push(l_exit);
+        localStorage.setItem('l_exit', JSON.stringify(l_exitArr));
+        var c3d = '\t// ==========> DO WHILE\n';
+        condicion.etq_verdaderas.forEach(function (element) {
+            c3d += element + ":\n";
+        });
+        this.expresion.forEach(function (element) {
+            c3d += element.traducir(arbol, newTabla).codigo3d;
+        });
+        condicion.etq_falsas.forEach(function (element) {
+            c3d += element + ":\n";
+        });
+        c3d += l_exit + ":\n";
+        c3d += '\t// ==========> END DO WHILE\n';
+        l_exitArr.pop();
+        localStorage.setItem('l_exit', JSON.stringify(l_exitArr));
+        res.codigo3d = c3d;
         return res;
     };
     return condWhile;
 }(Instruccion_1.Instruccion));
 exports.default = condWhile;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../Excepciones/Listado_Errores":9,"../../TS/Tipo":48,"../../TS/tablaSimbolos":49,"../Return":35}],19:[function(require,module,exports){
+},{"../../Abstracto/Codigo3d":4,"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],18:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3354,7 +3284,7 @@ var condFor = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condFor;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../Excepciones/Listado_Errores":9,"../../TS/Tipo":48,"../../TS/tablaSimbolos":49,"../Return":35}],20:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],19:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3394,6 +3324,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var Codigo3d_1 = require("../../Abstracto/Codigo3d");
 var Instruccion_1 = require("../../Abstracto/Instruccion");
 var nodoAST_1 = __importDefault(require("../../Abstracto/nodoAST"));
 var Errores_1 = __importDefault(require("../../Excepciones/Errores"));
@@ -3457,15 +3388,42 @@ var condWhile = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
-        var c3d = '\t/// ==========> \n';
-        c3d = '\t/// ==========> END\n';
+        var c3d = '\t// ==========> WHILE\n';
+        var newTabla = new tablaSimbolos_1.default(tabla);
+        newTabla.setNombre('While');
+        var condicion = this.condicion.traducir(arbol, newTabla);
+        if (condicion.tipo !== Tipo_1.tipoDato.BOOLEANO)
+            return res;
+        var l_loop = Codigo3d_1.new_etiqueta();
+        var l_exit = Codigo3d_1.new_etiqueta();
+        var localSt = localStorage.getItem('l_exit');
+        var l_exitArr = localSt ? JSON.parse(localSt) : [];
+        l_exitArr.push(l_exit);
+        localStorage.setItem('l_exit', JSON.stringify(l_exitArr));
+        c3d += l_loop + ":\n";
+        c3d += "" + condicion.codigo3d;
+        condicion.etq_verdaderas.forEach(function (element) {
+            c3d += element + ":\n";
+        });
+        this.expresion.forEach(function (element) {
+            c3d += element.traducir(arbol, newTabla).codigo3d;
+        });
+        c3d += "\tgoto " + l_loop + ";\n";
+        condicion.etq_falsas.forEach(function (element) {
+            c3d += element + ":\n";
+        });
+        c3d += l_exit + ":\n";
+        c3d += '\t// ==========> END WHILE\n';
+        l_exitArr.pop();
+        localStorage.setItem('l_exit', JSON.stringify(l_exitArr));
+        res.codigo3d = c3d;
         return res;
     };
     return condWhile;
 }(Instruccion_1.Instruccion));
 exports.default = condWhile;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../Excepciones/Listado_Errores":9,"../../TS/Tipo":48,"../../TS/tablaSimbolos":49,"../Return":35}],21:[function(require,module,exports){
+},{"../../Abstracto/Codigo3d":4,"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],20:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3635,40 +3593,46 @@ var condIf = /** @class */ (function (_super) {
             tipo: -1,
         };
         var c3d = '\t// ==========> IF\n';
-        var l_exit = (0, Codigo3d_1.new_etiqueta)();
+        var l_exit = Codigo3d_1.new_etiqueta();
         var resCondicion = this.cond1.traducir(arbol, tabla);
-        // console.log(resCondicion);
         if (resCondicion.tipo === -1)
             return res;
         c3d += resCondicion.codigo3d;
         resCondicion.etq_verdaderas.forEach(function (etiqueta) {
-            c3d += "".concat(etiqueta, ":\n");
+            c3d += etiqueta + ":\n";
         });
         var nuevaTabla = new tablaSimbolos_1.default(tabla);
         nuevaTabla.setNombre('If');
+        c3d += "\t // -> IF\n";
         this.condIf.forEach(function (cif) {
-            c3d += cif.traducir(arbol, nuevaTabla).codigo3d;
+            var c3dIf = cif.traducir(arbol, nuevaTabla).codigo3d;
+            c3d += c3dIf;
             // TODO: Evaluar return y continue
-            c3d += "\tgoto ".concat(l_exit, ";\n");
         });
+        c3d += "\tgoto " + l_exit + ";\n";
         resCondicion.etq_falsas.forEach(function (etiqueta) {
-            c3d += "".concat(etiqueta, ":\n");
+            c3d += etiqueta + ":\n";
         });
         if (this.condElse !== undefined) {
+            c3d += "\t // -> ELSE\n";
             var nuevaTabla_1 = new tablaSimbolos_1.default(tabla);
             nuevaTabla_1.setNombre('else');
             this.condElse.forEach(function (celse) {
-                c3d += celse.traducir(arbol, nuevaTabla_1).codigo3d;
+                var sent = celse.traducir(arbol, nuevaTabla_1).codigo3d;
+                c3d += sent;
                 // TODO: Evaluar return y continue
-                c3d += "\tgoto ".concat(l_exit, ";\n");
             });
+            c3d += "\tgoto " + l_exit + ";\n";
+            c3d += l_exit + ": // FIN DE ELSE IF\n";
         }
-        else if (this.condElseIf !== undefined) {
+        if (this.condElseIf !== undefined) {
+            c3d += "\t // -> ELSE IF\n";
             c3d += this.condElseIf.traducir(arbol, tabla).codigo3d;
             // TODO: Evaluar return y continue
-            c3d += "\tgoto ".concat(l_exit, ";\n");
+            c3d += "\tgoto " + l_exit + ";\n";
         }
-        c3d += "".concat(l_exit, ":\n");
+        if (this.condElse === undefined)
+            c3d += l_exit + ":\n";
         c3d += '\t// ==========> END IF\n';
         res.codigo3d = c3d;
         res.tipo = 0;
@@ -3678,7 +3642,7 @@ var condIf = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condIf;
 
-},{"../../Abstracto/Codigo3d":4,"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../Excepciones/Listado_Errores":9,"../../TS/Tipo":48,"../../TS/tablaSimbolos":49,"../Return":35}],22:[function(require,module,exports){
+},{"../../Abstracto/Codigo3d":4,"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],21:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3780,7 +3744,7 @@ var condIfTernario = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condIfTernario;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../TS/Tipo":48}],23:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../TS/Tipo":47}],22:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -3908,7 +3872,7 @@ var condSwitch = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitch;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../Excepciones/Listado_Errores":9,"../../TS/Tipo":48,"../Return":35}],24:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../Return":34}],23:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4019,7 +3983,7 @@ var condSwitchCase = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../Excepciones/Listado_Errores":9,"../../TS/Tipo":48,"../../TS/tablaSimbolos":49,"../Return":35}],25:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],24:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4117,7 +4081,7 @@ var condSwitchCase = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = condSwitchCase;
 
-},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":8,"../../Excepciones/Listado_Errores":9,"../../TS/Tipo":48,"../../TS/tablaSimbolos":49,"../Return":35}],26:[function(require,module,exports){
+},{"../../Abstracto/Instruccion":5,"../../Abstracto/nodoAST":6,"../../Excepciones/Errores":7,"../../Excepciones/Listado_Errores":8,"../../TS/Tipo":47,"../../TS/tablaSimbolos":48,"../Return":34}],25:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4181,7 +4145,7 @@ var Continue = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Continue;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":48}],27:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":47}],26:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4239,7 +4203,7 @@ var Declaracion = /** @class */ (function (_super) {
     }
     Declaracion.prototype.getNodo = function () {
         var nodo = new nodoAST_1.default('DECLARACION');
-        nodo.agregarHijo((0, cambiarTipo_1.default)(this.tipo.getTipo()) + '');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
         for (var ids = 0; ids < this.identificador.length; ids++) {
             nodo.agregarHijo(this.identificador[ids]);
         }
@@ -4262,7 +4226,7 @@ var Declaracion = /** @class */ (function (_super) {
                         }
                         else {
                             if (!arbol.actualizarTabla(this.identificador[ids], '0', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '0', 'Variable', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '0', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                                 arbol.listaSimbolos.push(nuevoSimbolo);
                             }
                         }
@@ -4277,7 +4241,7 @@ var Declaracion = /** @class */ (function (_super) {
                         }
                         else {
                             if (!arbol.actualizarTabla(this.identificador[ids], '0.0', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '0.0', 'Variable', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '0.0', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                                 arbol.listaSimbolos.push(nuevoSimbolo);
                             }
                         }
@@ -4292,7 +4256,7 @@ var Declaracion = /** @class */ (function (_super) {
                         }
                         else {
                             if (!arbol.actualizarTabla(this.identificador[ids], '\u0000', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '\u0000', 'Variable', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '\u0000', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                                 arbol.listaSimbolos.push(nuevoSimbolo);
                             }
                         }
@@ -4307,7 +4271,7 @@ var Declaracion = /** @class */ (function (_super) {
                         }
                         else {
                             if (!arbol.actualizarTabla(this.identificador[ids], '', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '', 'Variable', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], '', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                                 arbol.listaSimbolos.push(nuevoSimbolo);
                             }
                         }
@@ -4322,7 +4286,7 @@ var Declaracion = /** @class */ (function (_super) {
                         }
                         else {
                             if (!arbol.actualizarTabla(this.identificador[ids], 'true', this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], 'true', 'Variable', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], 'true', 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                                 arbol.listaSimbolos.push(nuevoSimbolo);
                             }
                         }
@@ -4344,7 +4308,7 @@ var Declaracion = /** @class */ (function (_super) {
                     }
                     else {
                         if (!arbol.actualizarTabla(this.identificador[ids], val, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                            var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], val, 'Variable', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                            var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador[ids], val, 'Variable', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                             arbol.listaSimbolos.push(nuevoSimbolo);
                         }
                     }
@@ -4353,6 +4317,7 @@ var Declaracion = /** @class */ (function (_super) {
         }
     };
     Declaracion.prototype.traducir = function (arbol, tabla) {
+        var _this = this;
         var res = {
             codigo3d: '',
             etq_falsas: [],
@@ -4363,60 +4328,58 @@ var Declaracion = /** @class */ (function (_super) {
             tipo: -1,
         };
         var c3d = '\t// ==========> DECLARACION\n';
-        if (this.valor === undefined) {
-            // SIN INICIALIZAR
-            for (var ids = 0; ids < this.identificador.length; ids++) {
-                if (this.tipo.getTipo() === Tipo_1.tipoDato.ENTERO) {
-                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.ENTERO), this.identificador[ids], 0);
+        this.identificador.forEach(function (id) {
+            if (_this.valor === undefined) {
+                // SIN INICIALIZAR
+                if (_this.tipo.getTipo() === Tipo_1.tipoDato.ENTERO) {
+                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.ENTERO), id, 0);
                     var posRelativa = tabla.setVariable3d(simbolo);
                     if (posRelativa < 0)
                         return res;
-                    c3d = "\tstack[(int) ".concat(posRelativa, "] = 0;\n");
+                    c3d += "\tstack[(int) " + posRelativa + "] = 0;\n";
                 }
-                else if (this.tipo.getTipo() === Tipo_1.tipoDato.DECIMAL) {
-                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.DECIMAL), this.identificador[ids], 0.0);
+                else if (_this.tipo.getTipo() === Tipo_1.tipoDato.DECIMAL) {
+                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.DECIMAL), id, 0.0);
                     var posRelativa = tabla.setVariable3d(simbolo);
                     if (posRelativa < 0)
                         return res;
-                    c3d = "\tstack[(int) ".concat(posRelativa, "] = 0.0;\n");
+                    c3d += "\tstack[(int) " + posRelativa + "] = 0.0;\n";
                 }
-                else if (this.tipo.getTipo() === Tipo_1.tipoDato.CARACTER) {
-                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.CARACTER), this.identificador[ids], '');
+                else if (_this.tipo.getTipo() === Tipo_1.tipoDato.CARACTER) {
+                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.CARACTER), id, '');
                     var posRelativa = tabla.setVariable3d(simbolo);
                     if (posRelativa < 0)
                         return res;
-                    c3d = "\tstack[(int) ".concat(posRelativa, "] = '';\n");
+                    c3d += "\tstack[(int) " + posRelativa + "] = '';\n";
                 }
-                else if (this.tipo.getTipo() === Tipo_1.tipoDato.CADENA) {
-                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.CADENA), this.identificador[ids], '');
+                else if (_this.tipo.getTipo() === Tipo_1.tipoDato.CADENA) {
+                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.CADENA), id, '');
                     var posRelativa = tabla.setVariable3d(simbolo);
                     if (posRelativa < 0)
                         return res;
-                    c3d = "\tstack[(int) ".concat(posRelativa, "] = -1;\n");
+                    c3d += "\tstack[(int) " + posRelativa + "] = -1;\n";
                 }
-                else if (this.tipo.getTipo() === Tipo_1.tipoDato.BOOLEANO) {
-                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.BOOLEANO), this.identificador[ids], true);
+                else if (_this.tipo.getTipo() === Tipo_1.tipoDato.BOOLEANO) {
+                    var simbolo = new Simbolo_1.default(new Tipo_1.default(Tipo_1.tipoDato.BOOLEANO), id, true);
                     var posRelativa = tabla.setVariable3d(simbolo);
                     if (posRelativa < 0)
                         return res;
-                    c3d = "\tstack[(int) ".concat(posRelativa, "] = 0;\n");
+                    c3d += "\tstack[(int) " + posRelativa + "] = 0;\n";
                 }
             }
-        }
-        else {
-            // INICIALIZADO
-            var valor = this.valor.traducir(arbol, tabla);
-            if (valor.tipo === -1)
-                return res;
-            c3d += "".concat(valor.codigo3d, "\n");
-            for (var ids = 0; ids < this.identificador.length; ids++) {
-                var simbolo = new Simbolo_1.default(new Tipo_1.default(valor.tipo), this.identificador[ids], '');
+            else {
+                // INICIALIZADO
+                var valor = _this.valor.traducir(arbol, tabla);
+                if (valor.tipo === -1)
+                    return res;
+                c3d += valor.codigo3d + "\n";
+                var simbolo = new Simbolo_1.default(new Tipo_1.default(valor.tipo), id, '');
                 var posRelativa = tabla.setVariable3d(simbolo);
                 if (posRelativa < 0)
                     return res;
-                c3d += "\tstack[(int) ".concat(posRelativa, "] = ").concat(valor.temporal, ";\n");
+                c3d += "\tstack[(int) " + posRelativa + "] = " + valor.temporal + ";\n";
             }
-        }
+        });
         c3d += '\t// ==========> END DECLARACION\n';
         res.codigo3d = c3d;
         return res;
@@ -4425,7 +4388,7 @@ var Declaracion = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Declaracion;
 
-},{"../../Reportes/cambiarTipo":51,"../../Reportes/reporteTabla":53,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Simbolo":47,"../TS/Tipo":48}],28:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46,"../TS/Tipo":47}],27:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4536,7 +4499,7 @@ var Incremento = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Incremento;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../Expresiones/Identificador":12,"../TS/Tipo":48}],29:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Expresiones/Identificador":11,"../TS/Tipo":47}],28:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4655,7 +4618,7 @@ var Exec = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Exec;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48,"../TS/tablaSimbolos":49,"./Declaracion":27,"./Metodos":34}],30:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47,"../TS/tablaSimbolos":48,"./Declaracion":26,"./Metodos":33}],29:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4692,7 +4655,7 @@ var Funciones = /** @class */ (function (_super) {
     }
     Funciones.prototype.getNodo = function () {
         var nodo = new nodoAST_1.default('FUNCION');
-        nodo.agregarHijo((0, cambiarTipo_1.default)(this.tipoDato.getTipo()) + '');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipoDato.getTipo()) + '');
         nodo.agregarHijo(this.identificador + '');
         nodo.agregarHijo('(');
         var nuevo = null;
@@ -4702,7 +4665,7 @@ var Funciones = /** @class */ (function (_super) {
         for (var param = 0; param < this.parametros.length; param++) {
             if (nuevo == null)
                 break;
-            var vari = (0, cambiarTipo_1.default)(this.parametros[param].tipato.getTipo());
+            var vari = cambiarTipo_1.default(this.parametros[param].tipato.getTipo());
             var ide = this.parametros[param].identificador;
             if (vari != null)
                 nuevo.agregarHijo(vari);
@@ -4740,7 +4703,6 @@ var Funciones = /** @class */ (function (_super) {
         }
     };
     Funciones.prototype.traducir = function (arbol, tabla) {
-        var _this = this;
         var res = {
             codigo3d: '',
             etq_falsas: [],
@@ -4751,8 +4713,7 @@ var Funciones = /** @class */ (function (_super) {
             tipo: -1,
         };
         this.instrucciones.forEach(function (instruccion) {
-            console.log("Funci\u00F3n ".concat(_this.identificador), instruccion);
-            // res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d
+            res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d;
         });
         return res;
     };
@@ -4760,7 +4721,7 @@ var Funciones = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Funciones;
 
-},{"../../Reportes/cambiarTipo":51,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"./Return":35}],31:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"./Return":34}],30:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4871,7 +4832,7 @@ var Decremento = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Decremento;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../Expresiones/Identificador":12,"../TS/Tipo":48}],32:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Expresiones/Identificador":11,"../TS/Tipo":47}],31:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5022,7 +4983,7 @@ var LlamadaFuncMetd = /** @class */ (function (_super) {
                             variable.setvalor(newVal);
                             nuevaTabla.setNombre(metodo.identificador);
                             if (!arbol.actualizarTabla(metodo.identificador.toString(), newVal, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(metodo.identificador, newVal, 'Funcion', (0, cambiarTipo_1.default)(this.tipoDato.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                                var nuevoSimbolo = new reporteTabla_1.reporteTabla(metodo.identificador, newVal, 'Funcion', cambiarTipo_1.default(this.tipoDato.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                                 arbol.listaSimbolos.push(nuevoSimbolo);
                             }
                             //nueva variable
@@ -5056,13 +5017,14 @@ var LlamadaFuncMetd = /** @class */ (function (_super) {
             tipo: -1,
         };
         var c3d = '';
+        res.codigo3d = c3d;
         return res;
     };
     return LlamadaFuncMetd;
 }(Instruccion_1.Instruccion));
 exports.default = LlamadaFuncMetd;
 
-},{"../../Reportes/cambiarTipo":51,"../../Reportes/reporteTabla":53,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48,"../TS/tablaSimbolos":49,"./Declaracion":27,"./Funciones":30,"./Metodos":34,"./declaracionListas":42,"./declaracionVectores":43}],33:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47,"../TS/tablaSimbolos":48,"./Declaracion":26,"./Funciones":29,"./Metodos":33,"./declaracionListas":41,"./declaracionVectores":42}],32:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5163,7 +5125,7 @@ var Main = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Main;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"./Return":35}],34:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"./Return":34}],33:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5210,7 +5172,7 @@ var Metodos = /** @class */ (function (_super) {
         for (var param = 0; param < this.parametros.length; param++) {
             if (nuevo == null)
                 break;
-            var vari = (0, cambiarTipo_1.default)(this.parametros[param].tipato.getTipo());
+            var vari = cambiarTipo_1.default(this.parametros[param].tipato.getTipo());
             var ide = this.parametros[param].identificador;
             if (vari != null)
                 nuevo.agregarHijo(vari);
@@ -5257,6 +5219,7 @@ var Metodos = /** @class */ (function (_super) {
             temporal: '',
             tipo: -1,
         };
+        console.log(this.instrucciones);
         this.instrucciones.forEach(function (instruccion) {
             res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d;
         });
@@ -5266,7 +5229,7 @@ var Metodos = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Metodos;
 
-},{"../../Reportes/cambiarTipo":51,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"./Return":35}],35:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"./Return":34}],34:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5351,7 +5314,7 @@ var Return = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Return;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":48}],36:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../TS/Tipo":47}],35:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5433,7 +5396,7 @@ var accesoLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = accesoLista;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],37:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],36:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5524,26 +5487,26 @@ var accesoVector = /** @class */ (function (_super) {
         if (variable === null)
             return res;
         var c3d = '\t// ==========> ACCESO VECTOR\n';
-        c3d += "".concat(index.codigo3d);
-        var t_pivote = (0, Codigo3d_1.new_temporal)();
-        var t_size = (0, Codigo3d_1.new_temporal)();
-        var t_ptr = (0, Codigo3d_1.new_temporal)();
-        var l_exit = (0, Codigo3d_1.new_etiqueta)();
-        c3d += "\t".concat(t_pivote, " = stack[(int) ").concat(variable.posAbsoluta, "];\n");
-        c3d += "\t".concat(t_size, " = heap[(int) ").concat(t_pivote, "];\n");
-        c3d += "\tif (".concat(index.temporal, " > ").concat(t_size, ") goto ").concat(l_exit, ";\n");
-        c3d += "\t".concat(t_pivote, " = ").concat(t_pivote, " + 1;\n");
-        c3d += "\t".concat(t_pivote, " = ").concat(t_pivote, " + ").concat(index.temporal, ";\n");
-        c3d += "\t".concat(t_ptr, " = heap[(int) ").concat(t_pivote, "];\n");
+        c3d += "" + index.codigo3d;
+        var t_pivote = Codigo3d_1.new_temporal();
+        var t_size = Codigo3d_1.new_temporal();
+        var t_ptr = Codigo3d_1.new_temporal();
+        var l_exit = Codigo3d_1.new_etiqueta();
+        c3d += "\t" + t_pivote + " = stack[(int) " + variable.posAbsoluta + "];\n";
+        c3d += "\t" + t_size + " = heap[(int) " + t_pivote + "];\n";
+        c3d += "\tif (" + index.temporal + " > " + t_size + ") goto " + l_exit + ";\n";
+        c3d += "\t" + t_pivote + " = " + t_pivote + " + 1;\n";
+        c3d += "\t" + t_pivote + " = " + t_pivote + " + " + index.temporal + ";\n";
+        c3d += "\t" + t_ptr + " = heap[(int) " + t_pivote + "];\n";
         if (variable.gettipo().getTipo() !== Tipo_1.tipoDato.CADENA) {
-            var t_valor = (0, Codigo3d_1.new_temporal)();
-            c3d += "\t".concat(t_valor, " = heap[(int) ").concat(t_ptr, "];\n");
+            var t_valor = Codigo3d_1.new_temporal();
+            c3d += "\t" + t_valor + " = heap[(int) " + t_ptr + "];\n";
             res.temporal = t_valor;
         }
         else {
             res.temporal = t_ptr;
         }
-        c3d += "".concat(l_exit, ":\n");
+        c3d += l_exit + ":\n";
         c3d += '\t// ==========> END ACCESO VECTOR';
         res.codigo3d = c3d;
         res.tipo = variable.gettipo().getTipo();
@@ -5553,7 +5516,7 @@ var accesoVector = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = accesoVector;
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],38:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],37:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5632,7 +5595,7 @@ var agregarLista = /** @class */ (function (_super) {
             arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
         }
         else
-            return new Errores_1.default('SEMANTICO', "VARIABLE ".concat(this.identificador, " NO EXISTE"), this.fila, this.columna);
+            return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
     };
     agregarLista.prototype.traducir = function (arbol, tabla) {
         throw new Error('Method not implemented.');
@@ -5641,7 +5604,7 @@ var agregarLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = agregarLista;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],39:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],38:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5730,7 +5693,7 @@ var asignacionLista = /** @class */ (function (_super) {
             arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
         }
         else
-            return new Errores_1.default('SEMANTICO', "VARIABLE ".concat(this.identificador, " NO EXISTE"), this.fila, this.columna);
+            return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
     };
     asignacionLista.prototype.traducir = function (arbol, tabla) {
         throw new Error('Method not implemented.');
@@ -5739,7 +5702,7 @@ var asignacionLista = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = asignacionLista;
 
-},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],40:[function(require,module,exports){
+},{"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],39:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5827,7 +5790,7 @@ var asignacionVector = /** @class */ (function (_super) {
             arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString());
         }
         else
-            return new Errores_1.default('SEMANTICO', "VARIABLE ".concat(this.identificador, " NO EXISTE"), this.fila, this.columna);
+            return new Errores_1.default('SEMANTICO', "VARIABLE " + this.identificador + " NO EXISTE", this.fila, this.columna);
     };
     asignacionVector.prototype.traducir = function (arbol, tabla) {
         var res = {
@@ -5849,40 +5812,40 @@ var asignacionVector = /** @class */ (function (_super) {
         if (variable.gettipo().getTipo() !== valor.tipo)
             return res;
         var c3d = '\t // ==========> ASIGNACION VECTOR\n';
-        c3d += "".concat(index.codigo3d).concat(valor.codigo3d);
-        var t_size = (0, Codigo3d_1.new_temporal)();
-        var t_pivote = (0, Codigo3d_1.new_temporal)();
-        var l_exit = (0, Codigo3d_1.new_etiqueta)();
-        c3d += "\t".concat(t_pivote, " = stack[(int) ").concat(variable.posAbsoluta, "];\n");
-        c3d += "\t".concat(t_size, " = heap[(int) ").concat(t_pivote, "];\n");
-        c3d += "\tif (".concat(index.temporal, " > ").concat(t_size, ") goto ").concat(l_exit, ";\n");
-        c3d += "\t".concat(t_pivote, " = ").concat(t_pivote, " + 1;\n");
+        c3d += "" + index.codigo3d + valor.codigo3d;
+        var t_size = Codigo3d_1.new_temporal();
+        var t_pivote = Codigo3d_1.new_temporal();
+        var l_exit = Codigo3d_1.new_etiqueta();
+        c3d += "\t" + t_pivote + " = stack[(int) " + variable.posAbsoluta + "];\n";
+        c3d += "\t" + t_size + " = heap[(int) " + t_pivote + "];\n";
+        c3d += "\tif (" + index.temporal + " > " + t_size + ") goto " + l_exit + ";\n";
+        c3d += "\t" + t_pivote + " = " + t_pivote + " + 1;\n";
         if (valor.tipo === Tipo_1.tipoDato.CADENA) {
-            var label = (0, Codigo3d_1.new_etiqueta)();
-            var t_char = (0, Codigo3d_1.new_temporal)();
-            var t_index = (0, Codigo3d_1.new_temporal)();
-            c3d += "\t".concat(t_index, " = H;\n");
-            c3d += "".concat(label, ":\n");
-            c3d += "\t".concat(t_char, " = heap[(int) ").concat(valor.temporal, "];\n");
-            c3d += "\theap[(int) H] = ".concat(t_char, ";\n");
+            var label = Codigo3d_1.new_etiqueta();
+            var t_char = Codigo3d_1.new_temporal();
+            var t_index = Codigo3d_1.new_temporal();
+            c3d += "\t" + t_index + " = H;\n";
+            c3d += label + ":\n";
+            c3d += "\t" + t_char + " = heap[(int) " + valor.temporal + "];\n";
+            c3d += "\theap[(int) H] = " + t_char + ";\n";
             c3d += "\tH = H + 1;\n";
-            c3d += "\t".concat(valor.temporal, " = ").concat(valor.temporal, " + 1;\n");
-            c3d += "\t".concat(t_char, " = heap[(int) ").concat(valor.temporal, "];\n");
-            c3d += "\tif (".concat(t_char, " != -1) goto ").concat(label, ";\n");
+            c3d += "\t" + valor.temporal + " = " + valor.temporal + " + 1;\n";
+            c3d += "\t" + t_char + " = heap[(int) " + valor.temporal + "];\n";
+            c3d += "\tif (" + t_char + " != -1) goto " + label + ";\n";
             c3d += "\theap[(int) H] = -1;\n";
             c3d += "\tH = H + 1;\n";
-            c3d += "\t".concat(t_pivote, " = ").concat(t_pivote, " + ").concat(index.temporal, ";\n");
-            c3d += "\theap[(int) ".concat(t_pivote, "] = ").concat(t_index, ";\n");
+            c3d += "\t" + t_pivote + " = " + t_pivote + " + " + index.temporal + ";\n";
+            c3d += "\theap[(int) " + t_pivote + "] = " + t_index + ";\n";
         }
         else {
-            var t_char = (0, Codigo3d_1.new_temporal)();
-            var t_index = (0, Codigo3d_1.new_temporal)();
-            c3d += "\t".concat(t_char, " = ").concat(valor.temporal, ";\n");
-            c3d += "\t".concat(t_pivote, " = ").concat(t_pivote, " + ").concat(index.temporal, ";\n");
-            c3d += "\t".concat(t_index, " = heap[(int) ").concat(t_pivote, "];\n");
-            c3d += "\theap[(int) ".concat(t_index, "] = ").concat(t_char, ";\n");
+            var t_char = Codigo3d_1.new_temporal();
+            var t_index = Codigo3d_1.new_temporal();
+            c3d += "\t" + t_char + " = " + valor.temporal + ";\n";
+            c3d += "\t" + t_pivote + " = " + t_pivote + " + " + index.temporal + ";\n";
+            c3d += "\t" + t_index + " = heap[(int) " + t_pivote + "];\n";
+            c3d += "\theap[(int) " + t_index + "] = " + t_char + ";\n";
         }
-        c3d += "".concat(l_exit, ":\n");
+        c3d += l_exit + ":\n";
         c3d += '\t // ==========> END ASIGNACION VECTOR\n';
         res.codigo3d = c3d;
         return res;
@@ -5891,7 +5854,7 @@ var asignacionVector = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = asignacionVector;
 
-},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],41:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],40:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -5947,7 +5910,7 @@ var casteo = /** @class */ (function (_super) {
     casteo.prototype.getNodo = function () {
         var nodo = new nodoAST_1.default('CASTEO');
         nodo.agregarHijo('(');
-        nodo.agregarHijo((0, cambiarTipo_1.default)(this.tipo.getTipo()) + '');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
         nodo.agregarHijo(')');
         nodo.agregarHijoAST(this.expresion.getNodo());
         return nodo;
@@ -6010,7 +5973,7 @@ var casteo = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = casteo;
 
-},{"../../Reportes/cambiarTipo":51,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],42:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],41:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -6052,14 +6015,14 @@ var declaracionListas = /** @class */ (function (_super) {
         var nodo = new nodoAST_1.default('LISTAS');
         nodo.agregarHijo('list');
         nodo.agregarHijo('<');
-        nodo.agregarHijo((0, cambiarTipo_1.default)(this.tipo.getTipo()) + '');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
         nodo.agregarHijo('>');
         nodo.agregarHijo(this.identificador);
         nodo.agregarHijo('=');
         nodo.agregarHijo('new');
         nodo.agregarHijo('list');
         nodo.agregarHijo('<');
-        nodo.agregarHijo((0, cambiarTipo_1.default)((_a = this.tipoVector) === null || _a === void 0 ? void 0 : _a.getTipo()) + '');
+        nodo.agregarHijo(cambiarTipo_1.default((_a = this.tipoVector) === null || _a === void 0 ? void 0 : _a.getTipo()) + '');
         nodo.agregarHijo('>');
         nodo.agregarHijo(';');
         return nodo;
@@ -6077,7 +6040,7 @@ var declaracionListas = /** @class */ (function (_super) {
                         ' EXISTE ACTUALMENTE', this.fila, this.columna);
                 else {
                     if (!arbol.actualizarTabla(this.identificador, arreglo.toString(), this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo.toString(), 'lista', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo.toString(), 'lista', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                         arbol.listaSimbolos.push(nuevoSimbolo);
                     }
                 }
@@ -6097,7 +6060,7 @@ var declaracionListas = /** @class */ (function (_super) {
                 return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
             else {
                 if (!arbol.actualizarTabla(this.identificador, arreglo.toString(), this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                    var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo.toString(), 'lista', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                    var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo.toString(), 'lista', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                     arbol.listaSimbolos.push(nuevoSimbolo);
                 }
             }
@@ -6132,7 +6095,7 @@ var declaracionListas = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = declaracionListas;
 
-},{"../../Reportes/cambiarTipo":51,"../../Reportes/reporteTabla":53,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Simbolo":47}],43:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46}],42:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -6176,7 +6139,7 @@ var declaracionVectores = /** @class */ (function (_super) {
     declaracionVectores.prototype.getNodo = function () {
         var _a, _b;
         var nodo = new nodoAST_1.default('VECTORES');
-        nodo.agregarHijo((0, cambiarTipo_1.default)(this.tipo.getTipo()) + '');
+        nodo.agregarHijo(cambiarTipo_1.default(this.tipo.getTipo()) + '');
         nodo.agregarHijo('[');
         nodo.agregarHijo(']');
         nodo.agregarHijo(this.identificador);
@@ -6221,7 +6184,7 @@ var declaracionVectores = /** @class */ (function (_super) {
                         ' EXISTE ACTUALMENTE', this.fila, this.columna);
                 else {
                     if (!arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo, 'vector', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo, 'vector', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                         arbol.listaSimbolos.push(nuevoSimbolo);
                     }
                 }
@@ -6244,7 +6207,7 @@ var declaracionVectores = /** @class */ (function (_super) {
                 return new Errores_1.default('SEMANTICO', 'LA VARIABLE ' + this.identificador + ' EXISTE ACTUALMENTE', this.fila, this.columna);
             else {
                 if (!arbol.actualizarTabla(this.identificador, arreglo, this.fila.toString(), tabla.getNombre().toString(), this.columna.toString())) {
-                    var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo, 'vector', (0, cambiarTipo_1.default)(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
+                    var nuevoSimbolo = new reporteTabla_1.reporteTabla(this.identificador, arreglo, 'vector', cambiarTipo_1.default(this.tipo.getTipo()) + '', tabla.getNombre(), this.fila.toString(), this.columna.toString());
                     arbol.listaSimbolos.push(nuevoSimbolo);
                 }
             }
@@ -6290,44 +6253,44 @@ var declaracionVectores = /** @class */ (function (_super) {
             var defaultValueItem = getDefaultValueByDataType(this.tipo.getTipo());
             // Agregar c3d de valores
             valores_1.forEach(function (valor) {
-                c3d += "".concat(valor.codigo3d, "\n");
+                c3d += valor.codigo3d + "\n";
             });
-            var t_pivote = (0, Codigo3d_1.new_temporal)(); // Pivote de arreglo
-            var t_item_1 = (0, Codigo3d_1.new_temporal)(); // Pivote de items
-            c3d += "\t".concat(t_pivote, " = H;\n");
-            c3d += "\theap[(int) H] = ".concat(arrLenght, ";\n");
-            c3d += "\tH = H + ".concat(arrLenght + 1, ";\n");
-            c3d += "\t".concat(t_item_1, " = ").concat(t_pivote, " + 1;\n");
+            var t_pivote = Codigo3d_1.new_temporal(); // Pivote de arreglo
+            var t_item_1 = Codigo3d_1.new_temporal(); // Pivote de items
+            c3d += "\t" + t_pivote + " = H;\n";
+            c3d += "\theap[(int) H] = " + arrLenght + ";\n";
+            c3d += "\tH = H + " + (arrLenght + 1) + ";\n";
+            c3d += "\t" + t_item_1 + " = " + t_pivote + " + 1;\n";
             valores_1.forEach(function (valor) {
                 if (_this.tipo.getTipo() === Tipo_1.tipoDato.CADENA) {
-                    var label = (0, Codigo3d_1.new_etiqueta)();
-                    var t_index = (0, Codigo3d_1.new_temporal)();
-                    var t_char = (0, Codigo3d_1.new_temporal)();
-                    c3d += "\t".concat(t_index, " = H;\n");
-                    c3d += "".concat(label, ":\n");
-                    c3d += "\t".concat(t_char, " = heap[(int) ").concat(valor.temporal, "];\n");
-                    c3d += "\theap[(int) H] = ".concat(t_char, ";\n");
+                    var label = Codigo3d_1.new_etiqueta();
+                    var t_index = Codigo3d_1.new_temporal();
+                    var t_char = Codigo3d_1.new_temporal();
+                    c3d += "\t" + t_index + " = H;\n";
+                    c3d += label + ":\n";
+                    c3d += "\t" + t_char + " = heap[(int) " + valor.temporal + "];\n";
+                    c3d += "\theap[(int) H] = " + t_char + ";\n";
                     c3d += "\tH = H + 1;\n";
-                    c3d += "\t".concat(valor.temporal, " = ").concat(valor.temporal, " + 1;\n");
-                    c3d += "\t".concat(t_char, " = heap[(int) ").concat(valor.temporal, "];\n");
-                    c3d += "\tif (".concat(t_char, " != -1) goto ").concat(label, ";\n");
+                    c3d += "\t" + valor.temporal + " = " + valor.temporal + " + 1;\n";
+                    c3d += "\t" + t_char + " = heap[(int) " + valor.temporal + "];\n";
+                    c3d += "\tif (" + t_char + " != -1) goto " + label + ";\n";
                     c3d += "\theap[(int) H] = -1;\n";
                     c3d += "\tH = H + 1;\n";
-                    c3d += "\theap[(int) ".concat(t_item_1, "] = ").concat(t_index, ";\n");
-                    c3d += "\t".concat(t_item_1, " = ").concat(t_item_1, " + 1;\n");
+                    c3d += "\theap[(int) " + t_item_1 + "] = " + t_index + ";\n";
+                    c3d += "\t" + t_item_1 + " = " + t_item_1 + " + 1;\n";
                 }
                 else {
-                    var t_index = (0, Codigo3d_1.new_temporal)();
-                    var t_char = (0, Codigo3d_1.new_temporal)();
-                    c3d += "\t".concat(t_index, " = H;\n");
-                    c3d += "\t".concat(t_char, " = ").concat(valor.temporal, ";\n");
-                    c3d += "\theap[(int) H] = ".concat(t_char, ";\n");
+                    var t_index = Codigo3d_1.new_temporal();
+                    var t_char = Codigo3d_1.new_temporal();
+                    c3d += "\t" + t_index + " = H;\n";
+                    c3d += "\t" + t_char + " = " + valor.temporal + ";\n";
+                    c3d += "\theap[(int) H] = " + t_char + ";\n";
                     c3d += "\tH = H + 1;\n";
-                    c3d += "\theap[(int) ".concat(t_item_1, "] = ").concat(t_index, ";\n");
-                    c3d += "\t".concat(t_item_1, " = ").concat(t_item_1, " + 1;\n");
+                    c3d += "\theap[(int) " + t_item_1 + "] = " + t_index + ";\n";
+                    c3d += "\t" + t_item_1 + " = " + t_item_1 + " + 1;\n";
                 }
             });
-            c3d += "\tstack[(int) ".concat(posAbsoluta, "] = ").concat(t_pivote, ";\n");
+            c3d += "\tstack[(int) " + posAbsoluta + "] = " + t_pivote + ";\n";
         }
         c3d += '\t// ==========> END DECLARACION VECTOR\n';
         res.codigo3d = c3d;
@@ -6353,7 +6316,7 @@ var getDefaultValueByDataType = function (tipo) {
     }
 };
 
-},{"../../Reportes/cambiarTipo":51,"../../Reportes/reporteTabla":53,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Simbolo":47,"../TS/Tipo":48}],44:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Simbolo":46,"../TS/Tipo":47}],43:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -6456,7 +6419,7 @@ var funcNativa = /** @class */ (function (_super) {
                 if (tipo == 'lista' || tipo == 'vector')
                     return tipo.toString();
                 else
-                    return (0, cambiarTipo_1.default)(this.expresion.tipoDato.getTipo());
+                    return cambiarTipo_1.default(this.expresion.tipoDato.getTipo());
             case 'string':
                 this.tipoDato = new Tipo_1.default(Tipo_1.tipoDato.CADENA);
                 if (this.expresion.tipoDato.getTipo() == Tipo_1.tipoDato.DECIMAL ||
@@ -6515,13 +6478,25 @@ var funcNativa = /** @class */ (function (_super) {
         }
     };
     funcNativa.prototype.traducir = function (arbol, tabla) {
-        throw new Error('Method not implemented.');
+        var res = {
+            codigo3d: '',
+            etq_falsas: [],
+            etq_salida: [],
+            etq_verdaderas: [],
+            pos: 0,
+            temporal: '',
+            tipo: -1,
+        };
+        var c3d = '\t// ==========> NATIVAS';
+        c3d += '\t// ==========> END NATIVAS';
+        res.codigo3d = c3d;
+        return res;
     };
     return funcNativa;
 }(Instruccion_1.Instruccion));
 exports.default = funcNativa;
 
-},{"../../Reportes/cambiarTipo":51,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../Expresiones/Identificador":12,"../TS/Tipo":48}],45:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../Expresiones/Identificador":11,"../TS/Tipo":47}],44:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -6590,12 +6565,12 @@ var Print = /** @class */ (function (_super) {
             var valor = expr.interpretar(arbol, tabla);
             if (valor instanceof Errores_1.default)
                 return valor;
-            (0, shared_1.setValueConsole)(valor);
+            shared_1.setValueConsole(valor);
             console.log(valor);
             arbol.actualizaConsola(valor + '');
         });
         if (this.isSalto)
-            (0, shared_1.setValueConsole)('\n');
+            shared_1.setValueConsole('\n');
     };
     Print.prototype.traducir = function (arbol, tabla) {
         var _this = this;
@@ -6614,7 +6589,7 @@ var Print = /** @class */ (function (_super) {
             var valor = expr.traducir(arbol, tabla);
             if (valor.tipo === -1)
                 return;
-            c3d += "".concat(valor.codigo3d, "\n");
+            c3d += valor.codigo3d + "\n";
             c3d_aux += _this.getTexto(valor);
         });
         c3d += c3d_aux;
@@ -6627,29 +6602,41 @@ var Print = /** @class */ (function (_super) {
     Print.prototype.getTexto = function (valor) {
         var c3d = '';
         if (valor.tipo === Tipo_1.tipoDato.BOOLEANO) {
-            c3d += "\tprintf(\"%i\", (int) ".concat(valor.temporal, ");\n");
+            var temp = Codigo3d_1.new_temporal();
+            var l_exit = Codigo3d_1.new_etiqueta();
+            valor.etq_verdaderas.forEach(function (element) {
+                c3d += element + ":\n";
+            });
+            c3d += "\t" + temp + " = 1;\n";
+            c3d += "\tgoto " + l_exit + ";\n";
+            valor.etq_falsas.forEach(function (element) {
+                c3d += element + ":\n";
+            });
+            c3d += "\t" + temp + " = 0;\n";
+            c3d += l_exit + ":";
+            c3d += "\tprintf(\"%i\", (int) " + temp + ");\n";
         }
         else if (valor.tipo === Tipo_1.tipoDato.CARACTER) {
-            c3d += "\tprintf(\"%c\", (char) ".concat(valor.temporal, ");\n");
+            c3d += "\tprintf(\"%c\", (char) " + valor.temporal + ");\n";
         }
         else if (valor.tipo === Tipo_1.tipoDato.CADENA) {
-            var temp = (0, Codigo3d_1.new_temporal)();
-            var label_inicio = (0, Codigo3d_1.new_etiqueta)();
-            var label_exit = (0, Codigo3d_1.new_etiqueta)();
-            c3d += "".concat(label_inicio, ":\n");
-            c3d += "\t".concat(temp, " = heap[(int) ").concat(valor.temporal, "];\n");
-            c3d += "\tprintf(\"%c\", (char) ".concat(temp, ");\n");
-            c3d += "\t".concat(valor.temporal, " = ").concat(valor.temporal, " + 1;\n");
-            c3d += "\t".concat(temp, " = heap[(int) ").concat(valor.temporal, "];\n");
-            c3d += "\tif (".concat(temp, " != -1) goto ").concat(label_inicio, ";\n");
-            c3d += "\tgoto ".concat(label_exit, ";\n");
-            c3d += "".concat(label_exit, ":\n");
+            var temp = Codigo3d_1.new_temporal();
+            var label_inicio = Codigo3d_1.new_etiqueta();
+            var label_exit = Codigo3d_1.new_etiqueta();
+            c3d += label_inicio + ":\n";
+            c3d += "\t" + temp + " = heap[(int) " + valor.temporal + "];\n";
+            c3d += "\tprintf(\"%c\", (char) " + temp + ");\n";
+            c3d += "\t" + valor.temporal + " = " + valor.temporal + " + 1;\n";
+            c3d += "\t" + temp + " = heap[(int) " + valor.temporal + "];\n";
+            c3d += "\tif (" + temp + " != -1) goto " + label_inicio + ";\n";
+            c3d += "\tgoto " + label_exit + ";\n";
+            c3d += label_exit + ":\n";
         }
         else if (valor.tipo === Tipo_1.tipoDato.DECIMAL) {
-            c3d += "\tprintf(\"%f\", (float) ".concat(valor.temporal, ");\n");
+            c3d += "\tprintf(\"%f\", (float) " + valor.temporal + ");\n";
         }
         else if (valor.tipo === Tipo_1.tipoDato.ENTERO) {
-            c3d += "\tprintf(\"%i\", (int) ".concat(valor.temporal, ");\n");
+            c3d += "\tprintf(\"%i\", (int) " + valor.temporal + ");\n";
         }
         return c3d;
     };
@@ -6657,7 +6644,7 @@ var Print = /** @class */ (function (_super) {
 }(Instruccion_1.Instruccion));
 exports.default = Print;
 
-},{"../../shared":55,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":8,"../TS/Tipo":48}],46:[function(require,module,exports){
+},{"../../shared":54,"../Abstracto/Codigo3d":4,"../Abstracto/Instruccion":5,"../Abstracto/nodoAST":6,"../Excepciones/Errores":7,"../TS/Tipo":47}],45:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -6720,7 +6707,7 @@ var Arbol = /** @class */ (function () {
                 if (identificador.toLowerCase() ==
                     f.identificador.toLowerCase()) {
                     if (!this.actualizarTabla(f.identificador.toString(), '', f.fila.toString(), '', f.columna.toString())) {
-                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(f.identificador, '', 'FuncionCreacion', (0, cambiarTipo_1.default)(f.tipoDato.getTipo()) + '', '', f.fila.toString(), f.columna.toString());
+                        var nuevoSimbolo = new reporteTabla_1.reporteTabla(f.identificador, '', 'FuncionCreacion', cambiarTipo_1.default(f.tipoDato.getTipo()) + '', '', f.fila.toString(), f.columna.toString());
                         this.listaSimbolos.push(nuevoSimbolo);
                     }
                     return f;
@@ -6753,7 +6740,7 @@ var Arbol = /** @class */ (function () {
         this.consola = value;
     };
     Arbol.prototype.actualizaConsola = function (uptodate) {
-        this.consola = "".concat(this.consola).concat(uptodate, "\n");
+        this.consola = "" + this.consola + uptodate + "\n";
     };
     Arbol.prototype.gettablaGlobal = function () {
         return this.tablaGlobal;
@@ -6765,7 +6752,7 @@ var Arbol = /** @class */ (function () {
 }());
 exports.default = Arbol;
 
-},{"../../Reportes/cambiarTipo":51,"../../Reportes/reporteTabla":53,"../Instrucciones/Funciones":30,"../Instrucciones/Metodos":34,"./tablaSimbolos":49}],47:[function(require,module,exports){
+},{"../../Reportes/cambiarTipo":50,"../../Reportes/reporteTabla":52,"../Instrucciones/Funciones":29,"../Instrucciones/Metodos":33,"./tablaSimbolos":48}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Simbolo = /** @class */ (function () {
@@ -6830,7 +6817,7 @@ var Simbolo = /** @class */ (function () {
 }());
 exports.default = Simbolo;
 
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tipoDato = void 0;
@@ -6861,7 +6848,7 @@ var tipoDato;
     tipoDato[tipoDato["NULO"] = 6] = "NULO";
 })(tipoDato = exports.tipoDato || (exports.tipoDato = {}));
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -6933,7 +6920,7 @@ var tablaSimbolos = /** @class */ (function () {
             }
             break;
         }
-        var posAbsoluta = (0, Codigo3d_1.new_stackPos)();
+        var posAbsoluta = Codigo3d_1.new_stackPos();
         simbolo.posRelativa = this.tablaActual.size;
         simbolo.posAbsoluta = posAbsoluta;
         this.tablaActual.set(simbolo.getidentificador().toLowerCase(), simbolo);
@@ -6949,7 +6936,7 @@ var tablaSimbolos = /** @class */ (function () {
 }());
 exports.default = tablaSimbolos;
 
-},{"../Abstracto/Codigo3d":4,"./Tipo":48}],50:[function(require,module,exports){
+},{"../Abstracto/Codigo3d":4,"./Tipo":47}],49:[function(require,module,exports){
 (function (process){(function (){
 /* parser generated by jison 0.4.18 */
 /*
@@ -8101,7 +8088,7 @@ if (typeof module !== 'undefined' && require.main === module) {
 }
 }
 }).call(this)}).call(this,require('_process'))
-},{"./Excepciones/Errores":8,"./Excepciones/Listado_Errores":9,"./Expresiones/Aritmetica":10,"./Expresiones/Cadenas":11,"./Expresiones/Identificador":12,"./Expresiones/Logica":13,"./Expresiones/Primitivo":14,"./Expresiones/Relacional":15,"./Instrucciones/Asignacion":16,"./Instrucciones/Break":17,"./Instrucciones/Ciclicas/condDoWhile":18,"./Instrucciones/Ciclicas/condFor":19,"./Instrucciones/Ciclicas/condWhile":20,"./Instrucciones/Condicionales/condIf":21,"./Instrucciones/Condicionales/condIfTernario":22,"./Instrucciones/Condicionales/condSwitch":23,"./Instrucciones/Condicionales/condSwitchCase":24,"./Instrucciones/Condicionales/condSwitchDefault":25,"./Instrucciones/Continue":26,"./Instrucciones/Declaracion":27,"./Instrucciones/Decremento":28,"./Instrucciones/Exec":29,"./Instrucciones/Funciones":30,"./Instrucciones/Incremento":31,"./Instrucciones/LlamadaFuncMetd":32,"./Instrucciones/Main":33,"./Instrucciones/Metodos":34,"./Instrucciones/Return":35,"./Instrucciones/accesoLista":36,"./Instrucciones/accesoVector":37,"./Instrucciones/agregarLista":38,"./Instrucciones/asignacionLista":39,"./Instrucciones/asignacionVector":40,"./Instrucciones/casteo":41,"./Instrucciones/declaracionListas":42,"./Instrucciones/declaracionVectores":43,"./Instrucciones/funcNativa":44,"./Instrucciones/print":45,"./TS/Tipo":48,"_process":3,"fs":1,"path":2}],51:[function(require,module,exports){
+},{"./Excepciones/Errores":7,"./Excepciones/Listado_Errores":8,"./Expresiones/Aritmetica":9,"./Expresiones/Cadenas":10,"./Expresiones/Identificador":11,"./Expresiones/Logica":12,"./Expresiones/Primitivo":13,"./Expresiones/Relacional":14,"./Instrucciones/Asignacion":15,"./Instrucciones/Break":16,"./Instrucciones/Ciclicas/condDoWhile":17,"./Instrucciones/Ciclicas/condFor":18,"./Instrucciones/Ciclicas/condWhile":19,"./Instrucciones/Condicionales/condIf":20,"./Instrucciones/Condicionales/condIfTernario":21,"./Instrucciones/Condicionales/condSwitch":22,"./Instrucciones/Condicionales/condSwitchCase":23,"./Instrucciones/Condicionales/condSwitchDefault":24,"./Instrucciones/Continue":25,"./Instrucciones/Declaracion":26,"./Instrucciones/Decremento":27,"./Instrucciones/Exec":28,"./Instrucciones/Funciones":29,"./Instrucciones/Incremento":30,"./Instrucciones/LlamadaFuncMetd":31,"./Instrucciones/Main":32,"./Instrucciones/Metodos":33,"./Instrucciones/Return":34,"./Instrucciones/accesoLista":35,"./Instrucciones/accesoVector":36,"./Instrucciones/agregarLista":37,"./Instrucciones/asignacionLista":38,"./Instrucciones/asignacionVector":39,"./Instrucciones/casteo":40,"./Instrucciones/declaracionListas":41,"./Instrucciones/declaracionVectores":42,"./Instrucciones/funcNativa":43,"./Instrucciones/print":44,"./TS/Tipo":47,"_process":3,"fs":1,"path":2}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function obtenerValor(valor) {
@@ -8126,7 +8113,7 @@ function obtenerValor(valor) {
 }
 exports.default = obtenerValor;
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var child_process_1 = require("child_process");
@@ -8137,9 +8124,9 @@ function graficarArbol(arbolitos) {
     contador = 1;
     cuerpo = '';
     graphAST('n0', arbolitos);
-    var principal = "digraph arbolAST{ \n      n0[label=\"".concat(arbolitos.getValor().replace('"', '\\"'), "\"];\n      ").concat(cuerpo, "\n    }");
+    var principal = "digraph arbolAST{ \n      n0[label=\"" + arbolitos.getValor().replace('"', '\\"') + "\"];\n      " + cuerpo + "\n    }";
     fs.writeFile('arbolAST.dot', principal, function () { });
-    (0, child_process_1.exec)('dot -Tsvg arbolAST.dot -o arbolAST.svg', function (error, stdout, stderr) {
+    child_process_1.exec('dot -Tsvg arbolAST.dot -o arbolAST.svg', function (error, stdout, stderr) {
         if (error) {
             return;
         }
@@ -8152,16 +8139,16 @@ exports.default = graficarArbol;
 function graphAST(texto, padre) {
     for (var _i = 0, _a = padre.getHijos(); _i < _a.length; _i++) {
         var hijo = _a[_i];
-        var nombreHijo = "n".concat(contador);
-        cuerpo += "".concat(nombreHijo, "[label=\"").concat(hijo
+        var nombreHijo = "n" + contador;
+        cuerpo += nombreHijo + "[label=\"" + hijo
             .getValor()
-            .replace('"', '\\"'), "\"];\n      ").concat(texto, " -> ").concat(nombreHijo, ";");
+            .replace('"', '\\"') + "\"];\n      " + texto + " -> " + nombreHijo + ";";
         contador++;
         graphAST(nombreHijo, hijo);
     }
 }
 
-},{"child_process":1,"fs":1}],53:[function(require,module,exports){
+},{"child_process":1,"fs":1}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reporteTabla = void 0;
@@ -8212,7 +8199,7 @@ var reporteTabla = /** @class */ (function () {
 }());
 exports.reporteTabla = reporteTabla;
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -8223,9 +8210,7 @@ var shared_1 = require("./shared");
 var Arbol_1 = __importDefault(require("./Analizador/TS/Arbol"));
 var Codigo3d_1 = require("./Analizador/Abstracto/Codigo3d");
 var Listado_Errores_1 = require("./Analizador/Excepciones/Listado_Errores");
-var ControlInterprete_1 = require("./Analizador/Excepciones/ControlInterprete");
 var listaErrores = new Listado_Errores_1.Listado_Errores();
-var pruebaErrores = new ControlInterprete_1.ControlInterprete();
 var file = document.querySelector('#file');
 var open_file = document.querySelector('#open_file');
 var clear_file = document.querySelector('#clear_file');
@@ -8253,7 +8238,7 @@ open_file === null || open_file === void 0 ? void 0 : open_file.addEventListener
     reader.onload = function (e) {
         var target = e.target;
         if (target !== undefined && target !== null) {
-            var content = "".concat(target.result);
+            var content = "" + target.result;
             sourceEditor.setValue(content);
         }
     };
@@ -8264,7 +8249,8 @@ clear_file === null || clear_file === void 0 ? void 0 : clear_file.addEventListe
     hideSubmenu('.submenu', 0);
 });
 analize === null || analize === void 0 ? void 0 : analize.addEventListener('click', function () {
-    (0, shared_1.setValueConsole)('Interpretando la entrada...\n\n');
+    shared_1.clearValueConsole();
+    shared_1.setValueConsole('Interpretando la entrada...\n\n');
     sourceEditor.save();
     var source = my_source.value;
     listaErrores.interpretar(source);
@@ -8273,9 +8259,9 @@ analize === null || analize === void 0 ? void 0 : analize.addEventListener('clic
     listaErrores.interpretar();*/
 });
 compile === null || compile === void 0 ? void 0 : compile.addEventListener('click', function () {
-    (0, shared_1.clearValueResult)();
-    (0, Codigo3d_1.clear_data)();
-    (0, shared_1.setValueConsole)('Compilando la entrada...\n\n');
+    shared_1.clearValueResult();
+    Codigo3d_1.clear_data();
+    shared_1.setValueConsole('Compilando la entrada...\n\n');
     sourceEditor.save();
     var source = my_source.value;
     // TODO: Pasar traductor a clase
@@ -8307,10 +8293,10 @@ var analize_source = function (source) {
     return new Arbol_1.default(parser.parse(source));
 };
 
-},{"./Analizador/Abstracto/Codigo3d":4,"./Analizador/Excepciones/ControlInterprete":7,"./Analizador/Excepciones/Listado_Errores":9,"./Analizador/TS/Arbol":46,"./Analizador/analizador":50,"./shared":55}],55:[function(require,module,exports){
+},{"./Analizador/Abstracto/Codigo3d":4,"./Analizador/Excepciones/Listado_Errores":8,"./Analizador/TS/Arbol":45,"./Analizador/analizador":49,"./shared":54}],54:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setValueConsole = exports.addHeaderResult = exports.clearValueResult = exports.setValueResult = void 0;
+exports.setValueConsole = exports.addHeaderResult = exports.clearValueResult = exports.clearValueConsole = exports.setValueResult = void 0;
 var Codigo3d_1 = require("./Analizador/Abstracto/Codigo3d");
 var setValueResult = function (res) {
     var textarea = document.querySelector('#my_result');
@@ -8320,13 +8306,18 @@ var setValueResult = function (res) {
     resultEditor.save();
 };
 exports.setValueResult = setValueResult;
+var clearValueConsole = function () {
+    consoleEditor.setValue('');
+    consoleEditor.save();
+};
+exports.clearValueConsole = clearValueConsole;
 var clearValueResult = function () {
     resultEditor.setValue('');
     resultEditor.save();
 };
 exports.clearValueResult = clearValueResult;
 var addHeaderResult = function () {
-    var res = (0, Codigo3d_1.agregarCabecera)();
+    var res = Codigo3d_1.agregarCabecera();
     var textarea = document.querySelector('#my_result');
     var value = res;
     value += textarea.value;
@@ -8343,5 +8334,5 @@ var setValueConsole = function (texto) {
 };
 exports.setValueConsole = setValueConsole;
 
-},{"./Analizador/Abstracto/Codigo3d":4}]},{},[54])(54)
+},{"./Analizador/Abstracto/Codigo3d":4}]},{},[53])(53)
 });

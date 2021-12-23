@@ -89,8 +89,7 @@ export default class Funciones extends Instruccion {
 			tipo: -1,
 		};
 		this.instrucciones.forEach((instruccion) => {
-			console.log(`Función ${this.identificador}`, instruccion);
-			// res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d
+			res.codigo3d += instruccion.traducir(arbol, tabla).codigo3d;
 		});
 		return res;
 	}
